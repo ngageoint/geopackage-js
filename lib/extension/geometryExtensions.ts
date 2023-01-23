@@ -38,8 +38,7 @@ export class GeometryExtensions extends BaseExtension {
    */
   public static isExtension(geometryType: GeometryType): boolean {
     return (
-      GeometryCodes.getCodeForGeometryType(geometryType) >
-      GeometryCodes.getCodeForGeometryType(GeometryType.GEOMETRYCOLLECTION)
+      GeometryCodes.getCodeForGeometryType(geometryType) > GeometryCodes.getCodeForGeometryType(GeometryType.GEOMETRYCOLLECTION)
     );
   }
 
@@ -63,8 +62,7 @@ export class GeometryExtensions extends BaseExtension {
    */
   public static isGeoPackageExtension(geometryType: GeometryType): boolean {
     return (
-      GeometryCodes.getCodeForGeometryType(geometryType) >=
-        GeometryCodes.getCodeForGeometryType(GeometryType.CIRCULARSTRING) &&
+      GeometryCodes.getCodeForGeometryType(geometryType) >= GeometryCodes.getCodeForGeometryType(GeometryType.CIRCULARSTRING) &&
       GeometryCodes.getCodeForGeometryType(geometryType) <= GeometryCodes.getCodeForGeometryType(GeometryType.SURFACE)
     );
   }
@@ -89,9 +87,9 @@ export class GeometryExtensions extends BaseExtension {
     tableName: string,
     columnName: string,
     geometryType: GeometryType,
-    author: string,
+    author?: string,
   ): Extensions {
-    const extensionName = GeometryExtensions.getExtensionName(geometryType, author);
+    const extensionName = author != null ? GeometryExtensions.getExtensionNameWithAuthor(geometryType, author) : GeometryExtensions.getExtensionName(geometryType);
     const description = GeometryExtensions.isGeoPackageExtension(geometryType)
       ? GeometryExtensions.GEOMETRY_TYPES_EXTENSION_DEFINITION
       : GeometryExtensions.USER_GEOMETRY_TYPES_EXTENSION_DEFINITION;
@@ -115,8 +113,31 @@ export class GeometryExtensions extends BaseExtension {
    *             interoperability concerns. (GeoPackage version 1.2)
    */
   public has(tableName: string, columnName: string, author: string, geometryType: GeometryType): boolean {
-    const extensionName = GeometryExtensions.getExtensionName(geometryType, author);
+    const extensionName = GeometryExtensions.getExtensionNameWithAuthor(geometryType, author);
     return this.hasExtension(extensionName, tableName, columnName);
+  }
+
+  /**
+   * Get the extension name of a extension Geometry, either user-defined or
+   * GeoPackage extension
+   *
+   * @param author author
+   * @param geometryType  geometry type
+   * @return extension name
+   * @deprecated as of 1.2.1, On August 15, 2016 the GeoPackage SWG voted to
+   *             remove this extension from the standard due to
+   *             interoperability concerns. (GeoPackage version 1.2)
+   */
+  public static getExtensionNameWithAuthor(geometryType: GeometryType, author: string): string {
+    if (!GeometryExtensions.isExtension(geometryType)) {
+      throw new GeoPackageException('GeometryType is not an extension: ' + GeometryType.nameFromType(geometryType));
+    }
+
+    return (GeometryExtensions.isGeoPackageExtension(geometryType)
+        ? GeoPackageConstants.EXTENSION_AUTHOR
+        : author) + Extensions.EXTENSION_NAME_DIVIDER
+      + GeoPackageConstants.GEOMETRY_EXTENSION_PREFIX
+      + Extensions.EXTENSION_NAME_DIVIDER + GeometryType.nameFromType(geometryType);
   }
 
   /**
@@ -132,23 +153,16 @@ export class GeometryExtensions extends BaseExtension {
    *             remove this extension from the standard due to
    *             interoperability concerns. (GeoPackage version 1.2)
    */
-  public static getExtensionName(geometryType: GeometryType, author: string = null): string {
+  public static getExtensionName(geometryType: GeometryType): string {
     if (!GeometryExtensions.isExtension(geometryType)) {
       throw new GeoPackageException('GeometryType is not an extension: ' + GeometryType.nameFromType(geometryType));
     }
 
-    if (author != null && !GeometryExtensions.isGeoPackageExtension(geometryType)) {
-      throw new GeoPackageException(
-        'GeometryType is not a GeoPackage extension, User-Defined requires an author: ' +
-          GeometryType.nameFromType(geometryType),
-      );
+    if (!GeometryExtensions.isGeoPackageExtension(geometryType)) {
+      throw new GeoPackageException('GeometryType is not a GeoPackage extension, User-Defined requires an author: ' + GeometryType.nameFromType(geometryType));
     }
 
-    return (author != null
-      ? GeometryExtensions.isGeoPackageExtension(geometryType)
-        ? GeoPackageConstants.EXTENSION_AUTHOR
-        : author
-      : GeoPackageConstants.EXTENSION_AUTHOR) +
+    return GeoPackageConstants.EXTENSION_AUTHOR +
       Extensions.EXTENSION_NAME_DIVIDER +
       GeoPackageConstants.GEOMETRY_EXTENSION_PREFIX +
       Extensions.EXTENSION_NAME_DIVIDER +

@@ -2570,7 +2570,7 @@ export class GeoPackage {
    * @param typeFilter
    */
   getRelatedRows(baseTableName: string, baseId: number, typeFilter?: RelationType[]): Map<ExtendedRelation, Map<UserMappingRow, UserRow<any, any>>>  {
-    return this.getRelatedTablesExtension().getRelatedRows(baseTableName, baseId);
+    return this.getRelatedTablesExtension().getRelatedRows(baseTableName, baseId, typeFilter);
   }
 
   /**

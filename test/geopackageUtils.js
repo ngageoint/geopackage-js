@@ -1,13 +1,28 @@
 import * as GP from '../index';
 import { FeatureConverter } from "@ngageoint/simple-features-geojson-js";
-import { GeometryType } from "@ngageoint/simple-features-js";
+import {
+  CompoundCurve,
+  CurvePolygon,
+  GeometryCollection,
+  GeometryType, LineString, MultiLineString, MultiPoint,
+  MultiPolygon,
+  Point, Polygon, PolyhedralSurface, TIN, Triangle
+} from "@ngageoint/simple-features-js";
 import {
   AttributesTableMetadata,
   DataColumnConstraintType,
   FeatureIndexManager,
   FeatureIndexType,
-  FeatureTableMetadata, FeatureTileTableLinker, MediaTableMetadata, MetadataScopeType, ReferenceScopeType, RelationType,
-  RTreeIndexExtension, UserCustomColumn
+  FeatureTableMetadata,
+  FeatureTileTableLinker,
+  GeometryExtensions,
+  MediaTableMetadata,
+  MetadataScopeType,
+  ReferenceScopeType,
+  RelationType,
+  RTreeIndexExtension,
+  SimpleAttributesTableMetadata,
+  UserCustomColumn
 } from "../index";
 import { ContentValues } from "../lib/user/contentValues";
 const GeoPackageDataType = GP.GeoPackageDataType,
@@ -16,8 +31,6 @@ const GeoPackageDataType = GP.GeoPackageDataType,
   BoundingBox = GP.BoundingBox,
   FeatureColumn = GP.FeatureColumn,
   DataColumns = GP.DataColumns,
-  Metadata = GP.Metadata,
-  MetadataReference = GP.MetadataReference,
   CrsWktExtension = GP.CrsWktExtension,
   SchemaExtension = GP.SchemaExtension,
   MetadataExtension = GP.MetadataExtension,
@@ -46,112 +59,91 @@ GeoPackageUtils.createCRSWKTExtension = function(geoPackage) {
 
 GeoPackageUtils.createFeatures = function(geoPackage) {
   console.log('Creating Features');
-  const bitSystems = {
-    type: 'Point',
-    coordinates: [-104.801918, 39.720014],
-  };
+  const bitSystems = new Point(-104.801918, 39.720014);
+  const nga = new Point(-77.196736, 38.75337);
 
-  const nga = {
-    type: 'Point',
-    coordinates: [-77.196736, 38.75337],
-  };
+  const lockheedDrive = new LineString();
+  lockheedDrive.addPoint(new Point(-104.800614, 39.720721));
+  lockheedDrive.addPoint(new Point(-104.802174, 39.720726));
+  lockheedDrive.addPoint(new Point(-104.802584, 39.72066));
+  lockheedDrive.addPoint(new Point(-104.803088, 39.720477));
+  lockheedDrive.addPoint(new Point(-104.803474, 39.720209));
 
-  const lockheedDrive = {
-    type: 'LineString',
-    coordinates: [
-      [-104.800614, 39.720721],
-      [-104.802174, 39.720726],
-      [-104.802584, 39.72066],
-      [-104.803088, 39.720477],
-      [-104.803474, 39.720209],
-    ],
-  };
+  const ngaLine = new LineString();
+  ngaLine.addPoints([
+    new Point(-77.19665, 38.756501),
+    new Point(-77.196414, 38.755979),
+    new Point(-77.195518, 38.755208),
+    new Point(-77.195303, 38.755272),
+    new Point(-77.195351, 38.755459),
+    new Point(-77.195863, 38.755697),
+    new Point(-77.196328, 38.756069),
+    new Point(-77.196568, 38.756526),
+  ]);
 
-  const ngaLine = {
-    type: 'LineString',
-    coordinates: [
-      [-77.19665, 38.756501],
-      [-77.196414, 38.755979],
-      [-77.195518, 38.755208],
-      [-77.195303, 38.755272],
-      [-77.195351, 38.755459],
-      [-77.195863, 38.755697],
-      [-77.196328, 38.756069],
-      [-77.196568, 38.756526],
-    ],
-  };
+  const bitsPolygon = new Polygon();
+  bitsPolygon.addRing(new LineString([
+    new Point(-104.802246, 39.720343),
+    new Point(-104.802246, 39.719753),
+    new Point(-104.802183, 39.719754),
+    new Point(-104.802184, 39.719719),
+    new Point(-104.802138, 39.719694),
+    new Point(-104.802097, 39.719691),
+    new Point(-104.802096, 39.719648),
+    new Point(-104.801646, 39.719648),
+    new Point(-104.801644, 39.719722),
+    new Point(-104.80155, 39.719723),
+    new Point(-104.801549, 39.720207),
+    new Point(-104.801648, 39.720207),
+    new Point(-104.801648, 39.720341),
+    new Point(-104.802246, 39.720343),
+  ]));
 
-  const bitsPolygon = {
-    type: 'Polygon',
-    coordinates: [
-      [
-        [-104.802246, 39.720343],
-        [-104.802246, 39.719753],
-        [-104.802183, 39.719754],
-        [-104.802184, 39.719719],
-        [-104.802138, 39.719694],
-        [-104.802097, 39.719691],
-        [-104.802096, 39.719648],
-        [-104.801646, 39.719648],
-        [-104.801644, 39.719722],
-        [-104.80155, 39.719723],
-        [-104.801549, 39.720207],
-        [-104.801648, 39.720207],
-        [-104.801648, 39.720341],
-        [-104.802246, 39.720343],
-      ],
-    ],
-  };
-
-  const ngaVisitorCenterPolygon = {
-    type: 'Polygon',
-    coordinates: [
-      [
-        [-77.195299, 38.755159],
-        [-77.195203, 38.75508],
-        [-77.19541, 38.75493],
-        [-77.19535, 38.754884],
-        [-77.195228, 38.754966],
-        [-77.195135, 38.754889],
-        [-77.195048, 38.754956],
-        [-77.194986, 38.754906],
-        [-77.194897, 38.754976],
-        [-77.194953, 38.755025],
-        [-77.194763, 38.755173],
-        [-77.194827, 38.755224],
-        [-77.195012, 38.755082],
-        [-77.195041, 38.755104],
-        [-77.195028, 38.755116],
-        [-77.19509, 38.755167],
-        [-77.195106, 38.755154],
-        [-77.195205, 38.755233],
-        [-77.195299, 38.755159],
-      ],
-    ],
-  };
+  const ngaVisitorCenterPolygon = new Polygon();
+  ngaVisitorCenterPolygon.addRing(new LineString([
+    new Point(-77.195299, 38.755159),
+    new Point(-77.195203, 38.75508),
+    new Point(-77.19541, 38.75493),
+    new Point(-77.19535, 38.754884),
+    new Point(-77.195228, 38.754966),
+    new Point(-77.195135, 38.754889),
+    new Point(-77.195048, 38.754956),
+    new Point(-77.194986, 38.754906),
+    new Point(-77.194897, 38.754976),
+    new Point(-77.194953, 38.755025),
+    new Point(-77.194763, 38.755173),
+    new Point(-77.194827, 38.755224),
+    new Point(-77.195012, 38.755082),
+    new Point(-77.195041, 38.755104),
+    new Point(-77.195028, 38.755116),
+    new Point(-77.19509, 38.755167),
+    new Point(-77.195106, 38.755154),
+    new Point(-77.195205, 38.755233),
+    new Point(-77.195299, 38.755159),
+  ]));
 
   const point1 = {
-    geoJson: bitSystems,
+    geometry: bitSystems,
     name: 'BIT Systems',
   };
   const point2 = {
-    geoJson: nga,
+    geometry: nga,
     name: 'NGA',
   };
   const line1 = {
-    geoJson: lockheedDrive,
+    geometry: lockheedDrive,
     name: 'East Lockheed Drive',
   };
   const line2 = {
-    geoJson: ngaLine,
+    geometry: ngaLine,
     name: 'NGA',
   };
   const poly1 = {
-    geoJson: bitsPolygon,
+    geometry: bitsPolygon,
     name: 'BIT Systems',
   };
   const poly2 = {
-    geoJson: ngaVisitorCenterPolygon,
+    geometry: ngaVisitorCenterPolygon,
     name: 'NGA Visitor Center',
   };
 
@@ -166,14 +158,68 @@ GeoPackageUtils.createFeatures = function(geoPackage) {
   return geoPackage;
 };
 
+GeoPackageUtils.createNonLinearFeatures = function(geoPackage) {
+  console.log('Creating Non-Linear Features');
+
+  GeoPackageUtils.createFeatureTableAndAddFeatures(geoPackage, "table_" + GeometryType.nameFromType(GeometryType.CIRCULARSTRING), [{
+    geometry: GeoPackageUtils.createCompoundCurve(GeoPackageUtils.coinFlip(), GeoPackageUtils.coinFlip()),
+    name: 'Circular String'
+  }], GeometryType.CIRCULARSTRING);
+  GeoPackageUtils.createFeatureTableAndAddFeatures(geoPackage, "table_" + GeometryType.nameFromType(GeometryType.COMPOUNDCURVE), [{
+    geometry: GeoPackageUtils.createCompoundCurve(GeoPackageUtils.coinFlip(), GeoPackageUtils.coinFlip()),
+    name: 'Compound Curve'
+  }], GeometryType.COMPOUNDCURVE);
+  GeoPackageUtils.createFeatureTableAndAddFeatures(geoPackage, "table_" + GeometryType.nameFromType(GeometryType.CURVEPOLYGON), [{
+    geometry: GeoPackageUtils.createCurvePolygon(GeoPackageUtils.coinFlip(), GeoPackageUtils.coinFlip()),
+    name: 'Curve Polygon'
+  }], GeometryType.CURVEPOLYGON);
+  GeoPackageUtils.createFeatureTableAndAddFeatures(geoPackage, "table_" + GeometryType.nameFromType(GeometryType.MULTICURVE), [{
+    geometry: GeoPackageUtils.createMultiLineString(GeoPackageUtils.coinFlip(), GeoPackageUtils.coinFlip()),
+    name: 'Multi Curve'
+  }], GeometryType.MULTICURVE);
+  GeoPackageUtils.createFeatureTableAndAddFeatures(geoPackage, "table_" + GeometryType.nameFromType(GeometryType.MULTISURFACE), [{
+    geometry: GeoPackageUtils.createMultiPolygon(GeoPackageUtils.coinFlip(), GeoPackageUtils.coinFlip()),
+    name: 'Multi Surface'
+  }], GeometryType.MULTISURFACE);
+  GeoPackageUtils.createFeatureTableAndAddFeatures(geoPackage, "table_" + GeometryType.nameFromType(GeometryType.CURVE), [{
+    geometry: GeoPackageUtils.createCompoundCurve(GeoPackageUtils.coinFlip(), GeoPackageUtils.coinFlip()),
+    name: 'Curve'
+  }], GeometryType.CURVE);
+  GeoPackageUtils.createFeatureTableAndAddFeatures(geoPackage, "table_" + GeometryType.nameFromType(GeometryType.SURFACE), [
+    {
+      geometry: GeoPackageUtils.createPolygon(GeoPackageUtils.coinFlip(), GeoPackageUtils.coinFlip()),
+      name: 'Surface'
+    },
+    {
+      geometry: GeoPackageUtils.createPolyhedralSurface(),
+      name: 'Surface'
+    },
+    {
+      geometry: GeoPackageUtils.createTin(),
+      name: 'SURFACE'
+    },
+    {
+      geometry: GeoPackageUtils.createTriangle(),
+      name: 'Surface'
+    }], GeometryType.SURFACE);
+  return geoPackage;
+};
+
 GeoPackageUtils.createFeatureTableAndAddFeatures = function(geoPackage, tableName, features, type) {
   console.log('Creating Feature Table ' + tableName);
   const geometryColumns = new GeometryColumns();
   geometryColumns.setTableName(tableName);
   geometryColumns.setColumnName('geometry');
   geometryColumns.setGeometryType(type);
-  geometryColumns.setZ(0);
-  geometryColumns.setM(0);
+  let hasZ = false;
+  let hasM = false
+  for (let i = 0; i < features.length; i++) {
+    const feature = features[i];
+    hasZ = feature.geometry.hasZ || hasZ;
+    hasM = feature.geometry.hasM || hasM;
+  }
+  geometryColumns.setZ(hasZ ? 1 : 0);
+  geometryColumns.setM(hasM ? 1 : 0);
   geometryColumns.setSrsId(4326);
 
   const boundingBox = new BoundingBox(-180, -80, 180, 80);
@@ -230,21 +276,16 @@ GeoPackageUtils.createFeatureTableAndAddFeatures = function(geoPackage, tableNam
   const featureDao = geoPackage.getFeatureDao(tableName);
   for (let i = 0; i < features.length; i++) {
     const feature = features[i];
-    GeoPackageUtils.createFeature(geoPackage, {
-      type: 'Feature',
-      geometry: feature.geoJson,
-      properties: {}
-    }, feature.name, featureDao);
+    GeoPackageUtils.createFeature(geoPackage, feature.geometry, feature.name, featureDao);
   }
   return geoPackage;
 };
 
-GeoPackageUtils.createFeature = function(geoPackage, geoJson, name, featureDao) {
+GeoPackageUtils.createFeature = function(geoPackage, geometry, name, featureDao) {
   const srs = featureDao.getSrs();
   const featureRow = featureDao.newRow();
   const geometryData = new GeoPackageGeometryData();
   geometryData.setSrsId(srs.getSrsId());
-  const geometry = FeatureConverter.toSimpleFeaturesGeometry(geoJson);
   geometryData.setGeometry(geometry);
   featureRow.geometry = geometryData;
   featureRow.setValue('text', name);
@@ -408,6 +449,14 @@ GeoPackageUtils.createFeatureTileLinkExtension = function(geoPackage) {
 };
 
 GeoPackageUtils.createNonLinearGeometryTypesExtension = function(geoPackage) {
+  const geometryTypeExtension = new GeometryExtensions(geoPackage);
+  const geometryTypes = [GeometryType.CIRCULARSTRING, GeometryType.COMPOUNDCURVE, GeometryType.CURVEPOLYGON, GeometryType.MULTICURVE, GeometryType.MULTISURFACE, GeometryType.CURVE, GeometryType.SURFACE];
+  geometryTypes.forEach(geometryType => {
+    const tableName = "table_" + GeometryType.nameFromType(geometryType);
+    const columnName = "geometry";
+    geometryTypeExtension.getOrCreateGeometryExtension(tableName, columnName, geometryType, 'nga');
+  });
+
   return geoPackage;
 };
 
@@ -422,6 +471,8 @@ GeoPackageUtils.createRTreeSpatialIndexExtension = function(geoPackage) {
 };
 
 GeoPackageUtils.createRelatedTablesMediaExtension = async function(geoPackage) {
+  console.log('Creating Related Tables Media Extension');
+
   const relatedTables = geoPackage.getRelatedTablesExtension();
   let mediaTable = MediaTable.create(MediaTableMetadata.create('media'));
   relatedTables.createRelatedTable(mediaTable);
@@ -464,6 +515,8 @@ GeoPackageUtils.createRelatedTablesMediaExtension = async function(geoPackage) {
 };
 
 GeoPackageUtils.createRelatedTablesFeaturesExtension = function(geoPackage) {
+  console.log('Creating Related Tables Tiles Feature Extension');
+
   const point1FeatureDao = geoPackage.getFeatureDao('point1');
   const polygon1FeatureDao = geoPackage.getFeatureDao('polygon1');
   const point2FeatureDao = geoPackage.getFeatureDao('point2');
@@ -509,7 +562,124 @@ GeoPackageUtils.createRelatedTablesFeaturesExtension = function(geoPackage) {
   return geoPackage;
 };
 
+GeoPackageUtils.createRelatedTablesTilesExtension = function(geoPackage) {
+  console.log('Creating Related Tables Tiles Extension');
+  const tilesA = geoPackage.getTileDao('OSM');
+  const tilesB = geoPackage.getTileDao('OSM_2');
+
+  const rte = geoPackage.getRelatedTablesExtension();
+  rte.getOrCreateExtension();
+
+  const columns = [];
+  columns.push(UserCustomColumn.createColumn(DublinCoreType.DATE.getName(), GeoPackageDataType.DATETIME));
+  columns.push(UserCustomColumn.createColumn(DublinCoreType.DESCRIPTION.getName(), GeoPackageDataType.TEXT));
+  columns.push(UserCustomColumn.createColumn(DublinCoreType.SOURCE.getName(), GeoPackageDataType.TEXT));
+  columns.push(UserCustomColumn.createColumn(DublinCoreType.TITLE.getName(), GeoPackageDataType.TEXT));
+
+  UserMappingTable.create('OSM_OSM_2', columns);
+  const mappingColumnValues = {};
+  mappingColumnValues[DublinCoreType.DATE.getName()] = new Date();
+  mappingColumnValues[DublinCoreType.DESCRIPTION.getName()] = 'Description';
+  mappingColumnValues[DublinCoreType.SOURCE.getName()] = 'Source';
+  mappingColumnValues[DublinCoreType.TITLE.getName()] = 'Title';
+
+  const tileResultSet = tilesA.queryForAll();
+  const tileRowIds = [];
+  while (tileResultSet.moveToNext()) {
+    const tileRow = tileResultSet.getRow();
+    tileRowIds.push(tileRow.getId());
+  }
+  tileResultSet.close();
+
+  for (let i = 0; i < tileRowIds.length; i++) {
+    const id = tileRowIds[i];
+    geoPackage.linkTile('OSM', id, 'OSM_2', id);
+    const relationships = geoPackage.getLinkedTiles('OSM', id);
+    relationships.length.should.be.equal(1);
+    relationships[0].getId().should.be.equal(id);
+  }
+
+  return geoPackage;
+};
+
+GeoPackageUtils.createRelatedTablesAttributesExtension = function(geoPackage) {
+  console.log('Creating Related Tables Attributes Extension');
+
+  const point1FeatureDao = geoPackage.getFeatureDao('point1');
+  // relate the point1 feature to the polygon1 feature
+  const point1ResultSet = point1FeatureDao.queryForAll();
+  point1ResultSet.moveToNext();
+  const point1Row = point1ResultSet.getRow();
+  point1ResultSet.close()
+
+  const rte = geoPackage.getRelatedTablesExtension();
+  rte.getOrCreateExtension();
+
+  const columns = [];
+  columns.push(UserCustomColumn.createColumn(DublinCoreType.DATE.getName(), GeoPackageDataType.DATETIME));
+  columns.push(UserCustomColumn.createColumn(DublinCoreType.DESCRIPTION.getName(), GeoPackageDataType.TEXT));
+  columns.push(UserCustomColumn.createColumn(DublinCoreType.SOURCE.getName(), GeoPackageDataType.TEXT));
+  columns.push(UserCustomColumn.createColumn(DublinCoreType.TITLE.getName(), GeoPackageDataType.TEXT));
+
+  UserMappingTable.create('point1_to_attributes', columns);
+  const mappingColumnValues = {};
+  mappingColumnValues[DublinCoreType.DATE.getName()] = new Date();
+  mappingColumnValues[DublinCoreType.DESCRIPTION.getName()] = 'Description';
+  mappingColumnValues[DublinCoreType.SOURCE.getName()] = 'Source';
+  mappingColumnValues[DublinCoreType.TITLE.getName()] = 'Title';
+
+  const attributesDao = geoPackage.getAttributesDao('attributes');
+  const resultSet = attributesDao.queryForAll();
+  resultSet.moveToNext();
+  const row = resultSet.getRow();
+  resultSet.close();
+
+  geoPackage.linkAttributes('point1', point1Row.getId(), 'attributes', row.getId());
+  const relationships = geoPackage.getLinkedAttributes('point1', point1Row.getId());
+  relationships.length.should.be.equal(1);
+  relationships[0].getId().should.be.equal(row.getId());
+
+  return geoPackage;
+};
+
+
 GeoPackageUtils.createRelatedTablesSimpleAttributesExtension = function(geoPackage) {
+  console.log('Creating Related Tables Simple Attributes Extension');
+
+  const point1FeatureDao = geoPackage.getFeatureDao('point1');
+  // relate the point1 feature to the polygon1 feature
+  const point1ResultSet = point1FeatureDao.queryForAll();
+  point1ResultSet.moveToNext();
+  const point1Row = point1ResultSet.getRow();
+  point1ResultSet.close()
+
+  const rte = geoPackage.getRelatedTablesExtension();
+  rte.getOrCreateExtension();
+
+  const columns = [];
+  columns.push(UserCustomColumn.createColumn(DublinCoreType.DATE.getName(), GeoPackageDataType.DATETIME));
+  columns.push(UserCustomColumn.createColumn(DublinCoreType.DESCRIPTION.getName(), GeoPackageDataType.TEXT));
+  columns.push(UserCustomColumn.createColumn(DublinCoreType.SOURCE.getName(), GeoPackageDataType.TEXT));
+  columns.push(UserCustomColumn.createColumn(DublinCoreType.TITLE.getName(), GeoPackageDataType.TEXT));
+
+  UserMappingTable.create('point1_to_simple_attributes', columns);
+  const mappingColumnValues = {};
+  mappingColumnValues[DublinCoreType.DATE.getName()] = new Date();
+  mappingColumnValues[DublinCoreType.DESCRIPTION.getName()] = 'Description';
+  mappingColumnValues[DublinCoreType.SOURCE.getName()] = 'Source';
+  mappingColumnValues[DublinCoreType.TITLE.getName()] = 'Title';
+
+  const simpleAttributesDao = geoPackage.getSimpleAttributesDao('simple_attributes');
+  const resultSet = simpleAttributesDao.queryForAll();
+  resultSet.moveToNext();
+  const row = resultSet.getRow();
+  resultSet.close();
+
+  geoPackage.linkSimpleAttributes('point1', point1Row.getId(), 'simple_attributes', row.getId());
+  const relationships = geoPackage.getLinkedSimpleAttributes('point1', point1Row.getId());
+  relationships.length.should.be.equal(1);
+  relationships[0].getId().should.be.equal(row.getId());
+
   return geoPackage;
 };
 
@@ -547,6 +717,13 @@ GeoPackageUtils.createTiles = async function(geoPackage) {
     0,
     3,
   )
+  await GeoPackageUtils.addWebMercatorTilesFromPath(
+    geoPackage,
+    'OSM_2',
+    path.join(__dirname, 'fixtures', 'tiles'),
+    0,
+    3,
+  )
   return geoPackage;
 };
 
@@ -567,19 +744,19 @@ GeoPackageUtils.addWebMercatorTilesFromPath = async function(geoPackage, tableNa
   const contentsSrsId = 3857;
   const tileMatrixSetSrsId = 3857;
   geoPackage.getSpatialReferenceSystemDao().createWebMercator();
-  const tileMatrixSet = geoPackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId,);
+  const tileMatrixSet = geoPackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
   geoPackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, minZoom, maxZoom);
   for (let zoom = minZoom; zoom <= maxZoom; zoom++) {
     const xfilenames = fs.readdirSync(path.join(tileBaseDir, zoom.toString()));
     for (const xFilename of xfilenames) {
       const x = Number(xFilename);
       if (Number.isNaN(x)) continue;
-      const yfilenames = fs.readdirSync(path.join(tileBaseDir, zoom.toString(), x.toString()));
+      const yfilenames = fs.readdirSync(path.join(tileBaseDir, zoom.toString(), xFilename));
       for (const yFilename of yfilenames) {
-        const y = Number(yFilename);
+        const y = Number(yFilename.substring(0, 1));
         if (Number.isNaN(y)) continue;
-        const image = await GeoPackageUtils.loadFile(path.join(__dirname, 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString() + '.png'))
-        return geoPackage.addTile(image, tableName, zoom, y, x);
+        const data = await GeoPackageUtils.loadFile(path.join(__dirname, 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString() + '.png'))
+        geoPackage.addTile(data, tableName, zoom, y, x);
       }
     }
   }
@@ -722,6 +899,67 @@ GeoPackageUtils.createAttributes = function(geoPackage) {
   return geoPackage;
 };
 
+GeoPackageUtils.createSimpleAttributes = function(geoPackage) {
+  console.log('Creating Simple Attributes table');
+  const tableName = 'simple_attributes';
+
+  const columns = [];
+  columns.push(UserCustomColumn.createColumn('text', GeoPackageDataType.TEXT, true));
+  columns.push(UserCustomColumn.createColumn('real', GeoPackageDataType.REAL, true));
+  columns.push(UserCustomColumn.createColumn('integer', GeoPackageDataType.INTEGER, true));
+  columns.push(UserCustomColumn.createColumn('text_limited', GeoPackageDataType.TEXT, true));
+
+  const schemaExtension = new SchemaExtension(geoPackage);
+  schemaExtension.getOrCreateExtension();
+  schemaExtension.createDataColumnsTable();
+  schemaExtension.createDataColumnConstraintsTable();
+
+  const dc = new DataColumns();
+  dc.setTableName(tableName);
+  dc.setColumnName('text');
+  dc.setName('Test Name');
+  dc.setTitle('Test');
+  dc.setDescription('Test Description');
+  dc.setMimeType('text/html');
+  dc.setConstraintName('test constraint');
+
+  geoPackage.createSimpleAttributesWithMetadata(SimpleAttributesTableMetadata.create(tableName, columns));
+
+  const dataColumnsDao = schemaExtension.getDataColumnsDao();
+  dataColumnsDao.create(dc);
+
+  const simpleAttributesDao = geoPackage.getSimpleAttributesDao(tableName);
+
+  for (let i = 0; i < 10; i++) {
+    const simpleAttributesRow = simpleAttributesDao.newRow();
+    simpleAttributesRow.setValue('text', tableName);
+    simpleAttributesRow.setValue('real', Math.random() * 5000.0);
+    simpleAttributesRow.setValue('integer', Math.round(Math.random() * 500));
+    simpleAttributesRow.setValue(
+      'text_limited',
+      Math.random()
+        .toString(36)
+        .replace(/[^a-z]+/g, '')
+        .substr(0, 5),
+    );
+    simpleAttributesDao.create(simpleAttributesRow);
+  }
+
+  const row = simpleAttributesDao.newRow();
+  row.setValue('text', tableName);
+  row.setValue('real', Math.random() * 5000.0);
+  row.setValue('integer', Math.round(Math.random() * 500));
+  row.setValue('text_limited', Math.random()
+    .toString(36)
+    .replace(/[^a-z]+/g, '')
+    .substr(0, 5));
+  simpleAttributesDao.create(row);
+  const attributesResultSet = simpleAttributesDao.queryForAll();
+  attributesResultSet.getCount().should.be.equal(11);
+  attributesResultSet.close();
+  return geoPackage;
+};
+
 GeoPackageUtils.createMetadataExtension = function(geoPackage) {
   const metadataExtension = new MetadataExtension(geoPackage);
   metadataExtension.getOrCreateExtension();
@@ -791,3 +1029,251 @@ GeoPackageUtils.createCoverageDataExtension = function(geoPackage) {
 GeoPackageUtils.createPropertiesExtension = function(geoPackage) {
   return geoPackage;
 };
+
+
+
+/**
+ * Create a random point
+ *
+ * @param hasZ
+ * @param hasM
+ * @return Point
+ */
+GeoPackageUtils.createPoint = function(hasZ, hasM) {
+  let x = Math.random() * 180.0 * (Math.random() < .5 ? 1 : -1);
+  let y = Math.random() * 90.0 * (Math.random() < .5 ? 1 : -1);
+  let point = new Point(hasZ, hasM, x, y);
+  if (hasZ) {
+    point.z = Math.random() * 1000.0;
+  }
+  if (hasM) {
+    point.m = Math.random() * 1000.0;
+  }
+  return point;
+}
+
+/**
+ * Create a random line string
+ *
+ * @param hasZ
+ * @param hasM
+ * @param ring
+ * @return LineString
+ */
+GeoPackageUtils.createLineString = function(hasZ, hasM, ring = false) {
+  const lineString = new LineString(hasZ, hasM);
+  const num = 2 + Math.round(Math.random() * 9);
+  for (let i = 0; i < num; i++) {
+    lineString.addPoint(GeoPackageUtils.createPoint(hasZ, hasM));
+  }
+  if (ring) {
+    lineString.addPoint(lineString.points[0]);
+  }
+  return lineString;
+}
+
+/**
+ * Create a random polygon
+ * @param hasZ
+ * @param hasM
+ * @return Polygon
+ */
+GeoPackageUtils.createPolygon = function(hasZ, hasM) {
+  const polygon = new Polygon(hasZ, hasM);
+  const num = 1 + Math.round(Math.random() * 5);
+  for (let i = 0; i < num; i++) {
+    polygon.addRing(GeoPackageUtils.createLineString(hasZ, hasM, true));
+  }
+  return polygon;
+}
+
+/**
+ * Create a triangle
+ * @return {Triangle}
+ */
+GeoPackageUtils.createTriangle = function() {
+  const triangle = new Triangle();
+  const line = new LineString();
+  const firstPoint = new Point(0, 0);
+  const secondPoint = new Point(1, 1);
+  const thirdPoint = new Point(1, 0);
+  line.addPoints([firstPoint, secondPoint, thirdPoint, firstPoint.copy()]);
+  triangle.addRing(line);
+  return triangle;
+}
+
+/**
+ * Create a polyhedral
+ * @return {PolyhedralSurface}
+ */
+GeoPackageUtils.createPolyhedralSurface = function() {
+  const faces = [];
+  const base = new Triangle(new LineString([new Point(0, 0), new Point(1, 1), new Point(1, 0), new Point(0, 0)]));
+  const side = new Triangle(new LineString([new Point(0, 0), new Point(1, 1), new Point(0, 1), new Point(0, 0)]));
+  faces.push(base);
+  faces.push(side);
+  return new PolyhedralSurface(faces);
+}
+
+/**
+ * Create a random polygon
+ * @return {TIN}
+ */
+GeoPackageUtils.createTin = function() {
+  const faces = [];
+  const base = new Triangle(new LineString([new Point(0, 0), new Point(1, 1), new Point(1, 0), new Point(0, 0)]));
+  const sideA = new Triangle(new LineString([new Point(0, 0), new Point(1, 1), new Point(0, 1), new Point(0, 0)]));
+  const sideB = new Triangle(new LineString([new Point(0, 0), new Point(1, 0), new Point(1, -1), new Point(0, 0)]));
+  const sideC = new Triangle(new LineString([new Point(1, 0), new Point(1, 1), new Point(2, 1), new Point(1, 0)]));
+  faces.push(base);
+  faces.push(sideA);
+  faces.push(sideB);
+  faces.push(sideC);
+  return new TIN(faces);
+}
+
+/**
+ * Create a random multi point
+ *
+ * @param hasZ
+ * @param hasM
+ * @return MultiPoint
+ */
+GeoPackageUtils.createMultiPoint = function(hasZ, hasM) {
+  const multiPoint = new MultiPoint(hasZ, hasM);
+  const num = 1 + Math.round(Math.random() * 5);
+  for (let i = 0; i < num; i++) {
+    multiPoint.addPoint(GeoPackageUtils.createPoint(hasZ, hasM));
+  }
+  return multiPoint;
+}
+
+/**
+ * Create a random multi line string
+ *
+ * @param hasZ
+ * @param hasM
+ * @return MultiLineString
+ */
+GeoPackageUtils.createMultiLineString = function(hasZ, hasM) {
+  const multiLineString = new MultiLineString(hasZ, hasM);
+  const num = 1 + Math.round(Math.random() * 5);
+  for (let i = 0; i < num; i++) {
+    multiLineString.addLineString(GeoPackageUtils.createLineString(hasZ, hasM));
+  }
+  return multiLineString;
+}
+
+/**
+ * Create a random multi polygon
+ *
+ * @param hasZ
+ * @param hasM
+ * @return MultiPolygon
+ */
+GeoPackageUtils.createMultiPolygon = function(hasZ, hasM) {
+  const multiPolygon = new MultiPolygon(hasZ, hasM);
+  const num = 1 + Math.round(Math.random() * 5);
+  for (let i = 0; i < num; i++) {
+    multiPolygon.addPolygon(GeoPackageUtils.createPolygon(hasZ, hasM));
+  }
+  return multiPolygon;
+}
+
+/**
+ * Create a random geometry collection
+ *
+ * @param hasZ
+ * @param hasM
+ * @return GeometryCollection
+ */
+GeoPackageUtils.createGeometryCollection = function(hasZ, hasM) {
+  const geometryCollection = new GeometryCollection(hasZ, hasM);
+  const num = 1 + Math.round(Math.random() * 5);
+  for (let i = 0; i < num; i++) {
+    let geometry = null;
+    let randomGeometry = Math.floor(Math.random() * 6);
+    switch (randomGeometry) {
+      case 0:
+        geometry = GeoPackageUtils.createPoint(hasZ, hasM);
+        break;
+      case 1:
+        geometry = GeoPackageUtils.createLineString(hasZ, hasM);
+        break;
+      case 2:
+        geometry = GeoPackageUtils.createPolygon(hasZ, hasM);
+        break;
+      case 3:
+        geometry = GeoPackageUtils.createMultiPoint(hasZ, hasM);
+        break;
+      case 4:
+        geometry = GeoPackageUtils.createMultiLineString(hasZ, hasM);
+        break;
+      case 5:
+        geometry = GeoPackageUtils.createMultiPolygon(hasZ, hasM);
+        break;
+    }
+
+    geometryCollection.addGeometry(geometry);
+  }
+
+  return geometryCollection;
+}
+
+/**
+ * Creates a random point
+ * @param minX
+ * @param minY
+ * @param xRange
+ * @param yRange
+ * @returns Point
+ */
+GeoPackageUtils.createRandomPoint = function(minX, minY, xRange, yRange) {
+  const x = minX + (Math.random() * xRange);
+  const y = minY + (Math.random() * yRange);
+  return new Point(x, y);
+}
+
+/**
+ * Create a random compound curve
+ *
+ * @param hasZ
+ * @param hasM
+ * @param ring
+ * @return CompoundCurve
+ */
+GeoPackageUtils.createCompoundCurve = function(hasZ, hasM, ring = false) {
+  const compoundCurve = new CompoundCurve(hasZ, hasM);
+  const num = 2 + Math.round(Math.random() * 9);
+  for (let i = 0; i < num; i++) {
+    compoundCurve.addLineString(GeoPackageUtils.createLineString(hasZ, hasM));
+  }
+  if (ring) {
+    compoundCurve.getLineString(num - 1).addPoint(compoundCurve.getLineString(0).startPoint());
+  }
+  return compoundCurve;
+}
+
+/**
+ * Create a random curve polygon
+ *
+ * @param hasZ
+ * @param hasM
+ * @return CurvePolygon
+ */
+GeoPackageUtils.createCurvePolygon = function(hasZ, hasM) {
+  const curvePolygon = new CurvePolygon(hasZ, hasM);
+  const num = 1 + Math.round(Math.random() * 5);
+  for (let i = 0; i < num; i++) {
+    curvePolygon.addRing(GeoPackageUtils.createCompoundCurve(hasZ, hasM, true));
+  }
+  return curvePolygon;
+}
+
+/**
+ * Randomly return true or false
+ * @return true or false
+ */
+GeoPackageUtils.coinFlip = module.exports.coinFlip = function() {
+  return Math.random() < 0.5;
+}

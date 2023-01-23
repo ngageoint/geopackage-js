@@ -35,13 +35,17 @@ describe('Create GeoPackage samples', function() {
         GeoPackageUtils.createSchemaExtension(gp);
         GeoPackageUtils.createGeometryIndexExtension(gp);
         GeoPackageUtils.createNonLinearGeometryTypesExtension(gp);
+        GeoPackageUtils.createNonLinearFeatures(gp);
         GeoPackageUtils.createRTreeSpatialIndexExtension(gp);
         await GeoPackageUtils.createRelatedTablesMediaExtension(gp);
         GeoPackageUtils.createRelatedTablesFeaturesExtension(gp);
         await GeoPackageUtils.createTiles(gp);
         await GeoPackageUtils.createWebPExtension(gp);
         GeoPackageUtils.createAttributes(gp);
+        GeoPackageUtils.createSimpleAttributes(gp);
         GeoPackageUtils.createRelatedTablesSimpleAttributesExtension(gp);
+        GeoPackageUtils.createRelatedTablesAttributesExtension(gp);
+        GeoPackageUtils.createRelatedTablesTilesExtension(gp);
         GeoPackageUtils.createMetadataExtension(gp);
         GeoPackageUtils.createCoverageDataExtension(gp);
         GeoPackageUtils.createPropertiesExtension(gp);
