@@ -39,7 +39,7 @@ import { FeatureResultSet } from '../../features/user/featureResultSet';
 import { GeoPackageImage } from '../../image/geoPackageImage';
 import { FeatureIndexResults } from '../../features/index/featureIndexResults';
 import { FeatureTileCanvas } from './featureTileCanvas';
-import { EmulatedCanvas2D, EmulatedCanvas2DContext } from '../../../@types/canvaskit';
+import { EmulatedCanvas2D } from '../../../@types/canvaskit';
 import type { GeoPackage } from '../../geoPackage';
 
 /**
