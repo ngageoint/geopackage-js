@@ -1,8 +1,3 @@
-/**
- * @memberOf module:extension/nga/style
- * @class IconTable
- */
-
 import { MediaTable } from '../../related/media/mediaTable';
 import { GeoPackageDataType } from '../../../db/geoPackageDataType';
 import { UserColumn } from '../../../user/userColumn';

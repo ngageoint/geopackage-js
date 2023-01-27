@@ -1,6 +1,3 @@
-/**
- * @module attributes/attributesDao
- */
 import { UserDao } from '../user/userDao';
 import { AttributesTable } from './attributesTable';
 import { AttributesRow } from './attributesRow';
@@ -45,9 +42,10 @@ export class AttributesDao extends UserDao<AttributesColumn, AttributesTable, At
   }
 
   /**
-   * AttributesDao does not p
+   * Not implemented
    * @param projection
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public getBoundingBoxWithProjection(projection: Projection): BoundingBox {
     throw new GeoPackageException('Bounding Box not supported for Attributes');
   }

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { ContentsDataType } from './contentsDataType';
 import { BoundingBox } from '../boundingBox';
 import { DBValue } from '../db/dbValue';
@@ -458,5 +457,4 @@ export class Contents {
     this.setMinY(boundingBox.getMinLatitude());
     this.setMaxY(boundingBox.getMaxLatitude());
   }
-
 }

@@ -1,7 +1,7 @@
 /**
  * Enumeration of Data Column Constraint Types
  */
- export enum DataColumnConstraintType {
+export enum DataColumnConstraintType {
   /**
    * Value range
    */
@@ -25,6 +25,8 @@ export namespace DataColumnConstraintType {
   }
 
   export function fromName(type: string): DataColumnConstraintType {
-    return DataColumnConstraintType[type.toUpperCase() as keyof typeof DataColumnConstraintType] as DataColumnConstraintType;
+    return DataColumnConstraintType[
+      type.toUpperCase() as keyof typeof DataColumnConstraintType
+    ] as DataColumnConstraintType;
   }
 }

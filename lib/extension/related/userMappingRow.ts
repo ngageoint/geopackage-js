@@ -3,11 +3,6 @@ import { UserColumn } from '../../user/userColumn';
 import { UserCustomRow } from '../../user/custom/userCustomRow';
 
 /**
- * UserMappingRow module.
- * @module extension/relatedTables
- */
-
-/**
  * User Mapping Row containing the values from a single result set row
  */
 export class UserMappingRow extends UserCustomRow {

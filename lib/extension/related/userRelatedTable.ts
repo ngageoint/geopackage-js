@@ -1,7 +1,3 @@
-/**
- * userRelatedTable module.
- * @module extension/relatedTables
- */
 import { Contents } from '../../contents/contents';
 import { UserCustomTable } from '../../user/custom/userCustomTable';
 import { GeoPackageException } from '../../geoPackageException';

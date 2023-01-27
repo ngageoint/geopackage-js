@@ -55,13 +55,14 @@ export class DataColumnConstraintsDao extends GeoPackageDao<DataColumnConstraint
     return {
       [Symbol.iterator](): IterableIterator<DataColumnConstraints> {
         return this;
-      }, next(): IteratorResult<DataColumnConstraints> {
+      },
+      next(): IteratorResult<DataColumnConstraints> {
         const result = iterator.next();
         return {
           value: createObject(result.value),
-          done: result.done
-        }
-      }
+          done: result.done,
+        };
+      },
     };
   }
   /**

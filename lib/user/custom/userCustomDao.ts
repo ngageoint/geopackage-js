@@ -1,6 +1,3 @@
-/**
- * @module user/custom
- */
 import { UserDao } from '../userDao';
 import { UserCustomTableReader } from './userCustomTableReader';
 import { UserCustomTable } from './userCustomTable';
@@ -59,9 +56,7 @@ export class UserCustomDao extends UserDao<UserCustomColumn, UserCustomTable, Us
    */
   createObject(results: Record<string, DBValue>): UserCustomRow {
     const row = this.newRow();
-    const columnNames = this.getTable()
-      .getUserColumns()
-      .getColumnNames();
+    const columnNames = this.getTable().getUserColumns().getColumnNames();
     for (const columnName of columnNames) {
       row.setValue(columnName, results[columnName]);
     }
@@ -80,14 +75,28 @@ export class UserCustomDao extends UserDao<UserCustomColumn, UserCustomTable, Us
     return new UserCustomDao(database, geoPackage, userCustomTable);
   }
 
+  /**
+   * Not supported
+   * @protected
+   */
   protected getBoundingBox(): BoundingBox {
     throw new GeoPackageException('Bounding Box not supported for User Custom');
   }
 
+  /**
+   * Not supported
+   * @param {Projection} projection
+   * @protected
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getBoundingBoxInProjection(projection: Projection): BoundingBox {
     throw new GeoPackageException('Bounding Box not supported for User Custom');
   }
 
+  /**
+   * Generates a new row for this user custom dao
+   * @return {UserCustomRow}
+   */
   newRow(): UserCustomRow {
     return new UserCustomRow(this.getTable());
   }
@@ -101,6 +110,12 @@ export class UserCustomDao extends UserDao<UserCustomColumn, UserCustomTable, Us
     return resultSet != null ? resultSet.getCount() : 0;
   }
 
+  /**
+   * {inheritDoc}
+   * @param projection
+   * @protected
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getBoundingBoxWithProjection(projection: Projection): BoundingBox {
     throw new GeoPackageException('Method not implemented.');
   }

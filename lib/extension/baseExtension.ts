@@ -85,12 +85,17 @@ export abstract class BaseExtension {
 
         this.extensionsDao.create(extension);
       } catch (e) {
-        console.error(e)
+        console.error(e);
         throw new GeoPackageException(
-          "Failed to create '" + extensionName
-          + "' extension for GeoPackage: "
-          + this.geoPackage.getName() + ", Table Name: "
-          + tableName + ", Column Name: " + columnName);
+          "Failed to create '" +
+            extensionName +
+            "' extension for GeoPackage: " +
+            this.geoPackage.getName() +
+            ', Table Name: ' +
+            tableName +
+            ', Column Name: ' +
+            columnName,
+        );
       }
     }
     return extension;

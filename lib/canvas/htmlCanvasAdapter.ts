@@ -2,7 +2,6 @@ import { CanvasAdapter } from './canvasAdapter';
 import { GeoPackageImage } from '../image/geoPackageImage';
 import { ImageType } from '../image/imageType';
 import { CanvasUtils } from './canvasUtils';
-import { ImageFormatEnumValues } from '../../@types/canvaskit';
 
 /**
  * Browser based canvas adapter
@@ -10,17 +9,26 @@ import { ImageFormatEnumValues } from '../../@types/canvaskit';
 export class HtmlCanvasAdapter implements CanvasAdapter {
   private static initialized = false;
 
+  /**
+   * @inheritDoc
+   */
   initialize(): Promise<void> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       HtmlCanvasAdapter.initialized = true;
       resolve();
     });
   }
 
+  /**
+   * @inheritDoc
+   */
   isInitialized(): boolean {
     return HtmlCanvasAdapter.initialized;
   }
 
+  /**
+   * @inheritDoc
+   */
   create(width: number, height: number): any {
     const c = document.createElement('canvas');
     c.width = width;
@@ -28,6 +36,9 @@ export class HtmlCanvasAdapter implements CanvasAdapter {
     return c;
   }
 
+  /**
+   * @inheritDoc
+   */
   createImage(data: Uint8Array | Buffer | string | Blob, contentType: string): Promise<GeoPackageImage> {
     return new Promise((resolve, reject) => {
       let src: string = null;
@@ -52,14 +63,24 @@ export class HtmlCanvasAdapter implements CanvasAdapter {
     });
   }
 
+  /**
+   * @inheritDoc
+   */
   createImageData(width, height): ImageData {
     return new ImageData(width, height);
   }
 
+  /**
+   * @inheritDoc
+   */
   disposeCanvas(canvas: any): void {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     canvas = null;
   }
 
+  /**
+   * @inheritDoc
+   */
   measureText(context: any, fontFace: string, fontSize: number, text: string): number {
     context.save();
     context.font = fontSize + 'px' + (fontFace != null ? " '" + fontFace + "'" : '');
@@ -70,6 +91,9 @@ export class HtmlCanvasAdapter implements CanvasAdapter {
     return width;
   }
 
+  /**
+   * @inheritDoc
+   */
   drawText(
     context: any,
     text: string,
@@ -87,6 +111,9 @@ export class HtmlCanvasAdapter implements CanvasAdapter {
     context.restore();
   }
 
+  /**
+   * @inheritDoc
+   */
   async scaleImage(image: GeoPackageImage, scale: number): Promise<GeoPackageImage> {
     if (scale === 1.0) {
       return image;
@@ -96,6 +123,9 @@ export class HtmlCanvasAdapter implements CanvasAdapter {
     return this.scaleImageToDimensions(image, scaledWidth, scaledHeight);
   }
 
+  /**
+   * @inheritDoc
+   */
   async scaleImageToDimensions(
     image: GeoPackageImage,
     scaledWidth: number,
@@ -109,13 +139,22 @@ export class HtmlCanvasAdapter implements CanvasAdapter {
     return result;
   }
 
+  /**
+   * @inheritDoc
+   */
   toDataURL(canvas: any, format = 'image/png'): Promise<string> {
     return Promise.resolve(canvas.toDataURL(format));
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  /**
+   * @inheritDoc
+   */
+  // eslint-disable-next-line @typescript-eslint/no-empty-function,@typescript-eslint/no-unused-vars
   disposeImage(image: GeoPackageImage): void {}
 
+  /**
+   * @inheritDoc
+   */
   writeImageToBytes(image: GeoPackageImage, imageFormat: ImageType, compressionQuality: number): Promise<Uint8Array> {
     const canvas: any = this.create(image.getWidth(), image.getHeight());
     const ctx = canvas.getContext('2d');
@@ -127,6 +166,9 @@ export class HtmlCanvasAdapter implements CanvasAdapter {
     return Promise.resolve(CanvasUtils.base64toUInt8Array(dataUrl));
   }
 
+  /**
+   * @inheritDoc
+   */
   getImageData(image: GeoPackageImage): ImageData {
     const canvas = this.create(image.getWidth(), image.getHeight());
     const ctx = canvas.getContext('2d');

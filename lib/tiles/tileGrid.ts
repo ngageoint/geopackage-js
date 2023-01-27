@@ -1,6 +1,5 @@
 /**
  * Tile grid with x and y ranges
- * @module tiles/tileGrid
  * @class
  */
 export class TileGrid {
@@ -36,7 +35,7 @@ export class TileGrid {
     this.minY = minY;
     this.maxX = maxX;
     this.maxY = maxY;
-}
+  }
 
   /**
    * Get count of tiles

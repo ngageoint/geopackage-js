@@ -1,8 +1,3 @@
-/**
- * attributeTableReader module.
- * @module attributes/attributesTableReader
- */
-
 import { UserTableReader } from '../user/userTableReader';
 import { AttributesTable } from './attributesTable';
 import { UserColumn } from '../user/userColumn';
@@ -14,7 +9,6 @@ import type { GeoPackage } from '../geoPackage';
  * Reads the metadata from an existing attribute table
  */
 export class AttributesTableReader extends UserTableReader<AttributesColumn, AttributesTable> {
-  // eslint-disable-next-line @typescript-eslint/camelcase
   constructor(table_name: string) {
     super(table_name);
   }

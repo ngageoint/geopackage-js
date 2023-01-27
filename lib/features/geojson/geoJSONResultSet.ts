@@ -1,19 +1,16 @@
-import { Feature, GeoJsonObject } from 'geojson';
+import { Feature } from 'geojson';
 import { FeatureIndexResults } from '../index/featureIndexResults';
 import { FeatureRow } from '../user/featureRow';
-import { FeatureConverter } from '@ngageoint/simple-features-geojson-js';
 import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
 import { FeatureDao } from '../user/featureDao';
 import { DataColumnsDao } from '../../extension/schema/columns/dataColumnsDao';
-import { Projection, Projections } from '@ngageoint/projections-js';
-import { FeatureTable } from '../user/featureTable';
+import { Projections } from '@ngageoint/projections-js';
 import { GeoJSONUtils } from './geoJSONUtils';
 
 /**
  * GeoJSON Results is a wrapper for FeatureIndexResults and handles the conversion to GeoJSON
  */
 export class GeoJSONResultSet implements IterableIterator<Feature> {
-
   /**
    * FeatureIndexResults
    * @private
@@ -55,14 +52,19 @@ export class GeoJSONResultSet implements IterableIterator<Feature> {
     return this;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   next(...args: [] | [undefined]): IteratorResult<Feature> {
     let nextRow = this.featureIndexResultSet.next();
     let feature: Feature;
-    let done: boolean = true;
+    let done = true;
     if (!nextRow.done) {
-      let featureRow: FeatureRow = nextRow.value;
+      const featureRow: FeatureRow = nextRow.value;
       while (!nextRow.done && !feature) {
-        feature = GeoJSONUtils.convertFeatureRowIntoGeoJSONFeature(featureRow, this.geometryTransform, this.dataColumnsMap);
+        feature = GeoJSONUtils.convertFeatureRowIntoGeoJSONFeature(
+          featureRow,
+          this.geometryTransform,
+          this.dataColumnsMap,
+        );
         if (feature != null) {
           done = nextRow.done;
           break;
@@ -83,5 +85,4 @@ export class GeoJSONResultSet implements IterableIterator<Feature> {
   public close(): void {
     this.featureIndexResultSet.close();
   }
-
 }

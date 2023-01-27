@@ -200,7 +200,7 @@ export class GeoPackageCache {
    * @param retain GeoPackages to retain
    */
   public closeRetain(retain: string[]): void {
-    const close = Object.keys(this.cache).filter(name => retain.indexOf(name) === -1);
+    const close = Object.keys(this.cache).filter((name) => retain.indexOf(name) === -1);
     this.closeWithNames(close);
   }
 

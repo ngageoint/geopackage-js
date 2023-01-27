@@ -23,7 +23,7 @@ export class GeoPackageTileRetriever implements TileRetriever {
    * @param height height
    * @param imageFormat image format
    */
-  public constructor(tileDao: TileDao, width: number, height: number, imageFormat: string = 'image/png') {
+  public constructor(tileDao: TileDao, width: number, height: number, imageFormat = 'image/png') {
     tileDao.adjustTileMatrixLengths();
     this.tileCreator = new TileCreator(tileDao, width, height, imageFormat);
   }
@@ -111,10 +111,11 @@ export class GeoPackageTileRetriever implements TileRetriever {
    * Returns the bounding box for the tile matrix set in EPSG:3857 (Web Mercator)
    * @return {BoundingBox} bounding bxo
    */
-  getWebMercatorBoundingBox() {
-    return this.tileCreator.getTileDao().getTileMatrixSet().getBoundingBox().projectBoundingBox(
-      this.tileCreator.getTileDao().getProjection(),
-      Projections.getWebMercatorProjection(),
-    );
+  getWebMercatorBoundingBox(): BoundingBox {
+    return this.tileCreator
+      .getTileDao()
+      .getTileMatrixSet()
+      .getBoundingBox()
+      .projectBoundingBox(this.tileCreator.getTileDao().getProjection(), Projections.getWebMercatorProjection());
   }
 }

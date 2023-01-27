@@ -1,43 +1,43 @@
-import { default as testSetup } from '../../../testSetup'
-import { FeatureIndexManager } from "../../../../lib/features/index/featureIndexManager";
-import { TileBoundingBoxUtils } from "../../../../lib/tiles/tileBoundingBoxUtils";
-import { FeatureTableMetadata } from "../../../../lib/features/user/featureTableMetadata";
-import { FeatureIndexType } from "../../../../lib/features/index/featureIndexType";
-import { MediaTableMetadata } from "../../../../lib/extension/related/media/mediaTableMetadata";
+import { default as testSetup } from '../../../testSetup';
+import { FeatureIndexManager } from '../../../../lib/features/index/featureIndexManager';
+import { TileBoundingBoxUtils } from '../../../../lib/tiles/tileBoundingBoxUtils';
+import { FeatureTableMetadata } from '../../../../lib/features/user/featureTableMetadata';
+import { FeatureIndexType } from '../../../../lib/features/index/featureIndexType';
+import { MediaTableMetadata } from '../../../../lib/extension/related/media/mediaTableMetadata';
 
-var FeatureColumn = require('../../../../lib/features/user/featureColumn').FeatureColumn
-  , GeoPackageDataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
-  , BoundingBox = require('../../../../lib/boundingBox').BoundingBox
-  , GeometryData = require('../../../../lib/geom/geoPackageGeometryData').GeoPackageGeometryData
-  , GeometryType = require('@ngageoint/simple-features-js').GeometryType
-  , SetupFeatureTable = require('../../../setupFeatureTable')
-  , RelatedTablesUtils = require('../../extension/relatedTables/relatedTablesUtils')
-  , MediaTable = require('../../../../lib/extension/related/media/mediaTable').MediaTable
-  , FeatureConverter = require('@ngageoint/simple-features-geojson-js').FeatureConverter
-  , SimpleAttributesTable = require('../../../../lib/extension/related/simple/simpleAttributesTable').SimpleAttributesTable
-  , path = require('path')
-  , should = require('chai').should();
+var FeatureColumn = require('../../../../lib/features/user/featureColumn').FeatureColumn,
+  GeoPackageDataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType,
+  BoundingBox = require('../../../../lib/boundingBox').BoundingBox,
+  GeometryData = require('../../../../lib/geom/geoPackageGeometryData').GeoPackageGeometryData,
+  GeometryType = require('@ngageoint/simple-features-js').GeometryType,
+  SetupFeatureTable = require('../../../setupFeatureTable'),
+  RelatedTablesUtils = require('../../extension/relatedTables/relatedTablesUtils'),
+  MediaTable = require('../../../../lib/extension/related/media/mediaTable').MediaTable,
+  FeatureConverter = require('@ngageoint/simple-features-geojson-js').FeatureConverter,
+  SimpleAttributesTable =
+    require('../../../../lib/extension/related/simple/simpleAttributesTable').SimpleAttributesTable,
+  path = require('path'),
+  should = require('chai').should();
 
-describe('FeatureDao tests', function() {
-
-  describe('Non indexed test', function() {
+describe('FeatureDao tests', function () {
+  describe('Non indexed test', function () {
     var geoPackage;
 
     var filename;
-    beforeEach('create the GeoPackage connection', async function() {
+    beforeEach('create the GeoPackage connection', async function () {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
-      // @ts-ignore
+
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
       geoPackage = result.geoPackage;
     });
 
-    afterEach('close the geoPackage connection', async function() {
+    afterEach('close the geoPackage connection', async function () {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
 
-    it('should read the geometry', function() {
+    it('should read the geometry', function () {
       var featureDao = geoPackage.getFeatureDao('FEATURESriversds');
       var resultSet = featureDao.queryForAll();
       while (resultSet.moveToNext()) {
@@ -45,10 +45,10 @@ describe('FeatureDao tests', function() {
         var geometry = currentRow.getGeometry();
         should.exist(geometry);
       }
-      resultSet.close()
+      resultSet.close();
     });
 
-    it('should query for a row with property_1 equal to Gila', function() {
+    it('should query for a row with property_1 equal to Gila', function () {
       var featureDao = geoPackage.getFeatureDao('FEATURESriversds');
       var resultSet = featureDao.queryForEq('property_1', 'Gila');
       while (resultSet.moveToNext()) {
@@ -57,22 +57,19 @@ describe('FeatureDao tests', function() {
     });
   });
 
-  describe('Indexed test', function() {
+  describe('Indexed test', function () {
     var geoPackage;
-    var featureDao;
 
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers_indexed.gpkg');
     var filename;
 
-    beforeEach('should open the geoPackage', async function() {
-      // @ts-ignore
+    beforeEach('should open the geoPackage', async function () {
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
       geoPackage = result.geoPackage;
-      featureDao = geoPackage.getFeatureDao('rivers');
     });
 
-    afterEach('should close the geoPackage', async function() {
+    afterEach('should close the geoPackage', async function () {
       try {
         geoPackage.close();
         await testSetup.deleteGeoPackage(filename);
@@ -81,7 +78,7 @@ describe('FeatureDao tests', function() {
       }
     });
 
-    it('should query for indexed geometries', function() {
+    it('should query for indexed geometries', function () {
       var count = 0;
       // this bounding box only intersects a single feature
       var bbox = TileBoundingBoxUtils.getWebMercatorBoundingBox(42, 89, 8);
@@ -105,29 +102,28 @@ describe('FeatureDao tests', function() {
     });
   });
 
-  describe('Query For Shapes', function() {
-
+  describe('Query For Shapes', function () {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'test_shapes_two_points.gpkg');
     var filename;
     var geoPackage;
 
-    beforeEach('should copy the geoPackage', async function() {
+    beforeEach('should copy the geoPackage', async function () {
       filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
-      // @ts-ignore
+
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
       geoPackage = result.geoPackage;
     });
 
-    afterEach('should close the geoPackage', async function() {
+    afterEach('should close the geoPackage', async function () {
       await testSetup.deleteGeoPackage(filename);
     });
 
-    it('should query for GeoJSON features', function() {
-      let bb = new BoundingBox(-.4, 2.4, -.6, 2.6);
+    it('should query for GeoJSON features', function () {
+      let bb = new BoundingBox(-0.4, 2.4, -0.6, 2.6);
       let geoJSONResultSet = geoPackage.queryForGeoJSONFeatures('QueryTest', bb);
       let features = [];
-      for(const feature of geoJSONResultSet) {
+      for (const feature of geoJSONResultSet) {
         features.push(feature);
       }
       geoJSONResultSet.close();
@@ -136,7 +132,7 @@ describe('FeatureDao tests', function() {
       bb = new BoundingBox(1.5, 2.5, 2, 2.7);
       geoJSONResultSet = geoPackage.queryForGeoJSONFeatures('QueryTest', bb);
       features = [];
-      for(const feature of geoJSONResultSet) {
+      for (const feature of geoJSONResultSet) {
         features.push(feature);
       }
       geoJSONResultSet.close();
@@ -144,131 +140,141 @@ describe('FeatureDao tests', function() {
     });
   });
 
-  describe('geometry collection test', function() {
+  describe('geometry collection test', function () {
     var geoPackage;
-    var featureDao;
 
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'geometrycollection.gpkg');
     var filename;
 
-    beforeEach('should open the geoPackage', async function() {
-      // @ts-ignore
+    beforeEach('should open the geoPackage', async function () {
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
       geoPackage = result.geoPackage;
-      featureDao = geoPackage.getFeatureDao('test');
     });
 
-    afterEach('should close the geoPackage', async function() {
+    afterEach('should close the geoPackage', async function () {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
 
-    it('should return feature when bounds overlap a feature within geometry collection', function() {
-     try {
-       var bb = new BoundingBox(-34.98046875, 42.293564192170095, -15.1171875, 55.3791104480105);
-       const features = [];
-       const geoJSONResultSet = geoPackage.queryForGeoJSONFeatures('test', bb);
-       for(const feature of geoJSONResultSet) {
-         features.push(feature);
-
-       }
-       features.length.should.be.equal(1);
-     } catch (e) {
-       console.error(e);
-     }
+    it('should return feature when bounds overlap a feature within geometry collection', function () {
+      try {
+        var bb = new BoundingBox(-34.98046875, 42.293564192170095, -15.1171875, 55.3791104480105);
+        const features = [];
+        const geoJSONResultSet = geoPackage.queryForGeoJSONFeatures('test', bb);
+        for (const feature of geoJSONResultSet) {
+          features.push(feature);
+        }
+        features.length.should.be.equal(1);
+      } catch (e) {
+        console.error(e);
+      }
     });
   });
 
-  describe('multi point test', function() {
+  describe('multi point test', function () {
     var geoPackage;
-    var featureDao;
 
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'multipoint.gpkg');
     var filename;
 
-    beforeEach('should open the geoPackage', async function() {
-      // @ts-ignore
+    beforeEach('should open the geoPackage', async function () {
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
       geoPackage = result.geoPackage;
-      featureDao = geoPackage.getFeatureDao('multipoint');
     });
 
-    afterEach('should close the geoPackage', async function() {
+    afterEach('should close the geoPackage', async function () {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
 
-    it('should return feature when bounds overlap a feature within multipoint', function() {
+    it('should return feature when bounds overlap a feature within multipoint', function () {
       var bb = new BoundingBox(45.52734375, 53.4357192066942, 64.3359375, 61.938950426660604);
       const features = [];
       const geoJSONResultSet = geoPackage.queryForGeoJSONFeatures('multipoint', bb);
-      for(const feature of geoJSONResultSet) {
+      for (const feature of geoJSONResultSet) {
         features.push(feature);
       }
       features.length.should.be.equal(1);
     });
   });
 
-  describe('Query tests', function() {
+  describe('Query tests', function () {
     var geoPackage;
     var queryTestFeatureDao;
     var testPath = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp');
     var testGeoPackage;
     var tileBuffer;
 
-    afterEach('should delete the geoPackage', async function() {
+    afterEach('should delete the geoPackage', async function () {
       try {
         geoPackage.close();
       } catch (e) {}
       await testSetup.deleteGeoPackage(testGeoPackage);
     });
 
-    beforeEach('get the tile buffer', async function() {
-      // @ts-ignore
+    beforeEach('get the tile buffer', async function () {
       tileBuffer = await loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'tiles', '0', '0', '0.png'));
     });
 
-    beforeEach('should create the GeoPackage', async function() {
+    beforeEach('should create the GeoPackage', async function () {
       try {
         testGeoPackage = path.join(testPath, testSetup.createTempName());
-        geoPackage = await testSetup.createGeoPackage(testGeoPackage)
+        geoPackage = await testSetup.createGeoPackage(testGeoPackage);
 
-        // @ts-ignore
         var geometryColumns = SetupFeatureTable.buildGeometryColumns('QueryTest', 'geom', GeometryType.GEOMETRY);
 
         var columns = [];
-        columns.push(FeatureColumn.createColumn('name', GeoPackageDataType.TEXT, false, ""));
-        columns.push(FeatureColumn.createColumn('_feature_id', GeoPackageDataType.TEXT, false, ""));
-        columns.push(FeatureColumn.createColumn('_properties_id', GeoPackageDataType.TEXT, false, ""));
+        columns.push(FeatureColumn.createColumn('name', GeoPackageDataType.TEXT, false, ''));
+        columns.push(FeatureColumn.createColumn('_feature_id', GeoPackageDataType.TEXT, false, ''));
+        columns.push(FeatureColumn.createColumn('_properties_id', GeoPackageDataType.TEXT, false, ''));
 
         var box1 = {
-          "type": "Polygon",
-          "coordinates": [[[-1, 1], [1, 1], [1, 3], [-1, 3], [-1, 1]]]
+          type: 'Polygon',
+          coordinates: [
+            [
+              [-1, 1],
+              [1, 1],
+              [1, 3],
+              [-1, 3],
+              [-1, 1],
+            ],
+          ],
         };
 
         var box2 = {
-          "type": "Polygon",
-          "coordinates": [[[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]]]
+          type: 'Polygon',
+          coordinates: [
+            [
+              [0, 0],
+              [2, 0],
+              [2, 2],
+              [0, 2],
+              [0, 0],
+            ],
+          ],
         };
 
         var line = {
-          "type": "LineString",
-          "coordinates": [[2, 3], [-1, 0]]
+          type: 'LineString',
+          coordinates: [
+            [2, 3],
+            [-1, 0],
+          ],
         };
 
         var point = {
-          "type": "Point",
-          "coordinates": [0.5, 1.5]
+          type: 'Point',
+          coordinates: [0.5, 1.5],
         };
 
         var point2 = {
-          "type": "Point",
-          "coordinates": [1.5, .5]
+          type: 'Point',
+          coordinates: [1.5, 0.5],
         };
 
-        var createRow = function(geoJson, name, featureDao) {
+        var createRow = function (geoJson, name, featureDao) {
           var srs = featureDao.getSrs();
           var featureRow = featureDao.newRow();
           var geometryData = new GeometryData();
@@ -276,7 +282,7 @@ describe('FeatureDao tests', function() {
           var geometry = FeatureConverter.toSimpleFeaturesGeometry({
             type: 'Feature',
             geometry: geoJson,
-            properties: {}
+            properties: {},
           });
           geometryData.setGeometry(geometry);
           featureRow.setGeometry(geometryData);
@@ -311,7 +317,7 @@ describe('FeatureDao tests', function() {
       }
     });
 
-    it('should update a shape', function() {
+    it('should update a shape', function () {
       try {
         let resultSet = queryTestFeatureDao.queryForEq('_feature_id', 'line');
         resultSet.moveToNext();
@@ -329,27 +335,25 @@ describe('FeatureDao tests', function() {
       }
     });
 
-    it('should count by a field', function(){
+    it('should count by a field', function () {
       var count = queryTestFeatureDao.countForEq('name', 'line');
       count.should.be.equal(1);
     });
 
-    it('should query for _feature_id', function() {
-      // @ts-ignore
+    it('should query for _feature_id', function () {
       var row = geoPackage.getFeatureAsGeoJSON('QueryTest', 'line');
-      // @ts-ignore
+
       row.properties.name.should.be.equal('line');
     });
 
-    it('should query for _properties_id', function() {
-      // @ts-ignore
+    it('should query for _properties_id', function () {
       var row = geoPackage.getFeatureAsGeoJSON('QueryTest', 'propertiesline');
-      // @ts-ignore
+
       row.properties.name.should.be.equal('line');
     });
 
-    it('should query for the bounding box', function() {
-      var bb = new BoundingBox(-.4, 2.4, -.6, 2.6);
+    it('should query for the bounding box', function () {
+      var bb = new BoundingBox(-0.4, 2.4, -0.6, 2.6);
       const indexManager = geoPackage.getFeatureIndexManager(queryTestFeatureDao);
       var geoJSONResultSet = indexManager.queryForGeoJSONFeatures(bb);
       for (const feature of geoJSONResultSet) {
@@ -362,8 +366,8 @@ describe('FeatureDao tests', function() {
       geoJSONResultSet.close();
     });
 
-    it('should get features in the bounding box', function() {
-      const resultSet = geoPackage.getFeaturesInBoundingBox('QueryTest', -.4, 2.4, -.6, 2.6)
+    it('should get features in the bounding box', function () {
+      const resultSet = geoPackage.getFeaturesInBoundingBox('QueryTest', -0.4, 2.4, -0.6, 2.6);
       for (const feature of resultSet) {
         if (feature.getGeometryType() === GeometryType.POLYGON) {
           feature.getValue('name').should.be.equal('box1');
@@ -374,27 +378,28 @@ describe('FeatureDao tests', function() {
       resultSet.close();
     });
 
-    it('should get the x: 1029, y: 1013, z: 11 tile from the GeoPackage api in a reasonable amount of time', function() {
+    it('should get the x: 1029, y: 1013, z: 11 tile from the GeoPackage api in a reasonable amount of time', function () {
       this.timeout(5000);
       console.time('generating indexed tile');
-      return geoPackage.getFeatureTileFromXYZ('QueryTest', 1029, 1013, 11, 256, 256)
-      .then(data => {
-        console.timeEnd('generating indexed tile');
-        should.exist(data);
-      }).catch(e => console.error(e));
+      return geoPackage
+        .getFeatureTileFromXYZ('QueryTest', 1029, 1013, 11, 256, 256)
+        .then((data) => {
+          console.timeEnd('generating indexed tile');
+          should.exist(data);
+        })
+        .catch((e) => console.error(e));
     });
 
-    it('should get the x: 1026, y: 1015, z: 11 tile from the GeoPackage api in a reasonable amount of time', function() {
+    it('should get the x: 1026, y: 1015, z: 11 tile from the GeoPackage api in a reasonable amount of time', function () {
       this.timeout(5000);
       console.time('generating indexed tile');
-      return geoPackage.getFeatureTileFromXYZ('QueryTest', 1026, 1015, 11, 256, 256)
-      .then(function(data) {
+      return geoPackage.getFeatureTileFromXYZ('QueryTest', 1026, 1015, 11, 256, 256).then(function (data) {
         console.timeEnd('generating indexed tile');
         should.exist(data);
       });
     });
 
-    it('should get the x: 64, y: 63, z: 7 features as geojson', function() {
+    it('should get the x: 64, y: 63, z: 7 features as geojson', function () {
       this.timeout(3000);
       console.time('generating indexed tile');
       const geoJSONResultSet = geoPackage.getGeoJSONFeaturesInTile('QueryTest', 64, 63, 7);
@@ -407,19 +412,21 @@ describe('FeatureDao tests', function() {
       features.length.should.be.equal(5);
     });
 
-    it('should get the x: 64, y: 63, z: 7 tile from the GeoPackage api in a reasonable amount of time', function() {
+    it('should get the x: 64, y: 63, z: 7 tile from the GeoPackage api in a reasonable amount of time', function () {
       this.timeout(3000);
       console.time('generating indexed tile');
-      return geoPackage.getFeatureTileFromXYZ('QueryTest', 64, 63, 7, 256, 256)
-      .then((data) => {
-        console.timeEnd('generating indexed tile');
-        should.exist(data);
-      }).catch(e => {
-        console.error(e);
-      });
+      return geoPackage
+        .getFeatureTileFromXYZ('QueryTest', 64, 63, 7, 256, 256)
+        .then((data) => {
+          console.timeEnd('generating indexed tile');
+          should.exist(data);
+        })
+        .catch((e) => {
+          console.error(e);
+        });
     });
 
-    it('should create a media relationship between a feature and a media row', function() {
+    it('should create a media relationship between a feature and a media row', function () {
       var rte = geoPackage.getRelatedTablesExtension();
       var additionalMediaColumns = RelatedTablesUtils.createAdditionalUserColumns();
       var mediaTable = MediaTable.create(MediaTableMetadata.create('media_table', additionalMediaColumns));
@@ -447,13 +454,16 @@ describe('FeatureDao tests', function() {
       geoPackage.linkMedia(queryTestFeatureDao.getTableName(), featureRow.getId(), 'media_table', mediaRow.getId());
       const linkedMedia = geoPackage.getLinkedMedia(queryTestFeatureDao.getTableName(), featureRow.getId());
       linkedMedia.length.should.be.equal(1);
-      // @ts-ignore
+
       linkedMedia[0].getId().should.be.equal(mediaRowId);
     });
 
-    it('should create a simple attributes relationship between a feature and a simple attributes row', function() {
+    it('should create a simple attributes relationship between a feature and a simple attributes row', function () {
       var rte = geoPackage.getRelatedTablesExtension();
-      var simpleUserColumns = RelatedTablesUtils.createSimpleUserColumns(SimpleAttributesTable.numRequiredColumns(), true);
+      var simpleUserColumns = RelatedTablesUtils.createSimpleUserColumns(
+        SimpleAttributesTable.numRequiredColumns(),
+        true,
+      );
       var simpleTable = SimpleAttributesTable.create('simple_table', simpleUserColumns);
       rte.createRelatedTable(simpleTable);
 
@@ -472,25 +482,37 @@ describe('FeatureDao tests', function() {
       const resultSet = queryTestFeatureDao.query();
       const featureRow = resultSet.next().value;
       resultSet.close();
-      geoPackage.linkSimpleAttributes(queryTestFeatureDao.getTableName(), featureRow.getId(), 'simple_table', simpleRowId);
+      geoPackage.linkSimpleAttributes(
+        queryTestFeatureDao.getTableName(),
+        featureRow.getId(),
+        'simple_table',
+        simpleRowId,
+      );
 
-      var linkedAttributes = geoPackage.getLinkedSimpleAttributes(queryTestFeatureDao.getTableName(), featureRow.getId());
+      var linkedAttributes = geoPackage.getLinkedSimpleAttributes(
+        queryTestFeatureDao.getTableName(),
+        featureRow.getId(),
+      );
       linkedAttributes.length.should.be.equal(1);
-      // @ts-ignore
+
       linkedAttributes[0].getId().should.be.equal(simpleRowId);
     });
 
-    it('should create a feature relationship between a feature and another feature row', function() {
+    it('should create a feature relationship between a feature and another feature row', function () {
       var all = queryTestFeatureDao.query();
       const featureRow = all.next().value;
       const relatedFeatureRow = all.next().value;
       all.close();
 
-      geoPackage.linkFeature(queryTestFeatureDao.getTableName(), featureRow.getId(), queryTestFeatureDao.getTableName(), relatedFeatureRow.getId());
+      geoPackage.linkFeature(
+        queryTestFeatureDao.getTableName(),
+        featureRow.getId(),
+        queryTestFeatureDao.getTableName(),
+        relatedFeatureRow.getId(),
+      );
       var linkedFeatures = geoPackage.getLinkedFeatures(queryTestFeatureDao.getTableName(), featureRow.getId());
       linkedFeatures.length.should.be.equal(1);
       linkedFeatures[0].getId().should.be.equal(relatedFeatureRow.getId());
     });
   });
-
 });

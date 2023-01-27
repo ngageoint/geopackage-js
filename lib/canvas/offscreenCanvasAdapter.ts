@@ -2,7 +2,6 @@ import { CanvasAdapter } from './canvasAdapter';
 import { CanvasUtils } from './canvasUtils';
 import { GeoPackageImage } from '../image/geoPackageImage';
 import { ImageType } from '../image/imageType';
-import { ImageFormatEnumValues } from '../../@types/canvaskit';
 
 /**
  * OffscreenCanvas canvas adapter. This can only run inside a web worker.
@@ -10,23 +9,33 @@ import { ImageFormatEnumValues } from '../../@types/canvaskit';
 export class OffscreenCanvasAdapter implements CanvasAdapter {
   private static initialized = false;
 
+  /**
+   * @inheritDoc
+   */
   initialize(): Promise<void> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       OffscreenCanvasAdapter.initialized = true;
       resolve();
     });
   }
 
+  /**
+   * @inheritDoc
+   */
   isInitialized(): boolean {
     return OffscreenCanvasAdapter.initialized;
   }
 
+  /**
+   * @inheritDoc
+   */
   create(width: number, height: number): OffscreenCanvas {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
     return new OffscreenCanvas(width, height);
   }
 
+  /**
+   * @inheritDoc
+   */
   createImage(data: Uint8Array | Buffer | string | Blob, contentType = 'image/png'): Promise<GeoPackageImage> {
     return new Promise((resolve, reject) => {
       let blob;
@@ -38,23 +47,33 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
         blob = data as Blob;
       }
       createImageBitmap(blob)
-        .then(image => {
+        .then((image) => {
           resolve(new GeoPackageImage(image, image.width, image.height));
         })
-        .catch(error => {
+        .catch((error) => {
           reject(error);
         });
     });
   }
 
+  /**
+   * @inheritDoc
+   */
   createImageData(width, height): ImageData {
     return new ImageData(width, height);
   }
 
+  /**
+   * @inheritDoc
+   */
   disposeCanvas(canvas: OffscreenCanvas): void {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     canvas = null;
   }
 
+  /**
+   * @inheritDoc
+   */
   measureText(context: any, fontFace: string, fontSize: number, text: string): number {
     context.save();
     context.font = fontSize + 'px' + (fontFace != null ? " '" + fontFace + "'" : '');
@@ -65,6 +84,9 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
     return width;
   }
 
+  /**
+   * @inheritDoc
+   */
   drawText(
     context: any,
     text: string,
@@ -82,6 +104,9 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
     context.restore();
   }
 
+  /**
+   * @inheritDoc
+   */
   async scaleImage(image: GeoPackageImage, scale: number): Promise<GeoPackageImage> {
     if (scale === 1.0) {
       return image;
@@ -91,6 +116,9 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
     return this.scaleImageToDimensions(image, scaledWidth, scaledHeight);
   }
 
+  /**
+   * @inheritDoc
+   */
   async scaleImageToDimensions(
     image: GeoPackageImage,
     scaledWidth: number,
@@ -104,9 +132,12 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
     return result;
   }
 
+  /**
+   * @inheritDoc
+   */
   toDataURL(canvas: any, format = 'image/png', compressionQuality?: number): Promise<string> {
-    return new Promise(resolve => {
-      canvas.convertToBlob({ type: format, quality: compressionQuality }).then(blob => {
+    return new Promise((resolve) => {
+      canvas.convertToBlob({ type: format, quality: compressionQuality }).then((blob) => {
         const reader = new FileReader();
         reader.addEventListener('load', () => {
           const result: string = reader.result as string;
@@ -117,7 +148,10 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  /**
+   * @inheritDoc
+   */
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   disposeImage(image: GeoPackageImage): void {}
 
   /**
@@ -127,15 +161,13 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
    * @param compressionQuality
    */
   writeImageToBytes(image: GeoPackageImage, imageFormat: ImageType, compressionQuality?: number): Promise<Uint8Array> {
-    return new Promise(resolve => {
-      const canvas: any = this.create(image.getWidth(), image.getHeight());
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(image.getImage(), 0, 0);
-      if (imageFormat === ImageType.TIFF) {
-        // TODO: do something different
-      }
-      this.toBytes(canvas, imageFormat, compressionQuality);
-    });
+    const canvas: any = this.create(image.getWidth(), image.getHeight());
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(image.getImage(), 0, 0);
+    if (imageFormat === ImageType.TIFF) {
+      // TODO: do something different
+    }
+    return this.toBytes(canvas, imageFormat, compressionQuality);
   }
 
   /**
@@ -157,8 +189,6 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
     toContext.drawImage(fromCanvas, 0, 0);
   }
 
-
-
   /**
    * Converts the contents drawn in a canvas to a byte array
    * @param canvas
@@ -167,10 +197,10 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
    * @return Uint8Array
    */
   toBytes(canvas: any, imageFormat: ImageType, compressionQuality?: number): Promise<Uint8Array> {
-    return new Promise(resolve => {
-      this.toDataURL(canvas, ImageType.getMimeType(imageFormat), compressionQuality).then(result => {
+    return new Promise((resolve) => {
+      this.toDataURL(canvas, ImageType.getMimeType(imageFormat), compressionQuality).then((result) => {
         resolve(CanvasUtils.base64toUInt8Array(result));
       });
-    })
+    });
   }
 }

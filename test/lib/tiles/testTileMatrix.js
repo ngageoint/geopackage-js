@@ -1,35 +1,33 @@
-var TileMatrixDao = require('../../../lib/tiles/matrix/tileMatrixDao').TileMatrixDao
-, testSetup = require('../../testSetup').default
-, should = require('chai').should()
-, path = require('path');
-const { TileMatrixSetDao } = require("../../../lib/tiles/matrixset/tileMatrixSetDao");
+var TileMatrixDao = require('../../../lib/tiles/matrix/tileMatrixDao').TileMatrixDao,
+  testSetup = require('../../testSetup').default,
+  should = require('chai').should(),
+  path = require('path');
+const { TileMatrixSetDao } = require('../../../lib/tiles/matrixset/tileMatrixSetDao');
 
-describe('Tile Matrix tests', function() {
-
+describe('Tile Matrix tests', function () {
   var geoPackage;
   var tileMatrixDao;
   var filename;
 
-  beforeEach('should open the geoPackage', async function() {
+  beforeEach('should open the geoPackage', async function () {
     var riversfilename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
-    // @ts-ignore
     let result = await copyAndOpenGeopackage(riversfilename);
     filename = result.path;
     geoPackage = result.geoPackage;
     tileMatrixDao = new TileMatrixDao(geoPackage);
   });
 
-  afterEach('should close the geoPackage', async function() {
+  afterEach('should close the geoPackage', async function () {
     geoPackage.close();
     await testSetup.deleteGeoPackage(filename);
   });
 
-  it('should get the tile matrixes', function() {
+  it('should get the tile matrixes', function () {
     var tileMatrices = tileMatrixDao.queryForAll();
     tileMatrices.should.have.property('length', 4);
   });
 
-  it('should transform the tile matrix result to a TileMatrix', function() {
+  it('should transform the tile matrix result to a TileMatrix', function () {
     var tileMatrices = tileMatrixDao.queryForAll();
     tileMatrices[0].should.have.property('table_name', 'TILESosmds');
     tileMatrices[0].should.have.property('zoom_level', 0);
@@ -51,7 +49,7 @@ describe('Tile Matrix tests', function() {
     tileMatrix.should.have.property('pixel_y_size', 156543.033928041);
   });
 
-  it('should get the Contents from a TileMatrix', function() {
+  it('should get the Contents from a TileMatrix', function () {
     var tileMatrices = tileMatrixDao.queryForAll();
     var tileMatrix = tileMatrixDao.createObject(tileMatrices[0]);
     var contents = tileMatrixDao.getContents(tileMatrix);
@@ -68,7 +66,7 @@ describe('Tile Matrix tests', function() {
     contents.should.have.property('srs_id', 4326);
   });
 
-  it('should get the TileMatrixSet from a TileMatrix', function() {
+  it('should get the TileMatrixSet from a TileMatrix', function () {
     var tileMatrices = tileMatrixDao.queryForAll();
     var tileMatrix = tileMatrixDao.createObject(tileMatrices[0]);
     var tileMatrixSetDao = new TileMatrixSetDao(geoPackage);
@@ -81,5 +79,4 @@ describe('Tile Matrix tests', function() {
     tileMatrixSet.should.have.property('max_x', 20037508.342789244);
     tileMatrixSet.should.have.property('max_y', 20037508.342789244);
   });
-
 });

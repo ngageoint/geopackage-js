@@ -55,4 +55,3 @@ export namespace TileScalingType {
     return null;
   }
 }
-

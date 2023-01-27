@@ -1,31 +1,28 @@
-import { default as testSetup } from '../../../../testSetup'
-import { FeatureTileTableLinker } from "../../../../../lib/extension/nga/link/featureTileTableLinker";
+import { default as testSetup } from '../../../../testSetup';
+import { FeatureTileTableLinker } from '../../../../../lib/extension/nga/link/featureTileTableLinker';
 
-var should = require('chai').should()
-  , assert = require('chai').assert
-  , path = require('path');
+var assert = require('chai').assert,
+  path = require('path');
 
-describe('FeatureTileTableLinker tests', function() {
-
-  describe('Test Link', function() {
+describe('FeatureTileTableLinker tests', function () {
+  describe('Test Link', function () {
     var geoPackage;
 
     var originalFilename = path.join(__dirname, '..', '..', '..', '..', 'fixtures', 'import_db.gpkg');
     var filename;
 
-    beforeEach('should open the geoPackage', async function() {
-      // @ts-ignore
+    beforeEach('should open the geoPackage', async function () {
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
       geoPackage = result.geoPackage;
     });
 
-    afterEach('should close the geoPackage', async function() {
+    afterEach('should close the geoPackage', async function () {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
 
-    it('should test rtree index extension', function() {
+    it('should test rtree index extension', function () {
       geoPackage.getExtensionManager().deleteExtensions();
 
       const linker = new FeatureTileTableLinker(geoPackage);
@@ -54,13 +51,13 @@ describe('FeatureTileTableLinker tests', function() {
             // Link the tables
             linker.link(featureTable, tileTable);
             assert.isTrue(linker.isLinked(featureTable, tileTable));
-            dao.count().should.be.equal(count + 1)
+            dao.count().should.be.equal(count + 1);
             assert.isTrue(linker.has());
 
             // Shouldn't hurt to link it twice
             linker.link(featureTable, tileTable);
             assert.isTrue(linker.isLinked(featureTable, tileTable));
-            dao.count().should.be.equal(count + 1)
+            dao.count().should.be.equal(count + 1);
             assert.isTrue(linker.has());
 
             // Verify linked feature tables

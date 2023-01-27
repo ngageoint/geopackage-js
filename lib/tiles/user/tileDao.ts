@@ -153,7 +153,6 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
         const zoom = Math.ceil(Math.log2(360 / width));
         this.webZoomToGeoPackageZooms.set(zoom, tileMatrix.getZoomLevel());
       }
-
     }
   }
 
@@ -289,7 +288,7 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
    * @return zoom level set
    */
   public getZoomLevels(): number[] {
-    return Object.keys(this.zoomLevelToTileMatrix).map(key => Number.parseInt(key));
+    return Object.keys(this.zoomLevelToTileMatrix).map((key) => Number.parseInt(key));
   }
 
   /**
@@ -310,7 +309,7 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
    * @return tile matrix
    */
   public getTileMatrixAtMinZoom(): TileMatrix {
-    const minZoom = Math.min(...Object.keys(this.zoomLevelToTileMatrix).map(key => Number.parseInt(key)));
+    const minZoom = Math.min(...Object.keys(this.zoomLevelToTileMatrix).map((key) => Number.parseInt(key)));
     return this.zoomLevelToTileMatrix[minZoom];
   }
 

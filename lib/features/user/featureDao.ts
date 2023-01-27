@@ -37,12 +37,7 @@ export class FeatureDao extends UserDao<FeatureColumn, FeatureTable, FeatureRow,
    * @param geometryColumns geometry columns
    * @param table feature table
    */
-  public constructor(
-    database: string,
-    geoPackage: GeoPackage,
-    geometryColumns: GeometryColumns,
-    table: FeatureTable,
-  ) {
+  public constructor(database: string, geoPackage: GeoPackage, geometryColumns: GeometryColumns, table: FeatureTable) {
     super(database, geoPackage, new FeatureConnection(geoPackage.getConnection()), table);
     this.featureDb = this.getUserDb() as FeatureConnection;
     this.geometryColumns = geometryColumns;

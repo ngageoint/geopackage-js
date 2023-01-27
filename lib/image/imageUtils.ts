@@ -24,22 +24,22 @@ export class ImageUtils {
     data: Uint8Array | Buffer | string,
     contentType = 'image/png',
   ): Promise<GeoPackageImage> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (data instanceof GeoPackageImage) {
         resolve(data);
       } else {
         Canvas.initializeAdapter()
           .then(() => {
             Canvas.createImage(data, contentType)
-              .then(image => {
+              .then((image) => {
                 resolve(image);
               })
-              .catch(e => {
+              .catch((e) => {
                 console.error(e);
                 resolve(null);
               });
           })
-          .catch(e => {
+          .catch((e) => {
             console.error(e);
             resolve(null);
           });
@@ -54,25 +54,25 @@ export class ImageUtils {
    * @returns {Promise<any>}
    */
   public static async getScaledImage(data: Buffer | string, scale: number): Promise<GeoPackageImage> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       ImageUtils.getImage(data)
-        .then(image => {
+        .then((image) => {
           if (scale === 1.0) {
             resolve(image);
           } else {
             Canvas.scaleImage(image, scale)
-              .then(scaledImage => {
+              .then((scaledImage) => {
                 Canvas.disposeImage(image);
                 resolve(scaledImage);
               })
-              .catch(e => {
+              .catch((e) => {
                 Canvas.disposeImage(image);
                 console.error(e);
                 resolve(null);
               });
           }
         })
-        .catch(e => {
+        .catch((e) => {
           console.error(e);
           resolve(null);
         });
@@ -87,13 +87,13 @@ export class ImageUtils {
    * @returns {Promise<any>}
    */
   public static async scaleImage(image: any, scaledWidth: number, scaledHeight: number): Promise<GeoPackageImage> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       Canvas.scaleImageToDimensions(image, scaledWidth, scaledHeight)
-        .then(scaledImage => {
+        .then((scaledImage) => {
           Canvas.disposeImage(image);
           resolve(scaledImage);
         })
-        .catch(e => {
+        .catch((e) => {
           Canvas.disposeImage(image);
           console.error(e);
           resolve(null);
@@ -146,7 +146,7 @@ export class ImageUtils {
    */
   public static async isFullyTransparent(data: Uint8Array | Buffer, width, height): Promise<boolean> {
     let transparent = true;
-    let image = await Canvas.createImage(data);
+    const image = await Canvas.createImage(data);
     const imageData = Canvas.getImageData(image);
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {

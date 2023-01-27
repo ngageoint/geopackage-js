@@ -248,7 +248,7 @@ export class ExtensionManager extends ExtensionManagement {
         const extendedRelationsDao = relatedTablesExtension.getExtendedRelationsDao();
         const extensionsDao = this.geoPackage.getExtensionsDao();
         const extendedRelations = extendedRelationsDao.getBaseTableRelations(table);
-        extendedRelations.forEach(extendedRelation => {
+        extendedRelations.forEach((extendedRelation) => {
           const mappingTableName = extendedRelation.getMappingTableName();
           const extensions = extensionsDao
             .queryByExtensionAndTableName(RelatedTablesExtension.EXTENSION_NAME, mappingTableName)
@@ -513,7 +513,7 @@ export class ExtensionManager extends ExtensionManagement {
    * @param table table name
    */
   public deleteMetadata(table: string): void {
-    const metadataReferenceDao = this.geoPackage.getMetadataReferenceDao()
+    const metadataReferenceDao = this.geoPackage.getMetadataReferenceDao();
     try {
       if (metadataReferenceDao.isTableExists()) {
         metadataReferenceDao.deleteByTableName(table);

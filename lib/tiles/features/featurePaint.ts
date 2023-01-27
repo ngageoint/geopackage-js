@@ -2,8 +2,7 @@ import { FeatureDrawType } from './featureDrawType';
 import { Paint } from './paint';
 
 /**
- * FeaturePaint module.
- * @module tiles/features
+ * FeaturePaint
  */
 export class FeaturePaint {
   private featurePaints = {};

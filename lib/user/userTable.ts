@@ -392,7 +392,7 @@ export abstract class UserTable<TColumn extends UserColumn> {
    *
    * @param contents contents
    */
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected validateContents(contents: Contents): void {}
 
   /**

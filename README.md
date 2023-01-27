@@ -42,7 +42,7 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 - GeoPackageExtensions is now ExtensionManager
 - GeoPackageAPI is now GeoPackageManager
 - Added FeatureTileTableLink extension
-- Added Coverage extension
+- Added support for extended geometry types
 - Added Properties extension
 - Added ZoomOther extension
 - Added support for drawing extended geometry types
@@ -52,6 +52,7 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 - Reworked UserRow, UserTable, and UserColumn and updated all super types
 - Added in FeatureConnection, TileConnection, AttributesConnection and UserCustomConnections.
 - Added GeoPackageCache
+- 
 
 ##### 4.2.3
 

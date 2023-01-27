@@ -1,6 +1,3 @@
-/**
- * @module extension/relatedTables
- */
 import { UserCustomDao } from '../../user/custom/userCustomDao';
 import { UserMappingTable } from './userMappingTable';
 import { UserMappingRow } from './userMappingRow';
@@ -156,10 +153,7 @@ export class UserMappingDao extends UserCustomDao {
    * @return result set
    */
   public queryByIds(baseId: number, relatedId: number): UserCustomResultSet {
-    return this.query(
-      this.buildWhereIds(baseId, relatedId),
-      this.buildWhereIdsArgs(baseId, relatedId),
-    );
+    return this.query(this.buildWhereIds(baseId, relatedId), this.buildWhereIdsArgs(baseId, relatedId));
   }
 
   /**
@@ -219,10 +213,7 @@ export class UserMappingDao extends UserCustomDao {
    * @return count
    */
   public countByIds(baseId: number, relatedId: number): number {
-    return this.count(
-      this.buildWhereIds(baseId, relatedId),
-      this.buildWhereIdsArgs(baseId, relatedId),
-    );
+    return this.count(this.buildWhereIds(baseId, relatedId), this.buildWhereIdsArgs(baseId, relatedId));
   }
 
   /**

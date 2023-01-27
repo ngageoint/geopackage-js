@@ -1,8 +1,3 @@
-/**
- * @memberOf module:extension/nga/style
- * @class IconRow
- */
-
 import { IconTable } from './iconTable';
 import { MediaRow } from '../../related/media/mediaRow';
 import { ImageUtils } from '../../../image/imageUtils';

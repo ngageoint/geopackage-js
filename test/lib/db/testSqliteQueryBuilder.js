@@ -1,8 +1,7 @@
 var QueryBuilder = require('../../../lib/db/sqliteQueryBuilder').SqliteQueryBuilder;
 
-describe('SqliteQueryBuilder tests', function() {
-
-  it('should create a query', function() {
+describe('SqliteQueryBuilder tests', function () {
+  it('should create a query', function () {
     var parameters = {
       distinct: true,
       tables: 'test_table',
@@ -11,14 +10,26 @@ describe('SqliteQueryBuilder tests', function() {
       groupBy: 'grouping_column',
       having: 'having clause',
       orderBy: 'order_column',
-      limit: 500
-    }
-    var query = QueryBuilder.buildQuery(parameters.distinct, parameters.tables, parameters.columns, parameters.where, parameters.join, parameters.groupBy, parameters.having, parameters.orderBy, parameters.limit);
+      limit: 500,
+    };
+    var query = QueryBuilder.buildQuery(
+      parameters.distinct,
+      parameters.tables,
+      parameters.columns,
+      parameters.where,
+      parameters.join,
+      parameters.groupBy,
+      parameters.having,
+      parameters.orderBy,
+      parameters.limit,
+    );
 
-    query.should.be.equal('select distinct * from test_table join where a = 1 group by grouping_column having having clause order by order_column limit 500');
+    query.should.be.equal(
+      'select distinct * from test_table join where a = 1 group by grouping_column having having clause order by order_column limit 500',
+    );
   });
 
-  it('should create a query with columns', function() {
+  it('should create a query with columns', function () {
     var parameters = {
       distinct: true,
       tables: 'test_table',
@@ -28,14 +39,26 @@ describe('SqliteQueryBuilder tests', function() {
       groupBy: 'grouping_column',
       having: 'having clause',
       orderBy: 'order_column',
-      limit: 500
-    }
-    var query = QueryBuilder.buildQuery(parameters.distinct, parameters.tables, parameters.columns, parameters.where, parameters.join, parameters.groupBy, parameters.having, parameters.orderBy, parameters.limit);
+      limit: 500,
+    };
+    var query = QueryBuilder.buildQuery(
+      parameters.distinct,
+      parameters.tables,
+      parameters.columns,
+      parameters.where,
+      parameters.join,
+      parameters.groupBy,
+      parameters.having,
+      parameters.orderBy,
+      parameters.limit,
+    );
 
-    query.should.be.equal('select distinct "column1", "column2", "column3" from test_table join where a = 1 group by grouping_column having having clause order by order_column limit 500');
+    query.should.be.equal(
+      'select distinct "column1", "column2", "column3" from test_table join where a = 1 group by grouping_column having having clause order by order_column limit 500',
+    );
   });
 
-  it('should create a query selecting all columns for a table', function() {
+  it('should create a query selecting all columns for a table', function () {
     var parameters = {
       distinct: true,
       tables: 'test_table',
@@ -45,10 +68,21 @@ describe('SqliteQueryBuilder tests', function() {
       groupBy: 'grouping_column',
       having: 'having clause',
       orderBy: 'order_column',
-      limit: 500
-    }
-    var query = QueryBuilder.buildQuery(parameters.distinct, parameters.tables, parameters.columns, parameters.where, parameters.join, parameters.groupBy, parameters.having, parameters.orderBy, parameters.limit);
-    query.should.be.equal('select distinct test_table.* from test_table join where a = 1 group by grouping_column having having clause order by order_column limit 500');
+      limit: 500,
+    };
+    var query = QueryBuilder.buildQuery(
+      parameters.distinct,
+      parameters.tables,
+      parameters.columns,
+      parameters.where,
+      parameters.join,
+      parameters.groupBy,
+      parameters.having,
+      parameters.orderBy,
+      parameters.limit,
+    );
+    query.should.be.equal(
+      'select distinct test_table.* from test_table join where a = 1 group by grouping_column having having clause order by order_column limit 500',
+    );
   });
-
 });

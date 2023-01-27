@@ -1,16 +1,13 @@
-import { default as testSetup } from '../../../testSetup'
-import {RelatedTablesExtension} from '../../../../lib/extension/related/relatedTablesExtension'
-import {UserMappingTable} from '../../../../lib/extension/related/userMappingTable';
-import { GeoPackageDataType } from "../../../../lib/db/geoPackageDataType";
-import { RelationType } from "../../../../lib/extension/related/relationType";
-import { ContentsDataType } from "../../../../lib/contents/contentsDataType";
+import { default as testSetup } from '../../../testSetup';
+import { RelatedTablesExtension } from '../../../../lib/extension/related/relatedTablesExtension';
+import { UserMappingTable } from '../../../../lib/extension/related/userMappingTable';
+import { GeoPackageDataType } from '../../../../lib/db/geoPackageDataType';
+import { RelationType } from '../../../../lib/extension/related/relationType';
+import { ContentsDataType } from '../../../../lib/contents/contentsDataType';
 
-var DataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
-  , RelatedTablesUtils = require('./relatedTablesUtils')
-  , should = require('chai').should()
-  , assert = require('chai').assert
-  , path = require('path');
-
+var RelatedTablesUtils = require('./relatedTablesUtils'),
+  assert = require('chai').assert,
+  path = require('path');
 
 /**
  * Verify they equal
@@ -21,24 +18,24 @@ function assertEquals(a, b) {
   a.should.equal(b);
 }
 
-describe('Related Attributes tests', function() {
+describe('Related Attributes tests', function () {
   var geoPackage;
 
   var filename;
-  beforeEach('create the GeoPackage connection', async function() {
+  beforeEach('create the GeoPackage connection', async function () {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'import_db.gpkg');
-    // @ts-ignore
+
     let result = await copyAndOpenGeopackage(originalFilename);
     filename = result.path;
     geoPackage = result.geoPackage;
   });
 
-  afterEach('delete the geoPackage', async function() {
+  afterEach('delete the geoPackage', async function () {
     geoPackage.close();
     await testSetup.deleteGeoPackage(filename);
-  })
+  });
 
-  it('should create an attributes relationship', function() {
+  it('should create an attributes relationship', function () {
     try {
       // Create a related tables extension
       const rte = new RelatedTablesExtension(geoPackage);
@@ -55,15 +52,18 @@ describe('Related Attributes tests', function() {
       if (attributesTables.length === 0) {
         return; // pass with no testing
       }
-      const baseTableName = attributesTables[(Math.floor(Math.random() * attributesTables.length))];
-      const relatedTableName = attributesTables[(Math.floor(Math.random() * attributesTables.length))];
+      const baseTableName = attributesTables[Math.floor(Math.random() * attributesTables.length)];
+      const relatedTableName = attributesTables[Math.floor(Math.random() * attributesTables.length)];
 
       // Create and validate a mapping table
       const additionalMappingColumns = RelatedTablesUtils.createAdditionalUserColumns();
-      const mappingTableName = "attributes_attributes";
+      const mappingTableName = 'attributes_attributes';
       let userMappingTable = UserMappingTable.create(mappingTableName, additionalMappingColumns);
       assert.isFalse(rte.hasExtensionForMappingTable(userMappingTable.getTableName()));
-      assertEquals(UserMappingTable.numRequiredColumns() + additionalMappingColumns.length, userMappingTable.getColumns().length);
+      assertEquals(
+        UserMappingTable.numRequiredColumns() + additionalMappingColumns.length,
+        userMappingTable.getColumns().length,
+      );
       const baseIdColumn = userMappingTable.getBaseIdColumn();
       assert.isNotNull(baseIdColumn);
       assert.isTrue(baseIdColumn.isNamed(UserMappingTable.COLUMN_BASE_ID));
@@ -80,7 +80,11 @@ describe('Related Attributes tests', function() {
 
       // Create the relationship between the attributes table and attributes
       // table
-      let extendedRelation = rte.addAttributesRelationshipWithMappingTable(baseTableName, relatedTableName, userMappingTable);
+      let extendedRelation = rte.addAttributesRelationshipWithMappingTable(
+        baseTableName,
+        relatedTableName,
+        userMappingTable,
+      );
       assert.isTrue(rte.has());
       assert.isTrue(rte.hasExtensionForMappingTable(userMappingTable.getTableName()));
       assert.isNotNull(extendedRelation);
@@ -113,8 +117,8 @@ describe('Related Attributes tests', function() {
       let userMappingRow = null;
       for (let i = 0; i < 10; i++) {
         userMappingRow = dao.newRow();
-        userMappingRow.setBaseId(attributeIds[(Math.floor(Math.random() * attributesCount))]);
-        userMappingRow.setRelatedId(attributeIds2[(Math.floor(Math.random() * attributesCount2))]);
+        userMappingRow.setBaseId(attributeIds[Math.floor(Math.random() * attributesCount)]);
+        userMappingRow.setRelatedId(attributeIds2[Math.floor(Math.random() * attributesCount2)]);
         RelatedTablesUtils.populateUserRow(userMappingTable, userMappingRow, UserMappingTable.requiredColumns());
         assert.isTrue(dao.create(userMappingRow) > 0);
       }

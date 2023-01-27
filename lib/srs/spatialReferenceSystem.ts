@@ -90,9 +90,7 @@ export class SpatialReferenceSystem {
    *
    * @param srs_name srs name
    */
-  // eslint-disable-next-line @typescript-eslint/camelcase
   public setSrsName(srs_name: string): void {
-    // eslint-disable-next-line @typescript-eslint/camelcase
     this.srs_name = srs_name;
   }
 
@@ -110,9 +108,7 @@ export class SpatialReferenceSystem {
    *
    * @param srs_id srs id
    */
-  // eslint-disable-next-line @typescript-eslint/camelcase
   public setSrsId(srs_id: number): void {
-    // eslint-disable-next-line @typescript-eslint/camelcase
     this.srs_id = srs_id;
   }
 
@@ -148,9 +144,7 @@ export class SpatialReferenceSystem {
    *
    * @param organization_coordsys_id organization coordsys id
    */
-  // eslint-disable-next-line @typescript-eslint/camelcase
   public setOrganizationCoordsysId(organization_coordsys_id: number): void {
-    // eslint-disable-next-line @typescript-eslint/camelcase
     this.organization_coordsys_id = organization_coordsys_id;
   }
 
@@ -195,7 +189,6 @@ export class SpatialReferenceSystem {
    *
    * @return 12_06 3WKT definition
    */
-  // eslint-disable-next-line @typescript-eslint/camelcase
   public getDefinition_12_063(): string {
     return this.definition_12_063;
   }
@@ -205,9 +198,7 @@ export class SpatialReferenceSystem {
    *
    * @param definition_12_063 12_063 WKT definition
    */
-  // eslint-disable-next-line @typescript-eslint/camelcase
   public setDefinition_12_063(definition_12_063: string): void {
-    // eslint-disable-next-line @typescript-eslint/camelcase
     this.definition_12_063 = definition_12_063;
   }
 

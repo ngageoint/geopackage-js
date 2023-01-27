@@ -1,41 +1,36 @@
-import { default as testSetup } from '../../../testSetup'
-import {RelatedTablesExtension} from '../../../../lib/extension/related/relatedTablesExtension'
-import { MediaTableMetadata } from "../../../../lib/extension/related/media/mediaTableMetadata";
-import { UserMappingRow } from "../../../../lib/extension/related/userMappingRow";
-import { MediaRow } from "../../../../lib/extension/related/media/mediaRow";
-import { UserTableMetadataConstants } from "../../../../lib/user/userTableMetadataConstants";
+import { default as testSetup } from '../../../testSetup';
+import { MediaTableMetadata } from '../../../../lib/extension/related/media/mediaTableMetadata';
+import { UserMappingRow } from '../../../../lib/extension/related/userMappingRow';
+import { MediaRow } from '../../../../lib/extension/related/media/mediaRow';
+import { UserTableMetadataConstants } from '../../../../lib/user/userTableMetadataConstants';
 
-let DataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
-  , ContentsDataType = require('../../../../lib/contents/contentsDataType').ContentsDataType
-  , UserMappingTable = require('../../../../lib/extension/related/userMappingTable').UserMappingTable
-  , MediaTable = require('../../../../lib/extension/related/media/mediaTable').MediaTable
-  , RelatedTablesUtils = require('./relatedTablesUtils')
-  , should = require('chai').should()
-  , path = require('path');
+let DataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType,
+  ContentsDataType = require('../../../../lib/contents/contentsDataType').ContentsDataType,
+  UserMappingTable = require('../../../../lib/extension/related/userMappingTable').UserMappingTable,
+  MediaTable = require('../../../../lib/extension/related/media/mediaTable').MediaTable,
+  RelatedTablesUtils = require('./relatedTablesUtils'),
+  should = require('chai').should(),
+  path = require('path');
 
-describe('Related Media tests', function() {
-
-  let testGeoPackage;
-  let testPath = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp');
+describe('Related Media tests', function () {
   let geoPackage;
 
   let tileBuffer;
 
   let filename;
-  beforeEach('create the GeoPackage connection', async function() {
+  beforeEach('create the GeoPackage connection', async function () {
     let originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'gdal_sample.gpkg');
-    // @ts-ignore
+
     let result = await copyAndOpenGeopackage(originalFilename);
     filename = result.path;
     geoPackage = result.geoPackage;
 
-    // @ts-ignore
     tileBuffer = await loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'tiles', '0', '0', '0.png'));
   });
 
-  afterEach('delete the geoPackage', async function() {
+  afterEach('delete the geoPackage', async function () {
     await testSetup.deleteGeoPackage(filename);
-  })
+  });
 
   function validateContents(mediaTable, contents) {
     should.exist(contents);
@@ -45,9 +40,8 @@ describe('Related Media tests', function() {
     should.exist(contents.getLastChange());
   }
 
-  it('should create a media relationship', function() {
+  it('should create a media relationship', function () {
     try {
-
       this.timeout(5000);
       let rte = geoPackage.getRelatedTablesExtension();
       rte.has().should.be.equal(false);
@@ -87,7 +81,10 @@ describe('Related Media tests', function() {
       let mappingTableName = 'features_media';
       let userMappingTable = UserMappingTable.create(mappingTableName, additionalMappingColumns);
       rte.hasExtensionForMappingTable(userMappingTable.getTableName()).should.be.equal(false);
-      userMappingTable.getUserColumns().getColumnNames().length.should.be.equal(UserMappingTable.numRequiredColumns() + additionalMappingColumns.length);
+      userMappingTable
+        .getUserColumns()
+        .getColumnNames()
+        .length.should.be.equal(UserMappingTable.numRequiredColumns() + additionalMappingColumns.length);
 
       let baseIdColumn = userMappingTable.getBaseIdColumn();
       should.exist(baseIdColumn);
@@ -169,7 +166,7 @@ describe('Related Media tests', function() {
         const row = resultSet.getRow();
         mediaIds.push(row.getId());
       }
-      resultSet.close()
+      resultSet.close();
 
       // Insert user mapping rows between feature ids and media ids
       let userMappingDao = rte.getMappingDao(mappingTableName);
@@ -200,7 +197,7 @@ describe('Related Media tests', function() {
         RelatedTablesUtils.validateDublinCoreColumns(row);
         manualCount++;
       }
-      resultSet.close()
+      resultSet.close();
 
       manualCount.should.be.equal(count);
 
@@ -234,7 +231,7 @@ describe('Related Media tests', function() {
           RelatedTablesUtils.validateUserRow(mappingColumns, userMappingRow);
           RelatedTablesUtils.validateDublinCoreColumns(userMappingRow);
         }
-        resultSet.close()
+        resultSet.close();
 
         // get and test the media DAO
         mediaDao = rte.getMediaDaoWithExtendedRelation(featureRelation);
@@ -253,7 +250,7 @@ describe('Related Media tests', function() {
           let mediaRows = mediaDao.getRows(mappedIds);
           mediaRows.length.should.be.equal(mappedIds.length);
 
-          mediaRows.forEach(function(row) {
+          mediaRows.forEach(function (row) {
             let mediaRow = row;
             mediaRow.hasId().should.be.equal(true);
             mediaRow.getId().should.be.greaterThan(0);
@@ -281,7 +278,7 @@ describe('Related Media tests', function() {
       extendedRelationsDao.getBaseTableRelations(mediaTable.getTableName()).length.should.be.equal(0);
 
       // Test the media table relations
-      mediaRelatedTableRelations.forEach(function(mediaRelation) {
+      mediaRelatedTableRelations.forEach(function (mediaRelation) {
         // Test the relation
         mediaRelation.getId().should.be.greaterThan(0);
         featureDao.getTableName().should.be.equal(mediaRelation.getBaseTableName());
@@ -320,7 +317,7 @@ describe('Related Media tests', function() {
         while (resultSet.moveToNext()) {
           let mediaRow = new MediaRow(resultSet.getRow());
           let mappedIds = rte.getMappingsForRelated(mediaRelation.getMappingTableName(), mediaRow.getId());
-          mappedIds.forEach(function(mappedId){
+          mappedIds.forEach(function (mappedId) {
             let featureRow = featureDao.queryForIdRow(mappedId);
             should.exist(featureRow);
             featureRow.hasId().should.be.equal(true);
@@ -337,18 +334,18 @@ describe('Related Media tests', function() {
           });
           totalMapped += mappedIds.length;
         }
-        resultSet.close()
+        resultSet.close();
         totalMapped.should.be.equal(totalMappedCount);
       });
 
       // get the first row
-      let userMappingRow = null
+      let userMappingRow = null;
       resultSet = userMappingDao.queryForAll();
       while (resultSet.moveToNext()) {
         userMappingRow = new UserMappingRow(resultSet.getRow());
         break;
       }
-      resultSet.close()
+      resultSet.close();
 
       // Delete a single mapping
       let countOfIds = userMappingDao.countByIdsWithUserMappingRow(userMappingRow);

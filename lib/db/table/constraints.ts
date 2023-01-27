@@ -24,13 +24,13 @@ export class Constraints {
    * @param constraint constraint
    */
   add(constraint: Constraint): void {
-    const orders = this.constraints.map(c => c.order);
+    const orders = this.constraints.map((c) => c.order);
 
     const lastIndex = orders.lastIndexOf(constraint.order);
     let insertLocation = lastIndex + 1;
     if (lastIndex === -1) {
       insertLocation = sortedIndex(
-        this.constraints.map(c => c.order),
+        this.constraints.map((c) => c.order),
         constraint.order,
       );
     }
@@ -138,7 +138,7 @@ export class Constraints {
     if (typedConstraints === null) {
       typedConstraints = [];
     } else if (typedConstraints.length === 0) {
-      this.constraints = this.constraints.filter(c => c.getType() !== type);
+      this.constraints = this.constraints.filter((c) => c.getType() !== type);
     }
     return typedConstraints;
   }

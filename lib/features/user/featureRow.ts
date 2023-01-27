@@ -66,7 +66,10 @@ export class FeatureRow extends UserRow<FeatureColumn, FeatureTable> {
    * Handles geometry columns
    */
   public setValue(columnName: string, value: any): void {
-    if (columnName.toLowerCase() === this.getGeometryColumnName().toLowerCase() && (value instanceof Buffer || value instanceof Uint8Array)) {
+    if (
+      columnName.toLowerCase() === this.getGeometryColumnName().toLowerCase() &&
+      (value instanceof Buffer || value instanceof Uint8Array)
+    ) {
       const buffer = Buffer.from(value);
       value = GeoPackageGeometryData.createWithBuffer(buffer);
     }

@@ -208,7 +208,7 @@ export class ResultSet {
   /**
    * Returns true if this result has a value after calling next
    */
-  hasValue (): boolean {
+  hasValue(): boolean {
     return this.nextValue != null;
   }
 }

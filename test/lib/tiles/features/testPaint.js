@@ -1,9 +1,7 @@
+var Paint = require('../../../../lib/tiles/features/paint').Paint;
 
-var Paint = require('../../../../lib/tiles/features/paint').Paint
-, should = require('chai').should();
-
-describe('Paint Tests', function() {
-  it('should test Paint', function() {
+describe('Paint Tests', function () {
+  it('should test Paint', function () {
     var paint = new Paint();
     paint.getColor().should.be.equal('#000000FF');
     paint.getStrokeWidth().should.be.equal(1.0);

@@ -219,9 +219,9 @@ export class PropertiesManager {
   public getProperties(): string[] {
     const allProperties = new Set<string>();
     for (const properties of this.propertiesMap.values()) {
-      properties.getProperties().forEach(property => {
+      properties.getProperties().forEach((property) => {
         allProperties.add(property);
-      })
+      });
     }
     return Array.from(allProperties);
   }
@@ -282,11 +282,11 @@ export class PropertiesManager {
    * @return set of values
    */
   public getValues(property: string): string[] {
-    const allValues = new Set<string>;
+    const allValues = new Set<string>();
     for (const properties of this.propertiesMap.values()) {
-      properties.getValues(property).forEach(value => {
+      properties.getValues(property).forEach((value) => {
         allValues.add(value);
-      })
+      });
     }
     return Array.from(allValues);
   }

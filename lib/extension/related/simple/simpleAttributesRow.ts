@@ -1,8 +1,3 @@
-/**
- * SimpleAttributesRow module.
- * @module extension/relatedTables
- */
-
 import { SimpleAttributesTable } from './simpleAttributesTable';
 import { UserCustomRow } from '../../../user/custom/userCustomRow';
 import { UserCustomColumn } from '../../../user/custom/userCustomColumn';

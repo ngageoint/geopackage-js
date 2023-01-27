@@ -96,7 +96,7 @@ export class TileTableScaling extends BaseExtension {
     } catch (e) {
       throw new GeoPackageException(
         'Failed to create or update tile scaling for GeoPackage: ' +
-          + this.geoPackage.getName() +
+          +this.geoPackage.getName() +
           ', Tile Table: ' +
           this.tableName,
       );
@@ -124,9 +124,11 @@ export class TileTableScaling extends BaseExtension {
         tileScaling = this.tileScalingDao.queryForId(this.tableName);
       } catch (e) {
         throw new GeoPackageException(
-          "Failed to query for tile scaling for GeoPackage: "
-          + this.geoPackage.getName() + ", Tile Table: "
-          + this.tableName);
+          'Failed to query for tile scaling for GeoPackage: ' +
+            this.geoPackage.getName() +
+            ', Tile Table: ' +
+            this.tableName,
+        );
       }
     }
     return tileScaling;
@@ -138,14 +140,17 @@ export class TileTableScaling extends BaseExtension {
   has(): boolean {
     let exists = false;
     try {
-      exists = this.hasExtension(TileTableScaling.EXTENSION_NAME, this.tableName, null)
-        && this.tileScalingDao.isTableExists()
-        && this.tileScalingDao.idExists(this.tableName);
+      exists =
+        this.hasExtension(TileTableScaling.EXTENSION_NAME, this.tableName, null) &&
+        this.tileScalingDao.isTableExists() &&
+        this.tileScalingDao.idExists(this.tableName);
     } catch (e) {
       throw new GeoPackageException(
-        "Failed to check for tile scaling for GeoPackage: "
-        + this.geoPackage.getName() + ", Tile Table: "
-        + this.tableName);
+        'Failed to check for tile scaling for GeoPackage: ' +
+          this.geoPackage.getName() +
+          ', Tile Table: ' +
+          this.tableName,
+      );
     }
     return exists;
   }
@@ -156,7 +161,6 @@ export class TileTableScaling extends BaseExtension {
    * @return true if deleted
    */
   public delete(): boolean {
-
     let deleted = false;
 
     try {
@@ -164,12 +168,17 @@ export class TileTableScaling extends BaseExtension {
         deleted = this.tileScalingDao.deleteById(this.tableName) > 0;
       }
       if (this.extensionsDao.isTableExists()) {
-        deleted = this.extensionsDao.deleteByExtensionAndTableName(TileTableScaling.EXTENSION_NAME, this.tableName) > 0 || deleted;
+        deleted =
+          this.extensionsDao.deleteByExtensionAndTableName(TileTableScaling.EXTENSION_NAME, this.tableName) > 0 ||
+          deleted;
       }
     } catch (e) {
       throw new GeoPackageException(
-        "Failed to delete tile table scaling for GeoPackage: "
-        + this.geoPackage.getName() + ", Table: " + this.tableName);
+        'Failed to delete tile table scaling for GeoPackage: ' +
+          this.geoPackage.getName() +
+          ', Table: ' +
+          this.tableName,
+      );
     }
 
     return deleted;

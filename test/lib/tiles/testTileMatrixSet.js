@@ -1,35 +1,33 @@
-var TileMatrixSetDao = require('../../../lib/tiles/matrixset/tileMatrixSetDao').TileMatrixSetDao
-, BoundingBox = require('../../../lib/boundingBox').BoundingBox
-, testSetup = require('../../testSetup').default
-, should = require('chai').should()
-, path = require('path');
+var TileMatrixSetDao = require('../../../lib/tiles/matrixset/tileMatrixSetDao').TileMatrixSetDao,
+  BoundingBox = require('../../../lib/boundingBox').BoundingBox,
+  testSetup = require('../../testSetup').default,
+  should = require('chai').should(),
+  path = require('path');
 
-describe('Tile Matrix Set tests', function() {
-
+describe('Tile Matrix Set tests', function () {
   var geoPackage;
   var tileMatrixSetDao;
   var filename;
 
-  beforeEach('should open the geoPackage', async function() {
+  beforeEach('should open the geoPackage', async function () {
     var riversfilename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
-    // @ts-ignore
     let result = await copyAndOpenGeopackage(riversfilename);
     filename = result.path;
     geoPackage = result.geoPackage;
     tileMatrixSetDao = new TileMatrixSetDao(geoPackage);
   });
 
-  afterEach('should close the geoPackage', async function() {
+  afterEach('should close the geoPackage', async function () {
     geoPackage.close();
     await testSetup.deleteGeoPackage(filename);
   });
 
-  it('should get the tile matrixes', function() {
+  it('should get the tile matrixes', function () {
     var tileMatrixSets = tileMatrixSetDao.queryForAll();
     tileMatrixSets.should.have.property('length', 1);
   });
 
-  it('should get the TileMatrixSet from the ID', function() {
+  it('should get the TileMatrixSet from the ID', function () {
     var tileMatrixSet = tileMatrixSetDao.queryForId('TILESosmds');
     should.exist(tileMatrixSet);
     tileMatrixSet.should.have.property('table_name', 'TILESosmds');
@@ -40,21 +38,21 @@ describe('Tile Matrix Set tests', function() {
     tileMatrixSet.should.have.property('max_y', 20037508.342789244);
   });
 
-  it('should get the tile table names from the TileMatrixSet', function() {
+  it('should get the tile table names from the TileMatrixSet', function () {
     var tableNames = tileMatrixSetDao.getTileTables();
     should.exist(tableNames);
     tableNames.should.have.property('length', 1);
     tableNames[0].should.be.equal('TILESosmds');
   });
 
-  it('should get the projection from the TileMatrixSet', function() {
+  it('should get the projection from the TileMatrixSet', function () {
     var tileMatrixSet = tileMatrixSetDao.queryForId('TILESosmds');
     should.exist(tileMatrixSet);
     var projection = tileMatrixSetDao.getProjection(tileMatrixSet);
     should.exist(projection);
   });
 
-  it('should get the Contents from the TileMatrixSet', function(done) {
+  it('should get the Contents from the TileMatrixSet', function (done) {
     var tileMatrixSet = tileMatrixSetDao.queryForId('TILESosmds');
     should.exist(tileMatrixSet);
     var contents = tileMatrixSetDao.getContents(tileMatrixSet);
@@ -63,7 +61,7 @@ describe('Tile Matrix Set tests', function() {
     contents.should.have.property('data_type', 'tiles');
     contents.should.have.property('identifier', 'TILESosmds');
     contents.should.have.property('description', null);
-    contents.getLastChange().toISOString().should.be.equal('2015-12-04T15:28:53.871Z')
+    contents.getLastChange().toISOString().should.be.equal('2015-12-04T15:28:53.871Z');
     contents.should.have.property('min_x', -180);
     contents.should.have.property('min_y', -85.0511287798066);
     contents.should.have.property('max_x', 180);
@@ -72,7 +70,7 @@ describe('Tile Matrix Set tests', function() {
     done();
   });
 
-  it('should get the BoundingBox from the TileMatrixSet', function(done) {
+  it('should get the BoundingBox from the TileMatrixSet', function (done) {
     var tileMatrixSet = tileMatrixSetDao.queryForId('TILESosmds');
     should.exist(tileMatrixSet);
     var bb = tileMatrixSet.getBoundingBox();
@@ -83,7 +81,7 @@ describe('Tile Matrix Set tests', function() {
     done();
   });
 
-  it('should set the BoundingBox from the TileMatrixSet', function(done) {
+  it('should set the BoundingBox from the TileMatrixSet', function (done) {
     var tileMatrixSet = tileMatrixSetDao.queryForId('TILESosmds');
     should.exist(tileMatrixSet);
     var bb = new BoundingBox(-1, -1, 1, 1);
@@ -94,5 +92,4 @@ describe('Tile Matrix Set tests', function() {
     tileMatrixSet.should.have.property('max_y', 1);
     done();
   });
-
 });

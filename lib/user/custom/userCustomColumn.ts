@@ -36,7 +36,15 @@ export class UserCustomColumn extends UserColumn {
     max?: number,
     autoincrement?: boolean,
   ): UserCustomColumn {
-    return UserCustomColumn.createColumnWithIndex(UserCustomColumn.NO_INDEX, name, type, notNull, defaultValue, max, autoincrement);
+    return UserCustomColumn.createColumnWithIndex(
+      UserCustomColumn.NO_INDEX,
+      name,
+      type,
+      notNull,
+      defaultValue,
+      max,
+      autoincrement,
+    );
   }
 
   /**

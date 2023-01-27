@@ -74,7 +74,9 @@ export class ContentsIdExtension extends BaseExtension {
         contentsDao.create(contents);
       }
     } catch (e) {
-      throw new GeoPackageException('Failed to create contents entry for contents id. GeoPackage: ' + this.geoPackage.getName());
+      throw new GeoPackageException(
+        'Failed to create contents entry for contents id. GeoPackage: ' + this.geoPackage.getName(),
+      );
     }
 
     return extension;
@@ -324,7 +326,7 @@ export class ContentsIdExtension extends BaseExtension {
         query += ' WHERE ' + where;
       }
       query += ')';
-      contentIds = this.connection.all(query, params).map(result => this.contentsIdDao.createObject(result));
+      contentIds = this.connection.all(query, params).map((result) => this.contentsIdDao.createObject(result));
     }
     return contentIds;
   }
@@ -363,7 +365,7 @@ export class ContentsIdExtension extends BaseExtension {
       query += ' WHERE ' + where;
     }
 
-    return this.connection.all(query, params).map(result => result.table_name);
+    return this.connection.all(query, params).map((result) => result.table_name);
   }
 
   /**
@@ -391,7 +393,7 @@ export class ContentsIdExtension extends BaseExtension {
     try {
       if (!this.contentsIdDao.isTableExists()) {
         const tableCreator = new GeoPackageTableCreator(this.geoPackage);
-        created = tableCreator.execScript('contents_id');;
+        created = tableCreator.execScript('contents_id');
       }
     } catch (e) {
       throw new GeoPackageException('Failed to check if ContentsId table exists and create it');

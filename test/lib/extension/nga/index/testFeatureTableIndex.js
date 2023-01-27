@@ -1,27 +1,25 @@
-import { default as testSetup } from '../../../../testSetup'
-import { TestGeoPackageProgress } from "../../../io/testGeoPackageProgress";
-import { BoundingBox } from "../../../../../lib/boundingBox";
-import { ProjectionConstants, Projections } from "@ngageoint/projections-js";
-import { GeometryTransform } from "@ngageoint/simple-features-proj-js";
-import { Point } from "@ngageoint/simple-features-js";
-import { GeoPackageGeometryData } from "../../../../../lib/geom/geoPackageGeometryData";
-import { ExtensionScopeType } from "../../../../../lib/extension/extensionScopeType";
+import { default as testSetup } from '../../../../testSetup';
+import { TestGeoPackageProgress } from '../../../io/testGeoPackageProgress';
+import { BoundingBox } from '../../../../../lib/boundingBox';
+import { ProjectionConstants, Projections } from '@ngageoint/projections-js';
+import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
+import { Point } from '@ngageoint/simple-features-js';
+import { GeoPackageGeometryData } from '../../../../../lib/geom/geoPackageGeometryData';
+import { ExtensionScopeType } from '../../../../../lib/extension/extensionScopeType';
 
-var FeatureTableIndex = require('../../../../../lib/extension/nga/index/featureTableIndex').FeatureTableIndex
-  , assert = require('chai').assert
-  , path = require('path');
+var FeatureTableIndex = require('../../../../../lib/extension/nga/index/featureTableIndex').FeatureTableIndex,
+  assert = require('chai').assert,
+  path = require('path');
 
-describe('GeoPackage Feature Table Index Extension tests', function() {
-
-  describe('Create new index', function() {
+describe('GeoPackage Feature Table Index Extension tests', function () {
+  describe('Create new index', function () {
     var geoPackage;
 
     var originalFilename = path.join(__dirname, '..', '..', '..', '..', 'fixtures', 'import_db.gpkg');
     var filename;
 
-    beforeEach('create the GeoPackage connection', async function() {
+    beforeEach('create the GeoPackage connection', async function () {
       try {
-        // @ts-ignore
         let result = await copyAndOpenGeopackage(originalFilename);
         filename = result.path;
         geoPackage = result.geoPackage;
@@ -30,13 +28,13 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       }
     });
 
-    afterEach('should close the geoPackage', async function() {
+    afterEach('should close the geoPackage', async function () {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
 
-    it('test create', function() {
-      function validateGeometryIndex (featureTableIndex, geometryIndex) {
+    it('test create', function () {
+      function validateGeometryIndex(featureTableIndex, geometryIndex) {
         const featureRow = featureTableIndex.getFeatureRow(geometryIndex);
         assert.exists(featureRow);
         assert.equal(featureTableIndex.getTableName(), geometryIndex.getTableName());
@@ -80,7 +78,7 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
             // Randomly choose a feature row with Geometry for testing queries later
             if (testFeatureRow == null) {
               testFeatureRow = featureRow;
-            } else if (Math.random() < (1.0 / count)) {
+            } else if (Math.random() < 1.0 / count) {
               testFeatureRow = featureRow;
             }
           }
@@ -130,17 +128,17 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
 
         // Test the query by envelope
         let envelope = testFeatureRow.getGeometryEnvelope();
-        envelope.minX = (envelope.minX - .000001);
-        envelope.maxX = (envelope.maxX + .000001);
-        envelope.minY = (envelope.minY - .000001);
-        envelope.maxY = (envelope.maxY + .000001);
+        envelope.minX = envelope.minX - 0.000001;
+        envelope.maxX = envelope.maxX + 0.000001;
+        envelope.minY = envelope.minY - 0.000001;
+        envelope.maxY = envelope.maxY + 0.000001;
         if (envelope.hasZ) {
-          envelope.minZ = (envelope.minZ - .000001);
-          envelope.maxZ = (envelope.maxZ + .000001);
+          envelope.minZ = envelope.minZ - 0.000001;
+          envelope.maxZ = envelope.maxZ + 0.000001;
         }
         if (envelope.hasM) {
-          envelope.minM = (envelope.minM - .000001);
-          envelope.maxM = (envelope.maxM + .000001);
+          envelope.minM = envelope.minM - 0.000001;
+          envelope.maxM = envelope.maxM + 0.000001;
         }
         resultCount = 0;
         let featureFound = false;
@@ -158,11 +156,13 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
 
         // Pick a projection different from the feature dao and project the
         // bounding box
-        const boundingBox = new BoundingBox(envelope.minX - 1,
-          envelope.minY - 1, envelope.maxX + 1,
-          envelope.maxY + 1);
+        const boundingBox = new BoundingBox(envelope.minX - 1, envelope.minY - 1, envelope.maxX + 1, envelope.maxY + 1);
         let projection = null;
-        if (!featureDao.getProjection().equals(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)) {
+        if (
+          !featureDao
+            .getProjection()
+            .equals(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
+        ) {
           projection = Projections.getWGS84Projection();
         } else {
           projection = Projections.getWebMercatorProjection();
@@ -218,12 +218,16 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
 
       // Delete the extensions for the first half of the feature tables
       let everyOther = false;
-      for (const featureTable of featureTables.slice(0, Math.ceil(featureTables.length * .5))) {
+      for (const featureTable of featureTables.slice(0, Math.ceil(featureTables.length * 0.5))) {
         const featureDao = geoPackage.getFeatureDao(featureTable);
         let geometryCount = geometryIndexDao.queryForTableName(featureTable).length;
         assert.isTrue(geometryCount > 0);
         assert.exists(tableIndexDao.queryForId(featureTable));
-        let extensions = extensionsDao.queryByExtensionAndTableNameAndColumnName(FeatureTableIndex.EXTENSION_NAME, featureTable, featureDao.getGeometryColumnName());
+        let extensions = extensionsDao.queryByExtensionAndTableNameAndColumnName(
+          FeatureTableIndex.EXTENSION_NAME,
+          featureTable,
+          featureDao.getGeometryColumnName(),
+        );
         assert.isTrue(extensions.length > 0);
         const extension = extensions[0];
         assert.exists(extension);
@@ -260,7 +264,11 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
         assert.isFalse(featureTableIndex.isIndexed());
         assert.equal(0, geometryIndexDao.queryForTableName(featureTable).length);
         assert.notExists(tableIndexDao.queryForId(featureTable));
-        extensions = extensionsDao.queryByExtensionAndTableNameAndColumnName(FeatureTableIndex.EXTENSION_NAME, featureTable, featureDao.getGeometryColumnName());
+        extensions = extensionsDao.queryByExtensionAndTableNameAndColumnName(
+          FeatureTableIndex.EXTENSION_NAME,
+          featureTable,
+          featureDao.getGeometryColumnName(),
+        );
         assert.isTrue(extensions.length === 0);
         everyOther = !everyOther;
       }

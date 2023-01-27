@@ -1,7 +1,3 @@
-/**
- * @memberOf module:extension/nga/style
- * @class StyleMappingDao
- */
 import { UserMappingDao } from '../../related/userMappingDao';
 import { UserCustomDao } from '../../../user/custom/userCustomDao';
 import { StyleMappingTable } from './styleMappingTable';
@@ -18,8 +14,6 @@ export class StyleMappingDao extends UserMappingDao {
   /**
    * Constructor
    * @param userCustomDao
-   * @param geoPackage
-   * @param styleMappingTable
    */
   constructor(userCustomDao: UserCustomDao) {
     super(userCustomDao, StyleMappingDao.createMappingTable(userCustomDao));

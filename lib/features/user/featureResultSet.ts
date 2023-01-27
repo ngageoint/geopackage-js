@@ -26,7 +26,7 @@ export class FeatureResultSet extends UserResultSet<FeatureColumn, FeatureTable,
     columns: string[] | UserColumns<FeatureColumn>,
     resultSet: ResultSet,
     sql: string,
-    selectionArgs: any[],
+    selectionArgs: DBValue[],
   ) {
     super(table, columns, resultSet, sql, selectionArgs);
   }
@@ -43,7 +43,7 @@ export class FeatureResultSet extends UserResultSet<FeatureColumn, FeatureTable,
    * <p>
    * Handles geometries
    */
-  public getValueForColumn(column: FeatureColumn): any {
+  public getValueForColumn(column: FeatureColumn): DBValue {
     let value;
     if (column.isGeometry()) {
       value = this.getGeometry();
@@ -68,11 +68,7 @@ export class FeatureResultSet extends UserResultSet<FeatureColumn, FeatureTable,
   public getGeometry(): GeoPackageGeometryData {
     let geometry = null;
 
-    const geometryBytes = this.getBuffer(
-      this.getTable()
-        .getGeometryColumn()
-        .getName(),
-    );
+    const geometryBytes = this.getBuffer(this.getTable().getGeometryColumn().getName());
     if (geometryBytes != null) {
       geometry = GeoPackageGeometryData.createWithBuffer(geometryBytes);
     }

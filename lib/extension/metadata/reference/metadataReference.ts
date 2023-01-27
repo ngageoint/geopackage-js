@@ -1,8 +1,3 @@
-/**
- * MetadataReference module.
- * @module metadata/reference
- * @see module:dao/dao
- */
 import { Metadata } from '../metadata';
 import { DBValue } from '../../../db/dbValue';
 import { ReferenceScopeType } from './referenceScopeType';
@@ -15,6 +10,7 @@ type MetadataReferenceKeys =
   | 'timestamp'
   | 'md_file_id'
   | 'md_parent_id';
+
 /**
  * Links metadata in the gpkg_metadata table to data in the feature, and tiles tables
  * @class MetadataReference
@@ -187,7 +183,7 @@ export class MetadataReference {
    * Setter for the column name
    * @param columnName
    */
-  setColumnName(columnName: string) {
+  setColumnName(columnName: string): void {
     this.column_name = columnName;
   }
 
@@ -202,7 +198,7 @@ export class MetadataReference {
    * Setter for the row id value
    * @param rowIdValue
    */
-  setRowIdValue(rowIdValue: number) {
+  setRowIdValue(rowIdValue: number): void {
     this.row_id_value = rowIdValue;
   }
 
@@ -217,7 +213,7 @@ export class MetadataReference {
    * Setter for the timestamp
    * @param date
    */
-  setTimestamp(date: Date) {
+  setTimestamp(date: Date): void {
     this.timestamp = date;
   }
 
@@ -232,7 +228,7 @@ export class MetadataReference {
    * Setter the metadata file id
    * @param mdFileId
    */
-  setMdFileId(mdFileId: number) {
+  setMdFileId(mdFileId: number): void {
     this.md_file_id = mdFileId;
   }
 
@@ -247,7 +243,7 @@ export class MetadataReference {
    * Setter for the metadata parent id
    * @param mdParentId
    */
-  setMdParentId(mdParentId: number) {
+  setMdParentId(mdParentId: number): void {
     this.md_parent_id = mdParentId;
   }
 

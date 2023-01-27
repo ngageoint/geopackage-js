@@ -9,7 +9,6 @@ import { SQLiteMasterColumn } from '../master/sqliteMasterColumn';
 import { StringUtils } from '../stringUtils';
 import type { GeoPackageConnection } from '../geoPackageConnection';
 import { GeoPackageException } from '../../geoPackageException';
-import { DateConverter } from '../dateConverter';
 
 export class TableInfo {
   /**
@@ -75,7 +74,7 @@ export class TableInfo {
   constructor(tableName: string, columns: TableColumn[]) {
     this.tableName = tableName;
     this.columns = columns;
-    columns.forEach(column => {
+    columns.forEach((column) => {
       this.namesToColumns.set(column.getName(), column);
       if (column.isPrimaryKey()) {
         this.primaryKeys.push(column);
@@ -177,7 +176,7 @@ export class TableInfo {
     const results = db.all(sql, null);
     const tableColumns: TableColumn[] = [];
 
-    results.forEach(result => {
+    results.forEach((result) => {
       const index = result.cid;
       const name = result.name;
       let type = result.type;
@@ -270,7 +269,6 @@ export class TableInfo {
    */
   public static getDefaultValue(defaultValue: string, type: GeoPackageDataType): any {
     let value: any = defaultValue;
-
     if (defaultValue != null && type != null && defaultValue.toUpperCase() !== TableInfo.DEFAULT_NULL) {
       switch (type) {
         case GeoPackageDataType.TEXT:
@@ -278,7 +276,7 @@ export class TableInfo {
         case GeoPackageDataType.DATETIME:
           break;
         case GeoPackageDataType.BOOLEAN:
-          value = Number.parseInt(defaultValue) === 1
+          value = Number.parseInt(defaultValue) === 1;
           break;
         case GeoPackageDataType.TINYINT:
         case GeoPackageDataType.SMALLINT:
@@ -296,12 +294,10 @@ export class TableInfo {
           value = Buffer.from(defaultValue);
           break;
         default:
-          throw new GeoPackageException("Unsupported Data Type " + type);
+          throw new GeoPackageException('Unsupported Data Type ' + type);
       }
-
     }
 
     return value;
   }
-
 }

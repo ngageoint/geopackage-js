@@ -1,7 +1,3 @@
-/**
- * @memberOf module:extension/nga/style
- * @class StyleTable
- */
 import { AttributesTable } from '../../../attributes/attributesTable';
 import { RelationType } from '../../related/relationType';
 import { UserColumn } from '../../../user/userColumn';
@@ -9,10 +5,7 @@ import { GeoPackageDataType } from '../../../db/geoPackageDataType';
 import { AttributesColumn } from '../../../attributes/attributesColumn';
 
 /**
- * Icon Requirements Class Media Table
- * @param  {string} tableName table name
- * @param  {UserColumn[]} columns   media columns
- * @constructor
+ * StyleTable
  */
 export class StyleTable extends AttributesTable {
   public static readonly TABLE_NAME: string = 'nga_style';
@@ -138,7 +131,7 @@ export class StyleTable extends AttributesTable {
   }
   /**
    * Create a media table with a minimum required columns followed by the additional columns
-   * @return {module:extension/nga/style.StyleTable}
+   * @return {StyleTable}
    */
   static create(): StyleTable {
     return new StyleTable();

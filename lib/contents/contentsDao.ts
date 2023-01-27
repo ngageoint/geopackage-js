@@ -75,7 +75,7 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
     const results: Contents[] = [];
     if (tableTypes && tableTypes.length > 0) {
       const fieldValues = new FieldValues();
-      tableTypes.forEach(type => {
+      tableTypes.forEach((type) => {
         if (type != null) {
           fieldValues.addFieldValue(
             Contents.COLUMN_DATA_TYPE,
@@ -170,7 +170,7 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
                 tileMatrixCollection !== undefined &&
                 tileMatrixCollection.length > 0
               ) {
-                tileMatrixCollection.forEach(tileMatrix => {
+                tileMatrixCollection.forEach((tileMatrix) => {
                   tileMatrixDao.deleteByMultiId([tileMatrix.getTableName(), tileMatrix.getZoomLevel()]);
                 });
               }
@@ -253,7 +253,9 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
    * @return table names
    */
   public getTables(dataType?: ContentsDataType): string[] {
-    return this.getTablesForTypes(dataType != null ? [dataType] : [ContentsDataType.FEATURES, ContentsDataType.TILES, ContentsDataType.ATTRIBUTES]);
+    return this.getTablesForTypes(
+      dataType != null ? [dataType] : [ContentsDataType.FEATURES, ContentsDataType.TILES, ContentsDataType.ATTRIBUTES],
+    );
   }
 
   /**
@@ -266,7 +268,7 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
     let results;
     if (dataTypes != null && dataTypes.length > 0) {
       const fieldValues = new FieldValues();
-      dataTypes.forEach(type => {
+      dataTypes.forEach((type) => {
         fieldValues.addFieldValue(Contents.COLUMN_DATA_TYPE, ContentsDataType.nameFromType(type));
       });
       const where = this.buildWhere(fieldValues, 'or');
@@ -300,7 +302,7 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
     }
 
     for (const table of tables) {
-      const tableBoundingBox = this.getBoundingBoxForTableInProjection(projection, this.gpkgTableName);
+      const tableBoundingBox = this.getBoundingBoxForTableInProjection(projection, table);
       if (tableBoundingBox != null) {
         if (boundingBox != null) {
           boundingBox = boundingBox.union(tableBoundingBox);

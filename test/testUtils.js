@@ -1,17 +1,16 @@
-import { default as testSetup } from './testSetup'
+import { default as testSetup } from './testSetup';
 
-// @ts-nocheck
 var GeoPackageManager = require('../index').GeoPackageManager;
-var isNode = typeof(process) !== 'undefined' && process.version;
+var isNode = typeof process !== 'undefined' && process.version;
 
 var should = require('chai').should();
 var Path = require('path');
 
 var module = {
-  exports: {}
+  exports: {},
 };
 
-global.compareProperties = module.exports.compareProperties = function(o1, o2) {
+global.compareProperties = module.exports.compareProperties = function (o1, o2) {
   o2.should.have.all.keys(Object.keys(o1));
   o1.should.have.all.keys(Object.keys(o2));
   for (var key in o1) {
@@ -39,11 +38,11 @@ global.openGeoPackage = async (path) => {
   geoPackage.getName().should.be.equal(Path.basename(path));
   return {
     geoPackage,
-    path
+    path,
   };
 };
 
-global.copyAndOpenGeopackage = async function(original, copy) {
+global.copyAndOpenGeopackage = async function (original, copy) {
   let filename;
   if (isNode) {
     filename = copy || Path.join(__dirname, 'tmp', testSetup.createTempName());

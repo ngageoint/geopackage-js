@@ -15,7 +15,6 @@ import { IconRow } from './iconRow';
 import { FeatureRow } from '../../../features/user/featureRow';
 import { RelatedTablesExtension } from '../../related/relatedTablesExtension';
 import { ContentsIdExtension } from '../contents/contentsIdExtension';
-import { ExtendedRelation } from '../../related/extendedRelation';
 import { StyleRow } from './styleRow';
 import { GeometryType } from '@ngageoint/simple-features-js';
 import { ExtensionScopeType } from '../../extensionScopeType';
@@ -49,7 +48,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * Extension definition URL
    */
   public static readonly EXTENSION_DEFINITION =
-    'http://ngageoint.github.io/GeoPackage/docs/extensions/feature-style.html">http://ngageoint.github.io/GeoPackage/docs/extensions/feature-style.html';
+    'https://ngageoint.github.io/GeoPackage/docs/extensions/feature-style.html">https://ngageoint.github.io/GeoPackage/docs/extensions/feature-style.html';
 
   /**
    * Table name prefix for mapping styles
@@ -366,12 +365,8 @@ export class FeatureStyleExtension extends BaseExtension {
     };
     const tables = this.getTables();
     for (let i = 0; i < tables.length; i++) {
-      const {
-        styleRelationships,
-        tableStyleRelationships,
-        iconRelationship,
-        tableIconRelationship,
-      } = this.deleteRelationships(tables[i]);
+      const { styleRelationships, tableStyleRelationships, iconRelationship, tableIconRelationship } =
+        this.deleteRelationships(tables[i]);
 
       removed.styleRelationships += styleRelationships;
       removed.tableStyleRelationships += tableStyleRelationships;
@@ -385,9 +380,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * table
    * @param {FeatureTable|String} featureTable feature table
    */
-  deleteRelationships(
-    featureTable: string | FeatureTable,
-  ): {
+  deleteRelationships(featureTable: string | FeatureTable): {
     styleRelationships: number;
     tableStyleRelationships: number;
     iconRelationship: number;
@@ -421,7 +414,7 @@ export class FeatureStyleExtension extends BaseExtension {
     );
   }
   /**
-   * Delete a icon relationship for the feature table
+   * Delete icon relationship for the feature table
    * @param {FeatureTable|String} featureTable feature table
    */
   deleteIconRelationship(featureTable: string | FeatureTable): number {
@@ -476,7 +469,7 @@ export class FeatureStyleExtension extends BaseExtension {
     return this._getMappingDao(FeatureStyleExtension.TABLE_MAPPING_TABLE_STYLE, featureTable);
   }
   /**
-   * Get a Icon Mapping DAO
+   * Get Icon Mapping DAO
    * @param {FeatureTable|String} featureTable feature table
    * @return {StyleMappingDao} icon mapping DAO
    */
@@ -520,7 +513,7 @@ export class FeatureStyleExtension extends BaseExtension {
     return styleDao;
   }
   /**
-   * Get a icon DAO
+   * Get icon DAO
    * @return {IconDao}
    */
   getIconDao(): IconDao {
@@ -1415,9 +1408,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * Delete all feature styles including table styles, table icons, style, and icons
    * @param {FeatureTable|String} featureTable feature table
    */
-  deleteAllFeatureStyles(
-    featureTable: string | FeatureTable,
-  ): {
+  deleteAllFeatureStyles(featureTable: string | FeatureTable): {
     tableStyles: {
       styles: number;
       icons: number;
@@ -1436,9 +1427,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * Delete all styles including table styles and feature row style
    * @param {FeatureTable|String} featureTable feature table
    */
-  deleteAllStyles(
-    featureTable: string | FeatureTable,
-  ): {
+  deleteAllStyles(featureTable: string | FeatureTable): {
     tableStyles: number;
     styles: number;
   } {
@@ -1451,9 +1440,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * Delete all icons including table icons and feature row icons
    * @param {FeatureTable|String} featureTable feature table
    */
-  deleteAllIcons(
-    featureTable: string | FeatureTable,
-  ): {
+  deleteAllIcons(featureTable: string | FeatureTable): {
     tableIcons: number;
     icons: number;
   } {
@@ -1466,9 +1453,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * Delete the feature table feature styles
    * @param {FeatureTable|String} featureTable feature table
    */
-  deleteTableFeatureStyles(
-    featureTable: string | FeatureTable,
-  ): {
+  deleteTableFeatureStyles(featureTable: string | FeatureTable): {
     styles: number;
     icons: number;
   } {
@@ -1558,9 +1543,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * Delete all feature styles
    * @param {FeatureTable|String} featureTable feature table
    */
-  deleteFeatureStyles(
-    featureTable: string | FeatureTable,
-  ): {
+  deleteFeatureStyles(featureTable: string | FeatureTable): {
     styles: number;
     icons: number;
   } {

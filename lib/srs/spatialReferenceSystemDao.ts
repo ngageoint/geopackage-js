@@ -245,7 +245,7 @@ export class SpatialReferenceSystemDao extends GeoPackageDao<SpatialReferenceSys
 
   /**
    * Get the GeometryColumns for the SpatialReferenceSystem
-   * @param  {SpatialReferenceSystem} spatialReferenceSystem SpatialReferenceSystem   
+   * @param  {SpatialReferenceSystem} spatialReferenceSystem SpatialReferenceSystem
    * @return {GeometryColumns}
    */
   private getGeometryColumns(spatialReferenceSystem: SpatialReferenceSystem): GeometryColumns[] {
@@ -262,7 +262,7 @@ export class SpatialReferenceSystemDao extends GeoPackageDao<SpatialReferenceSys
 
   /**
    * Get the TileMatrixSet for the SpatialReferenceSystem
-   * @param  {SpatialReferenceSystem} spatialReferenceSystem SpatialReferenceSystem  
+   * @param  {SpatialReferenceSystem} spatialReferenceSystem SpatialReferenceSystem
    * @return {TileMatrixSet}
    */
   private getTileMatrixSet(spatialReferenceSystem: SpatialReferenceSystem): TileMatrixSet[] {

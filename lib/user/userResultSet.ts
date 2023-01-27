@@ -20,10 +20,13 @@ import { SQLUtils } from '../db/sqlUtils';
  *            row type
  */
 export abstract class UserResultSet<
-  TColumn extends UserColumn,
-  TTable extends UserTable<TColumn>,
-  TRow extends UserRow<TColumn, TTable>
-> extends ResultSetResult implements UserResult<TColumn, TTable, TRow> {
+    TColumn extends UserColumn,
+    TTable extends UserTable<TColumn>,
+    TRow extends UserRow<TColumn, TTable>,
+  >
+  extends ResultSetResult
+  implements UserResult<TColumn, TTable, TRow>
+{
   /**
    * Table
    */
@@ -132,13 +135,13 @@ export abstract class UserResultSet<
       } else {
         throw new GeoPackageException(
           'Primary Key value was not a number. table: ' +
-          this.columns.getTableName() +
-          ', index: ' +
-          pkColumn.getIndex() +
-          ', name: ' +
-          pkColumn.getName() +
-          ', value: ' +
-          objectValue,
+            this.columns.getTableName() +
+            ', index: ' +
+            pkColumn.getIndex() +
+            ', name: ' +
+            pkColumn.getName() +
+            ', value: ' +
+            objectValue,
         );
       }
     }
@@ -186,7 +189,7 @@ export abstract class UserResultSet<
         console.error(e);
         throw new GeoPackageException('Failed to retrieve the row');
       }
-      row = this.getRowWithColumnTypesAndValues(columnTypes, values)
+      row = this.getRowWithColumnTypesAndValues(columnTypes, values);
     }
 
     return row;
@@ -214,12 +217,12 @@ export abstract class UserResultSet<
     if (this.moveToNext()) {
       return {
         value: this.getRow(),
-        done: false
+        done: false,
       };
     } else {
       return {
         value: this.getRow(),
-        done: true
+        done: true,
       };
     }
   }

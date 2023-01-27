@@ -3,13 +3,13 @@ import {
   Geometry,
   GeometryEnvelope,
   GeometryFilter,
-  PointFiniteFilter
+  PointFiniteFilter,
 } from '@ngageoint/simple-features-js';
 import { ByteOrder, ByteReader, ByteWriter, GeometryReader, GeometryWriter } from '@ngageoint/simple-features-wkb-js';
 import {
   GeometryReader as WKTGeometryReader,
   GeometryWriter as WKTGeometryWriter,
-  StringReader
+  StringReader,
 } from '@ngageoint/simple-features-wkt-js';
 import { GeoPackageException } from '../geoPackageException';
 import { GeoPackageConstants } from '../geoPackageConstants';

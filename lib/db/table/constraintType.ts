@@ -92,7 +92,7 @@ export namespace ConstraintType {
    * Table constraint parsing lookup values
    */
   const tableLookup = new Map<string, ConstraintType>();
-  Array.from(TABLE_CONSTRAINTS).forEach(type => {
+  Array.from(TABLE_CONSTRAINTS).forEach((type) => {
     addLookups(tableLookup, type);
   });
 
@@ -100,7 +100,7 @@ export namespace ConstraintType {
    * Column constraint parsing lookup values
    */
   const columnLookup = new Map<string, ConstraintType>();
-  Array.from(COLUMN_CONSTRAINTS).forEach(type => {
+  Array.from(COLUMN_CONSTRAINTS).forEach((type) => {
     addLookups(columnLookup, type);
   });
 

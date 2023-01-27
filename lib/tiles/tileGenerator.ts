@@ -234,6 +234,7 @@ export abstract class TileGenerator {
    * @param zoom zoom level
    * @return original or expanded bounding box
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public getBoundingBoxWithZoom(zoom: number): BoundingBox {
     return this.boundingBox;
   }

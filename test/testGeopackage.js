@@ -4,21 +4,21 @@ import {
   FeatureColumn,
   GeoPackageDataType,
   BoundingBox,
-  FeatureTableMetadata, FeatureIndexType
-} from "../index";
+  FeatureTableMetadata,
+  FeatureIndexType,
+} from '../index';
 import { Canvas } from '../lib/canvas/canvas';
-import { Projections } from "@ngageoint/projections-js";
-import { GeometryType } from "@ngageoint/simple-features-js";
+import { Projections } from '@ngageoint/projections-js';
+import { GeometryType } from '@ngageoint/simple-features-js';
 const testSetup = require('./testSetup').default;
 
 const path = require('path'),
   fs = require('fs-extra'),
-  // @ts-ignore
   nock = require('nock'),
   mock = require('xhr-mock').default,
   should = require('chai').should();
 
-describe('GeoPackageManager tests', function() {
+describe('GeoPackageManager tests', function () {
   const existingPath = path.join(__dirname, 'fixtures', 'rivers.gpkg');
   const geopackageToCreate = path.join(__dirname, 'fixtures', 'tmp', 'tmp.gpkg');
   const tilePath = path.join(__dirname, 'fixtures', 'tiles', '0', '0', '0.png');
@@ -29,119 +29,104 @@ describe('GeoPackageManager tests', function() {
   const badUrl = base + '/bad';
   const errorUrl = base + '/error';
 
-  beforeEach(function() {
+  beforeEach(function () {
     if (!nock.isActive()) {
       nock.activate();
     }
     mock.setup();
   });
 
-  afterEach(function() {
-    // @ts-ignore
+  afterEach(function () {
     nock.restore();
     mock.teardown();
   });
 
-  it('should open the geoPackage', async function() {
-    // @ts-ignore
+  it('should open the geoPackage', async function () {
     const newPath = await testSetup.copyGeopackage(existingPath);
     const geoPackage = await GeoPackageManager.open(newPath);
     should.exist(geoPackage);
     should.exist(geoPackage.getTables);
     geoPackage.close();
-    // @ts-ignore
+
     await testSetup.deleteGeoPackage(newPath);
   });
 
-  it('should open the geoPackage with a promise', function() {
+  it('should open the geoPackage with a promise', function () {
     let gppath;
-    // @ts-ignore
+
     return testSetup
       .copyGeopackage(existingPath)
-      .then(function(newPath) {
+      .then(function (newPath) {
         gppath = newPath;
         return GeoPackageManager.open(gppath);
       })
-      .then(function(geoPackage) {
+      .then(function (geoPackage) {
         should.exist(geoPackage);
         should.exist(geoPackage.getTables);
       })
-      .then(function() {
-        // @ts-ignore
+      .then(function () {
         return testSetup.deleteGeoPackage(gppath);
       });
   });
 
-  it('should open the geoPackage from a URL', function() {
+  it('should open the geoPackage from a URL', function () {
     let gppath;
-    // @ts-ignore
+
     return testSetup
       .copyGeopackage(existingPath)
-      .then(function(newPath) {
+      .then(function (newPath) {
         gppath = newPath;
-        nock(base)
-          .get(urlPath)
-          .replyWithFile(200, gppath);
+        nock(base).get(urlPath).replyWithFile(200, gppath);
         mock.get(url, {
           body: fs.readFileSync(gppath).buffer,
         });
       })
-      .then(function() {
+      .then(function () {
         return GeoPackageManager.open(url);
       })
-      .then(function(geoPackage) {
+      .then(function (geoPackage) {
         should.exist(geoPackage);
         should.exist(geoPackage.getTables);
       })
-      .then(function() {
-        // @ts-ignore
+      .then(function () {
         return testSetup.deleteGeoPackage(gppath);
       })
-      .catch(function(err) {
+      .catch(function (err) {
         should.fail('', err);
       });
   });
 
-  it('should throw an error if the URL returns an error', function() {
-    nock(base)
-      .get('/error')
-      .replyWithError('error');
-    mock.get(errorUrl, function() {
+  it('should throw an error if the URL returns an error', function () {
+    nock(base).get('/error').replyWithError('error');
+    mock.get(errorUrl, function () {
       return Promise.reject(new Error());
     });
-    return (
-      GeoPackageManager.open(errorUrl)
-        // @ts-ignore
-        .then(function(geoPackage) {
-          should.fail(true, false, 'Should have failed');
-        })
-        .catch(function(err) {
-          should.exist(err);
-        })
-    );
+    return GeoPackageManager.open(errorUrl)
+
+      .then(function () {
+        should.fail(true, false, 'Should have failed');
+      })
+      .catch(function (err) {
+        should.exist(err);
+      });
   });
 
-  it('should throw an error if the URL does not return 200', function() {
-    nock(base)
-      .get('/bad')
-      .reply(404);
+  it('should throw an error if the URL does not return 200', function () {
+    nock(base).get('/bad').reply(404);
     mock.get(badUrl, {
       status: 404,
     });
-    return (
-      GeoPackageManager.open(badUrl)
-        // @ts-ignore
-        .then(function(geoPackage) {
-          should.fail(false, true);
-        })
-        .catch(function(err) {
-          should.exist(err);
-        })
-    );
+    return GeoPackageManager.open(badUrl)
+
+      .then(function () {
+        should.fail(false, true);
+      })
+      .catch(function (err) {
+        should.exist(err);
+      });
   });
 
-  it('should not open a file without the minimum tables', async function() {
-    // @ts-ignore
+  it('should not open a file without the minimum tables', async function () {
     await testSetup.createBareGeoPackage(geopackageToCreate);
     try {
       const geoPackage = await GeoPackageManager.open(geopackageToCreate);
@@ -149,11 +134,11 @@ describe('GeoPackageManager tests', function() {
     } catch (e) {
       should.exist(e);
     }
-    // @ts-ignore
+
     await testSetup.deleteGeoPackage(geopackageToCreate);
   });
 
-  it('should not open a file without the correct extension', async function() {
+  it('should not open a file without the correct extension', async function () {
     try {
       const geoPackage = await GeoPackageManager.open(tilePath);
       should.not.exist(geoPackage);
@@ -162,21 +147,19 @@ describe('GeoPackageManager tests', function() {
     }
   });
 
-  it('should not open a file without the correct extension via promise', function() {
-    GeoPackageManager.open(tilePath).catch(function(error) {
+  it('should not open a file without the correct extension via promise', function () {
+    GeoPackageManager.open(tilePath).catch(function (error) {
       should.exist(error);
     });
   });
 
-  it('should open the geoPackage byte array', async function() {
-    // @ts-ignore
+  it('should open the geoPackage byte array', async function () {
     const data = await fs.readFile(existingPath);
     const geoPackage = await GeoPackageManager.open(data);
     should.exist(geoPackage);
   });
 
-  it('should not open a byte array that is not a geoPackage', async function() {
-    // @ts-ignore
+  it('should not open a byte array that is not a geoPackage', async function () {
     const data = await fs.readFile(tilePath);
     try {
       const geoPackage = await GeoPackageManager.open(data);
@@ -186,7 +169,7 @@ describe('GeoPackageManager tests', function() {
     }
   });
 
-  it('should not create a geoPackage without the correct extension', async function() {
+  it('should not create a geoPackage without the correct extension', async function () {
     try {
       const gp = await GeoPackageManager.create(tilePath);
       should.fail(gp, null, 'Error should have been thrown');
@@ -197,35 +180,35 @@ describe('GeoPackageManager tests', function() {
     should.fail(false, true, 'Error should have been thrown');
   });
 
-  it('should not create a geoPackage without the correct extension return promise', function(done) {
+  it('should not create a geoPackage without the correct extension return promise', function (done) {
     GeoPackageManager.create(tilePath)
-      // @ts-ignore
-      .then(function(geoPackage) {
+
+      .then(function () {
         // should not get called
         false.should.be.equal(true);
       })
-      .catch(function(error) {
+      .catch(function (error) {
         should.exist(error);
         done();
       });
   });
 
-  it('should create a geoPackage', async function() {
+  it('should create a geoPackage', async function () {
     const gp = await GeoPackageManager.create(geopackageToCreate);
     should.exist(gp);
     should.exist(gp.getTables);
     await testSetup.deleteGeoPackage(geopackageToCreate);
   });
 
-  it('should create a geoPackage with a promise', function() {
-    GeoPackageManager.create(geopackageToCreate).then(async function(geoPackage) {
+  it('should create a geoPackage with a promise', function () {
+    GeoPackageManager.create(geopackageToCreate).then(async function (geoPackage) {
       should.exist(geoPackage);
       should.exist(geoPackage.getTables);
       await testSetup.deleteGeoPackage(geopackageToCreate);
     });
   });
 
-  it('should create a geoPackage and export it', async function() {
+  it('should create a geoPackage and export it', async function () {
     const gp = await GeoPackageManager.create(geopackageToCreate);
     should.exist(gp);
     const buffer = await gp.export();
@@ -233,71 +216,70 @@ describe('GeoPackageManager tests', function() {
     await testSetup.deleteGeoPackage(geopackageToCreate);
   });
 
-  it('should create a geoPackage in memory', async function() {
+  it('should create a geoPackage in memory', async function () {
     const gp = await GeoPackageManager.create();
     should.exist(gp);
   });
 
-  describe('should operate on an indexed geoPackage', function() {
+  describe('should operate on an indexed geoPackage', function () {
     let indexedGeopackage;
     const originalFilename = indexedPath;
     let filename;
 
-    beforeEach('should open the geoPackage', async function() {
-      // @ts-ignore
+    beforeEach('should open the geoPackage', async function () {
       const result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
       indexedGeopackage = result.geoPackage;
     });
 
-    afterEach('should close the geoPackage', async function() {
+    afterEach('should close the geoPackage', async function () {
       indexedGeopackage.close();
-      // @ts-ignore
+
       await testSetup.deleteGeoPackage(filename);
     });
 
-    it('should get the tables', function() {
+    it('should get the tables', function () {
       const tables = indexedGeopackage.getTables();
       tables.should.be.deep.equal(['rivers', 'rivers_tiles']);
     });
 
-    it('should get the tile tables', function() {
+    it('should get the tile tables', function () {
       const tables = indexedGeopackage.getTileTables();
       tables.should.be.deep.equal(['rivers_tiles']);
     });
 
-    it('should get the feature tables', function() {
+    it('should get the feature tables', function () {
       const tables = indexedGeopackage.getFeatureTables();
       tables.should.be.deep.equal(['rivers']);
     });
 
-    it('should check if it has feature table', function() {
+    it('should check if it has feature table', function () {
       const exists = indexedGeopackage.hasFeatureTable('rivers');
       exists.should.be.equal(true);
     });
 
-    it('should check if does not have feature table', function() {
+    it('should check if does not have feature table', function () {
       const exists = indexedGeopackage.hasFeatureTable('rivers_no');
       exists.should.be.equal(false);
     });
 
-    it('should check if it has tile table', function() {
+    it('should check if it has tile table', function () {
       const exists = indexedGeopackage.hasTileTable('rivers_tiles');
       exists.should.be.equal(true);
     });
 
-    it('should check if does not have tile table', function() {
+    it('should check if does not have tile table', function () {
       const exists = indexedGeopackage.hasTileTable('rivers_tiles_no');
       exists.should.be.equal(false);
     });
 
-    it('should get the 0 0 0 tile', function() {
-      return indexedGeopackage.xyzTile('rivers_tiles', 0, 0, 0, 256, 256).then(function(tile) {
+    it('should get the 0 0 0 tile', function () {
+      return indexedGeopackage.xyzTile('rivers_tiles', 0, 0, 0, 256, 256).then(function (tile) {
         should.exist(tile);
       });
     });
 
-    it('should get the 0 0 0 tile in a canvas', async function() {
+    it('should get the 0 0 0 tile in a canvas', async function () {
       let canvas = Canvas.create(256, 256);
       const geoPackageTile = await indexedGeopackage.xyzTile('rivers_tiles', 0, 0, 0, 256, 256);
       const image = await geoPackageTile.getGeoPackageImage();
@@ -307,9 +289,19 @@ describe('GeoPackageManager tests', function() {
       Canvas.disposeCanvas(canvas);
     });
 
-    it('should get the world as a 4326 tile in a canvas', async function() {
+    it('should get the world as a 4326 tile in a canvas', async function () {
       let canvas = Canvas.create(256, 256);
-      const geoPackageTile = await indexedGeopackage.projectedTile('rivers_tiles', -90, -180, 90, 180, 0, Projections.getWGS84Projection(), 512, 256);
+      const geoPackageTile = await indexedGeopackage.projectedTile(
+        'rivers_tiles',
+        -90,
+        -180,
+        90,
+        180,
+        0,
+        Projections.getWGS84Projection(),
+        512,
+        256,
+      );
       const image = await geoPackageTile.getGeoPackageImage();
       canvas.getContext('2d').drawImage(image.getImage(), 0, 0);
       Canvas.disposeImage(image);
@@ -322,12 +314,12 @@ describe('GeoPackageManager tests', function() {
     //   should.exist(vectorTile);
     // });
 
-    it('should query for the tiles in the bounding box', function() {
+    it('should query for the tiles in the bounding box', function () {
       const tiles = indexedGeopackage.getTilesInBoundingBoxWebZoom('rivers_tiles', 0, -180, 180, -80, 80);
       tiles.tiles.length.should.be.equal(1);
     });
 
-    it('should add geojson to the geoPackage and keep it indexed', function() {
+    it('should add geojson to the geoPackage and keep it indexed', function () {
       const id = indexedGeopackage.addGeoJSONFeatureToGeoPackage(
         {
           type: 'Feature',
@@ -340,7 +332,7 @@ describe('GeoPackageManager tests', function() {
           },
         },
         'rivers',
-        FeatureIndexType.GEOPACKAGE
+        FeatureIndexType.GEOPACKAGE,
       );
       // ensure the last indexed changed
       const db = indexedGeopackage.getDatabase().getConnectionSource();
@@ -348,9 +340,9 @@ describe('GeoPackageManager tests', function() {
       index.geom_id.should.be.equal(id);
     });
 
-    it('should add several geojson features to the geoPackage and index them', function(done) {
+    it('should add several geojson features to the geoPackage and index them', function (done) {
       this.timeout(5000);
-      const features = []
+      const features = [];
       for (let i = 0; i < 100; i++) {
         features.push({
           type: 'Feature',
@@ -361,16 +353,15 @@ describe('GeoPackageManager tests', function() {
             type: 'Point',
             coordinates: [-179, 20.5],
           },
-        })
+        });
       }
-      indexedGeopackage.addGeoJSONFeaturesToGeoPackage(
-        features,
-        'rivers',
-        true
-      ).then(() => {
+      indexedGeopackage.addGeoJSONFeaturesToGeoPackage(features, 'rivers', true).then(() => {
         const results = indexedGeopackage.queryForGeoJSONFeatures(
           'rivers',
-          new BoundingBox(-179, 20.5, -179, 20.5).projectBoundingBox(Projections.getWGS84Projection(), Projections.getWebMercatorProjection()),
+          new BoundingBox(-179, 20.5, -179, 20.5).projectBoundingBox(
+            Projections.getWGS84Projection(),
+            Projections.getWebMercatorProjection(),
+          ),
         );
         const queried = [];
         for (const feature of results) {
@@ -382,9 +373,8 @@ describe('GeoPackageManager tests', function() {
       });
     });
 
-    it('should add geojson to the geoPackage and keep it indexed and query it', function() {
-      // @ts-ignore
-      const id = indexedGeopackage.addGeoJSONFeatureToGeoPackage(
+    it('should add geojson to the geoPackage and keep it indexed and query it', function () {
+      indexedGeopackage.addGeoJSONFeatureToGeoPackage(
         {
           type: 'Feature',
           properties: {
@@ -396,11 +386,14 @@ describe('GeoPackageManager tests', function() {
           },
         },
         'rivers',
-        FeatureIndexType.GEOPACKAGE
+        FeatureIndexType.GEOPACKAGE,
       );
       const results = indexedGeopackage.queryForGeoJSONFeatures(
         'rivers',
-        new BoundingBox(-179, 20, -179,20).projectBoundingBox(Projections.getWGS84Projection(), Projections.getWebMercatorProjection()),
+        new BoundingBox(-179, 20, -179, 20).projectBoundingBox(
+          Projections.getWGS84Projection(),
+          Projections.getWebMercatorProjection(),
+        ),
       );
       const features = [];
       for (const feature of results) {
@@ -410,9 +403,8 @@ describe('GeoPackageManager tests', function() {
       features.length.should.be.equal(1);
     });
 
-    it('should add geojson to the geoPackage and keep it indexed and iterate it', async function() {
-      // @ts-ignore
-      const id = indexedGeopackage.addGeoJSONFeatureToGeoPackage(
+    it('should add geojson to the geoPackage and keep it indexed and iterate it', async function () {
+      indexedGeopackage.addGeoJSONFeatureToGeoPackage(
         {
           type: 'Feature',
           properties: {
@@ -424,20 +416,16 @@ describe('GeoPackageManager tests', function() {
           },
         },
         'rivers',
-        FeatureIndexType.GEOPACKAGE
+        FeatureIndexType.GEOPACKAGE,
       );
-      const iterator = indexedGeopackage.queryForGeoJSONFeatures(
-        'rivers',
-        new BoundingBox(-99.9, 40.16, -99.8, 40.18),
-      );
+      const iterator = indexedGeopackage.queryForGeoJSONFeatures('rivers', new BoundingBox(-99.9, 40.16, -99.8, 40.18));
       for (const geoJson of iterator) {
         geoJson.properties.Scalerank.should.be.equal('test');
       }
     });
 
-    it('should add geojson to the geoPackage and keep it indexed and iterate it and pull the features', function() {
-      // @ts-ignore
-      const id = indexedGeopackage.addGeoJSONFeatureToGeoPackage(
+    it('should add geojson to the geoPackage and keep it indexed and iterate it and pull the features', function () {
+      indexedGeopackage.addGeoJSONFeatureToGeoPackage(
         {
           type: 'Feature',
           properties: {
@@ -449,32 +437,31 @@ describe('GeoPackageManager tests', function() {
           },
         },
         'rivers',
-        FeatureIndexType.GEOPACKAGE
+        FeatureIndexType.GEOPACKAGE,
       );
       const iterator = indexedGeopackage.queryForGeoJSONFeatures('rivers');
       for (const geoJson of iterator) {
-        // @ts-ignore
         should.exist(geoJson.properties);
       }
       iterator.close();
     });
   });
 
-  describe('operating on a new geoPackage', function() {
+  describe('operating on a new geoPackage', function () {
     let geoPackage;
 
-    beforeEach(function(done) {
-      fs.unlink(geopackageToCreate, async function() {
+    beforeEach(function (done) {
+      fs.unlink(geopackageToCreate, async function () {
         geoPackage = await GeoPackageManager.create(geopackageToCreate);
         done();
       });
     });
 
-    afterEach(async function() {
+    afterEach(async function () {
       await testSetup.deleteGeoPackage(geopackageToCreate);
     });
 
-    it('should create a feature table', function() {
+    it('should create a feature table', function () {
       const columns = [];
 
       const tableName = 'features';
@@ -495,7 +482,9 @@ describe('GeoPackageManager tests', function() {
       columns.push(FeatureColumn.createColumn('test_blob.test', GeoPackageDataType.BLOB, false, null));
       columns.push(FeatureColumn.createColumn('test_integer.test', GeoPackageDataType.INTEGER, false, null));
 
-      let featureDao = geoPackage.createFeatureTableWithFeatureTableMetadata(FeatureTableMetadata.create(geometryColumns, columns));
+      let featureDao = geoPackage.createFeatureTableWithFeatureTableMetadata(
+        FeatureTableMetadata.create(geometryColumns, columns),
+      );
       should.exist(featureDao);
       const exists = geoPackage.hasFeatureTable(tableName);
       exists.should.be.equal(true);
@@ -536,14 +525,15 @@ describe('GeoPackageManager tests', function() {
       should.exist(feature.getGeometry());
       let count = 0;
       let geoJSONResultSet = geoPackage.queryForGeoJSONFeatures(tableName);
-      // @ts-ignore
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       for (const row of geoJSONResultSet) {
         count++;
       }
       geoJSONResultSet.close();
       count.should.be.equal(2);
     });
-    it('should create a feature table with a null geometry', function() {
+    it('should create a feature table with a null geometry', function () {
       const columns = [];
 
       const tableName = 'features';
@@ -564,7 +554,9 @@ describe('GeoPackageManager tests', function() {
       columns.push(FeatureColumn.createColumn('test_blob.test', GeoPackageDataType.BLOB, false, null));
       columns.push(FeatureColumn.createColumn('test_integer.test', GeoPackageDataType.INTEGER, false, null));
 
-      let featureDao = geoPackage.createFeatureTableWithFeatureTableMetadata(FeatureTableMetadata.create(geometryColumns, columns));
+      let featureDao = geoPackage.createFeatureTableWithFeatureTableMetadata(
+        FeatureTableMetadata.create(geometryColumns, columns),
+      );
       should.exist(featureDao);
       const exists = geoPackage.hasFeatureTable(tableName);
       exists.should.be.equal(true);
@@ -588,7 +580,7 @@ describe('GeoPackageManager tests', function() {
           properties: {
             'test_text_limited.test': 'test',
           },
-          geometry: null
+          geometry: null,
         },
         tableName,
       );
@@ -599,17 +591,15 @@ describe('GeoPackageManager tests', function() {
       should.exist(feature.getGeometry());
       let each = geoPackage.queryForGeoJSONFeatures(tableName);
       let count = 0;
-      // @ts-ignore
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       for (const row of each) {
         count++;
       }
       each.close();
       count.should.be.equal(2);
     });
-    it('should create a tile table', function() {
-      // @ts-ignore
-      const columns = [];
-
+    it('should create a tile table', function () {
       const tableName = 'tiles';
 
       const contentsBoundingBox = new BoundingBox(-180, 180, -80, 80);
@@ -617,12 +607,12 @@ describe('GeoPackageManager tests', function() {
       const tileMatrixSetBoundingBox = new BoundingBox(-180, 180, -80, 80);
       const tileMatrixSetSrsId = 4326;
       let tileMatrixSet = geoPackage.createTileTableWithTableName(
-          tableName,
-          contentsBoundingBox,
-          contentsSrsId,
-          tileMatrixSetBoundingBox,
-          tileMatrixSetSrsId,
-        );
+        tableName,
+        contentsBoundingBox,
+        contentsSrsId,
+        tileMatrixSetBoundingBox,
+        tileMatrixSetSrsId,
+      );
       should.exist(tileMatrixSet);
       const exists = geoPackage.hasTileTable('tiles');
       exists.should.be.equal(true);
@@ -631,7 +621,7 @@ describe('GeoPackageManager tests', function() {
       tables[0].should.be.equal('tiles');
     });
 
-    it('should create a standard web mercator tile table with the default tile size', function() {
+    it('should create a standard web mercator tile table with the default tile size', function () {
       const tableName = 'tiles_web_mercator';
       const contentsBounds = new BoundingBox(
         -20037508.342789244,
@@ -648,7 +638,6 @@ describe('GeoPackageManager tests', function() {
       );
       const tileMatrixSetSrsId = 3857;
 
-      // @ts-ignore
       const matrixSet = geoPackage.createStandardWebMercatorTileTable(
         tableName,
         contentsBounds,
@@ -669,23 +658,22 @@ describe('GeoPackageManager tests', function() {
       dbMatrixSet.should.deep.equal(matrixSet);
 
       const matrixDao = geoPackage.getTileMatrixDao();
-      const matrices = matrixDao.queryForAll().map(result => matrixDao.createObject(result));
+      const matrices = matrixDao.queryForAll().map((result) => matrixDao.createObject(result));
 
       matrices.length.should.equal(4);
-      matrices.forEach(matrix => {
+      matrices.forEach((matrix) => {
         matrix.getTileWidth().should.equal(256);
         matrix.getTileHeight().should.equal(256);
       });
     });
 
-    it('should create a standard plate carreé tile table with the default tile size', function() {
+    it('should create a standard plate carreé tile table with the default tile size', function () {
       const tableName = 'tiles_web_mercator';
       const contentsBounds = new BoundingBox(-180, -90, 180, 90);
       const contentsSrsId = 4326;
       const matrixSetBounds = new BoundingBox(-180, -90, 180, 90);
       const tileMatrixSetSrsId = 4326;
 
-      // @ts-ignore
       const matrixSet = geoPackage.createStandardWGS84TileTable(
         tableName,
         contentsBounds,
@@ -709,13 +697,13 @@ describe('GeoPackageManager tests', function() {
       const matrices = matrixDao.queryForAll();
 
       matrices.length.should.equal(4);
-      matrices.forEach(matrix => {
+      matrices.forEach((matrix) => {
         matrix.tile_width.should.equal(256);
         matrix.tile_height.should.equal(256);
       });
     });
 
-    it('should create a standard web mercator tile table with a custom tile size', function() {
+    it('should create a standard web mercator tile table with a custom tile size', function () {
       const tableName = 'custom_tile_size';
       const contentsBounds = new BoundingBox(-31644.9297, 4127.5995, 6697565.2924, 6723706.7561);
       const matrixSetBounds = new BoundingBox(
@@ -747,16 +735,16 @@ describe('GeoPackageManager tests', function() {
       dbMatrixSet.should.deep.equal(matrixSet);
 
       const matrixDao = geoPackage.getTileMatrixDao();
-      const matrices = matrixDao.queryForAll().map(result => matrixDao.createObject(result));
+      const matrices = matrixDao.queryForAll().map((result) => matrixDao.createObject(result));
 
       matrices.length.should.equal(5);
-      matrices.forEach(matrix => {
+      matrices.forEach((matrix) => {
         matrix.getTileWidth().should.equal(tileSize);
         matrix.getTileHeight().should.equal(tileSize);
       });
     });
 
-    it('should add a tile to the tile table', function(done) {
+    it('should add a tile to the tile table', function (done) {
       const tableName = 'tiles_web_mercator_2';
       const contentsBoundingBox = new BoundingBox(
         -20037508.342789244,
@@ -773,7 +761,6 @@ describe('GeoPackageManager tests', function() {
       );
       const tileMatrixSetSrsId = 3857;
 
-      // @ts-ignore
       let tileMatrixSet = geoPackage.createStandardWebMercatorTileTable(
         tableName,
         contentsBoundingBox,
@@ -784,23 +771,20 @@ describe('GeoPackageManager tests', function() {
         0,
       );
       should.exist(tileMatrixSet);
-      // @ts-ignore
-      loadTile(tilePath).then(tileData => {
+
+      loadTile(tilePath).then((tileData) => {
         const result = geoPackage.addTile(tileData, tableName, 0, 0, 0);
         result.should.be.equal(1);
         const tileRow = geoPackage.getTileFromTable(tableName, 0, 0, 0);
-        // @ts-ignore
-        testSetup.diffImages(tileRow.getTileData(), tilePath, function(err, equal) {
+
+        testSetup.diffImages(tileRow.getTileData(), tilePath, function (err, equal) {
           equal.should.be.equal(true);
           done();
         });
       });
     });
 
-    it('should add a tile to the tile table and get it via xyz', function(done) {
-      // @ts-ignore
-      const columns = [];
-
+    it('should add a tile to the tile table and get it via xyz', function (done) {
       const tableName = 'tiles_web_mercator_3';
 
       const contentsBoundingBox = new BoundingBox(
@@ -818,7 +802,6 @@ describe('GeoPackageManager tests', function() {
       );
       const tileMatrixSetSrsId = 3857;
 
-      // @ts-ignore
       const tileMatrixSet = geoPackage.createStandardWebMercatorTileTable(
         tableName,
         contentsBoundingBox,
@@ -829,13 +812,12 @@ describe('GeoPackageManager tests', function() {
         0,
       );
       should.exist(tileMatrixSet);
-      // @ts-ignore
-      fs.readFile(tilePath, function(err, tile) {
+
+      fs.readFile(tilePath, function (err, tile) {
         const result = geoPackage.addTile(tile, tableName, 0, 0, 0);
         result.should.be.equal(1);
-        geoPackage.xyzTile(tableName, 0, 0, 0, 256, 256).then(function(tile) {
-          // @ts-ignore
-          testSetup.diffImages(tile.getData(), tilePath, function(err, equal) {
+        geoPackage.xyzTile(tableName, 0, 0, 0, 256, 256).then(function (tile) {
+          testSetup.diffImages(tile.getData(), tilePath, function (err, equal) {
             equal.should.be.equal(true);
             done();
           });
@@ -843,10 +825,7 @@ describe('GeoPackageManager tests', function() {
       });
     });
 
-    it('should add a tile to the tile table and get it into a canvas via xyz', function(done) {
-      // @ts-ignore
-      const columns = [];
-
+    it('should add a tile to the tile table and get it into a canvas via xyz', function (done) {
       const tableName = 'tiles_web_mercator_4';
 
       const contentsBoundingBox = new BoundingBox(
@@ -864,7 +843,6 @@ describe('GeoPackageManager tests', function() {
       );
       const tileMatrixSetSrsId = 3857;
 
-      // @ts-ignore
       const tileMatrixSet = geoPackage.createStandardWebMercatorTileTable(
         tableName,
         contentsBoundingBox,
@@ -875,24 +853,25 @@ describe('GeoPackageManager tests', function() {
         0,
       );
       should.exist(tileMatrixSet);
-      // @ts-ignore
-      fs.readFile(tilePath, function(err, tile) {
+
+      fs.readFile(tilePath, function (err, tile) {
         const result = geoPackage.addTile(tile, tableName, 0, 0, 0);
         result.should.be.equal(1);
         Canvas.initializeAdapter().then(() => {
           let canvas = Canvas.create(256, 256);
-          geoPackage.xyzTile(tableName, 0, 0, 0, 256, 256)
-          // @ts-ignore
+          geoPackage
+            .xyzTile(tableName, 0, 0, 0, 256, 256)
+
             .then(function (tile) {
-              tile.getGeoPackageImage().then(image => {
+              tile.getGeoPackageImage().then((image) => {
                 canvas.getContext('2d').drawImage(image.getImage(), 0, 0);
-                // @ts-ignore
-                testSetup.diffCanvas(canvas, tilePath, function(err, equal) {
+
+                testSetup.diffCanvas(canvas, tilePath, function (err, equal) {
                   equal.should.be.equal(true);
                   Canvas.disposeCanvas(canvas);
                   done();
                 });
-              })
+              });
             });
         });
       });

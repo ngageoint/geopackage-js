@@ -262,7 +262,12 @@ export class GeometryColumns {
     if (contents != null) {
       // Verify the Contents have a features data type (Spec Requirement 23)
       if (!contents.isFeaturesTypeOrUnknown()) {
-        throw new GeoPackageException("The Contents of a GeometryColumns must have a data type of " + ContentsDataType.nameFromType(ContentsDataType.FEATURES) + ". actual type: " + contents.getDataTypeName());
+        throw new GeoPackageException(
+          'The Contents of a GeometryColumns must have a data type of ' +
+            ContentsDataType.nameFromType(ContentsDataType.FEATURES) +
+            '. actual type: ' +
+            contents.getDataTypeName(),
+        );
       }
       this.table_name = contents.getId();
     } else {

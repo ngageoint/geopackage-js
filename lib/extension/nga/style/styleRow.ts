@@ -1,8 +1,3 @@
-/**
- * @memberOf module:extension/nga/style
- * @class StyleRow
- */
-
 import { AttributesRow } from '../../../attributes/attributesRow';
 import { StyleTable } from './styleTable';
 import { UserColumn } from '../../../user/userColumn';

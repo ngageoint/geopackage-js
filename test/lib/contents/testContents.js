@@ -1,21 +1,19 @@
-import { default as testSetup } from '../../testSetup'
+import { default as testSetup } from '../../testSetup';
 
-var ContentsDataType = require('../../../lib/contents/contentsDataType').ContentsDataType
-  , ContentsDao = require('../../../lib/contents/contentsDao').ContentsDao
-  , TileMatrix = require('../../../lib/tiles/matrix/tileMatrix').TileMatrix
-  , should = require('chai').should()
-  , path = require('path');
+var ContentsDataType = require('../../../lib/contents/contentsDataType').ContentsDataType,
+  ContentsDao = require('../../../lib/contents/contentsDao').ContentsDao,
+  TileMatrix = require('../../../lib/tiles/matrix/tileMatrix').TileMatrix,
+  should = require('chai').should(),
+  path = require('path');
 
-describe('Contents tests', function() {
-
+describe('Contents tests', function () {
   var geoPackage;
   var contentsDao;
   var filename;
 
-  beforeEach('should open the geoPackage', async function() {
+  beforeEach('should open the geoPackage', async function () {
     try {
       var originalFilename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
-      // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
       geoPackage = result.geoPackage;
@@ -25,12 +23,12 @@ describe('Contents tests', function() {
     }
   });
 
-  afterEach('should close the geoPackage', async function() {
+  afterEach('should close the geoPackage', async function () {
     geoPackage.close();
     await testSetup.deleteGeoPackage(filename);
   });
 
-  it('should create a new contents entry', function() {
+  it('should create a new contents entry', function () {
     var contentsDao = geoPackage.getContentsDao();
     var contents = contentsDao.createObject();
     contents.table_name = 'testit';
@@ -39,7 +37,7 @@ describe('Contents tests', function() {
     contentsDao.create(contents);
   });
 
-  it('should get the contents', function() {
+  it('should get the contents', function () {
     const contents = contentsDao.queryForAll();
     should.exist(contents);
     contents.should.have.property('length', 2);
@@ -66,7 +64,7 @@ describe('Contents tests', function() {
     contents[1].should.have.property('srs_id', 3857);
   });
 
-  it('should get the contents from the ID TILESosmds', function() {
+  it('should get the contents from the ID TILESosmds', function () {
     var contents = contentsDao.queryForId('TILESosmds');
     should.exist(contents);
     contents.getLastChange().toISOString().should.be.equal('2015-12-04T15:28:53.871Z');
@@ -81,7 +79,7 @@ describe('Contents tests', function() {
     contents.getSrsId().should.be.equal(4326);
   });
 
-  it('should get the contents from the ID FEATURESriversds', function() {
+  it('should get the contents from the ID FEATURESriversds', function () {
     var contents = contentsDao.queryForId('FEATURESriversds');
     should.exist(contents);
     contents.getLastChange().toISOString().should.be.equal('2015-12-04T15:28:59.122Z');
@@ -96,28 +94,28 @@ describe('Contents tests', function() {
     contents.getSrsId().should.be.equal(3857);
   });
 
-  it('should get the projection from the ID TILESosmds', function() {
+  it('should get the projection from the ID TILESosmds', function () {
     var contents = contentsDao.queryForId('TILESosmds');
     should.exist(contents);
     var projection = contentsDao.getProjection(contents);
     should.exist(projection);
   });
 
-  it('should get the projection from the ID FEATURESriversds', function() {
+  it('should get the projection from the ID FEATURESriversds', function () {
     var contents = contentsDao.queryForId('FEATURESriversds');
     should.exist(contents);
     var projection = contentsDao.getProjection(contents);
     should.exist(projection);
   });
 
-  it('should get the GeometryColumns from the ID TILESosmds', function() {
+  it('should get the GeometryColumns from the ID TILESosmds', function () {
     var contents = contentsDao.queryForId('TILESosmds');
     should.exist(contents);
     var columns = contentsDao.getGeometryColumns(contents);
     should.not.exist(columns);
   });
 
-  it('should get the GeometryColumns from the ID FEATURESriversds', function() {
+  it('should get the GeometryColumns from the ID FEATURESriversds', function () {
     var contents = contentsDao.queryForId('FEATURESriversds');
     should.exist(contents);
     var columns = contentsDao.getGeometryColumns(contents);
@@ -130,7 +128,7 @@ describe('Contents tests', function() {
     columns.should.have.property('m', 0);
   });
 
-  it('should get the TileMatrixSet from the ID TILESosmds', function() {
+  it('should get the TileMatrixSet from the ID TILESosmds', function () {
     try {
       var contents = contentsDao.queryForId('TILESosmds');
       should.exist(contents);
@@ -147,14 +145,14 @@ describe('Contents tests', function() {
     }
   });
 
-  it('should get the TileMatrixSet from the ID FEATURESriversds', function() {
+  it('should get the TileMatrixSet from the ID FEATURESriversds', function () {
     var contents = contentsDao.queryForId('FEATURESriversds');
     should.exist(contents);
     var matrixSet = contentsDao.getTileMatrixSet(contents);
     should.not.exist(matrixSet);
   });
 
-  it('should get the TileMatrix from the ID TILESosmds', function() {
+  it('should get the TileMatrix from the ID TILESosmds', function () {
     var contents = contentsDao.queryForId('TILESosmds');
     should.exist(contents);
     var matrix = contentsDao.getTileMatrix(contents);
@@ -162,7 +160,7 @@ describe('Contents tests', function() {
     matrix.should.have.property('length', 4);
 
     var tm = new TileMatrix();
-    tm.table_name ='TILESosmds';
+    tm.table_name = 'TILESosmds';
     tm.zoom_level = 0;
     tm.matrix_width = 1;
     tm.matrix_height = 1;
@@ -174,11 +172,10 @@ describe('Contents tests', function() {
     matrix[0].should.be.deep.equal(tm);
   });
 
-  it('should get the TileMatrix from the ID FEATURESriversds', function() {
+  it('should get the TileMatrix from the ID FEATURESriversds', function () {
     var contents = contentsDao.queryForId('FEATURESriversds');
     should.exist(contents);
     var matrix = contentsDao.getTileMatrix(contents);
     should.not.exist(matrix);
   });
-
 });

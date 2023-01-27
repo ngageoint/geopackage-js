@@ -1,34 +1,30 @@
-import { default as testSetup } from '../../../testSetup'
-import {RelatedTablesExtension} from '../../../../lib/extension/related/relatedTablesExtension';
-import {ContentsDataType} from "../../../../lib/contents/contentsDataType";
+import { default as testSetup } from '../../../testSetup';
+import { RelatedTablesExtension } from '../../../../lib/extension/related/relatedTablesExtension';
+import { ContentsDataType } from '../../../../lib/contents/contentsDataType';
 
-var DataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
-  , Verification = require('../../../verification')
-  , ContentsDao = require('../../../../lib/contents/contentsDao').ContentsDao
-  , UserMappingTable = require('../../../../lib/extension/related/userMappingTable').UserMappingTable
-  , SimpleAttributesTable = require('../../../../lib/extension/related/simple/simpleAttributesTable').SimpleAttributesTable
-  , RelatedTablesUtils = require('./relatedTablesUtils')
-  , should = require('chai').should()
-  , path = require('path');
+var DataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType,
+  UserMappingTable = require('../../../../lib/extension/related/userMappingTable').UserMappingTable,
+  SimpleAttributesTable =
+    require('../../../../lib/extension/related/simple/simpleAttributesTable').SimpleAttributesTable,
+  RelatedTablesUtils = require('./relatedTablesUtils'),
+  should = require('chai').should(),
+  path = require('path');
 
-describe('Related Simple Attributes tests', function() {
+describe('Related Simple Attributes tests', function () {
   var geoPackage;
-  var tileBuffer;
   var filename;
-  beforeEach('create the GeoPackage connection', async function() {
+  beforeEach('create the GeoPackage connection', async function () {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'attributes.gpkg');
-    // @ts-ignore
+
     let result = await copyAndOpenGeopackage(originalFilename);
     filename = result.path;
     geoPackage = result.geoPackage;
-    // @ts-ignore
-    tileBuffer = await loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'tiles', '0', '0', '0.png'));
   });
 
-  afterEach('delete the geoPackage', async function() {
+  afterEach('delete the geoPackage', async function () {
     geoPackage.close();
     await testSetup.deleteGeoPackage(filename);
-  })
+  });
 
   function validateContents(simpleAttributesTable, contents) {
     should.exist(contents);
@@ -38,7 +34,7 @@ describe('Related Simple Attributes tests', function() {
     should.exist(contents.getLastChange());
   }
 
-  it('should create a simple attributes relationship', function() {
+  it('should create a simple attributes relationship', function () {
     const rte = new RelatedTablesExtension(geoPackage);
     rte.has().should.be.equal(false);
 
@@ -50,7 +46,11 @@ describe('Related Simple Attributes tests', function() {
     // Validate nullable non simple columns
     try {
       SimpleAttributesTable.create('simple_table', RelatedTablesUtils.createAdditionalUserColumns(false));
-      should.fail('Simple Attributes Table', undefined, 'Simple Attributes Table created with nullable non simple columns');
+      should.fail(
+        'Simple Attributes Table',
+        undefined,
+        'Simple Attributes Table created with nullable non simple columns',
+      );
     } catch (error) {
       // pass
     }
@@ -58,7 +58,11 @@ describe('Related Simple Attributes tests', function() {
     // Validate non nullable non simple columns
     try {
       SimpleAttributesTable.create('simple_table', RelatedTablesUtils.createAdditionalUserColumns(true));
-      should.fail('Simple Attributes Table', undefined, 'Simple Attributes Table created with non nullable non simple columns');
+      should.fail(
+        'Simple Attributes Table',
+        undefined,
+        'Simple Attributes Table created with non nullable non simple columns',
+      );
     } catch (error) {
       // pass
     }
@@ -84,11 +88,16 @@ describe('Related Simple Attributes tests', function() {
     idColumn.isNotNull().should.be.equal(true);
     idColumn.isPrimaryKey().should.be.equal(true);
 
-    var additionalMappingColumns = RelatedTablesUtils.createAdditionalUserColumns(UserMappingTable.numRequiredColumns());
+    var additionalMappingColumns = RelatedTablesUtils.createAdditionalUserColumns(
+      UserMappingTable.numRequiredColumns(),
+    );
     var mappingTableName = 'attributes_simple_attributes';
     var userMappingTable = UserMappingTable.create(mappingTableName, additionalMappingColumns);
     rte.hasExtensionForMappingTable(userMappingTable.getTableName()).should.be.equal(false);
-    userMappingTable.getUserColumns().getColumnNames().length.should.be.equal(UserMappingTable.numRequiredColumns() + additionalMappingColumns.length);
+    userMappingTable
+      .getUserColumns()
+      .getColumnNames()
+      .length.should.be.equal(UserMappingTable.numRequiredColumns() + additionalMappingColumns.length);
 
     var baseIdColumn = userMappingTable.getBaseIdColumn();
     should.exist(baseIdColumn);
@@ -111,7 +120,11 @@ describe('Related Simple Attributes tests', function() {
     var contentsTables = contentsDao.getTables();
     contentsTables.indexOf(simpleTable.getTableName()).should.be.equal(-1);
 
-    let extendedRelation = rte.addSimpleAttributesRelationshipWithMappingTable(baseTableName, simpleTable, userMappingTable)
+    let extendedRelation = rte.addSimpleAttributesRelationshipWithMappingTable(
+      baseTableName,
+      simpleTable,
+      userMappingTable,
+    );
     validateContents(simpleTable, simpleTable.getContents());
     rte.has().should.be.equal(true);
     rte.hasExtensionForMappingTable(userMappingTable.getTableName()).should.be.equal(true);
@@ -316,7 +329,7 @@ describe('Related Simple Attributes tests', function() {
       while (simpleResultSet.moveToNext()) {
         var simpleRow = simpleResultSet.getRow();
         var mappedIds = rte.getMappingsForRelated(simpleRelation.getMappingTableName(), simpleRow.getId());
-        mappedIds.forEach((mappedId) =>{
+        mappedIds.forEach((mappedId) => {
           var attributeRow = attributesDao.queryForIdRow(mappedId);
           should.exist(attributeRow);
           attributeRow.hasId().should.be.equal(true);
@@ -326,7 +339,7 @@ describe('Related Simple Attributes tests', function() {
         });
         totalMapped += mappedIds.length;
       }
-      simpleResultSet.close()
+      simpleResultSet.close();
 
       totalMapped.should.be.equal(totalMappedCount);
     });
@@ -350,7 +363,7 @@ describe('Related Simple Attributes tests', function() {
 
     queryCount.should.be.equal(countOfIds);
     countOfIds.should.be.equal(userMappingDao.deleteByIdsWithUserMappingRow(umr));
-    userMappingDao.count().should.be.equal(10-countOfIds);
+    userMappingDao.count().should.be.equal(10 - countOfIds);
 
     // Delete by base id
     var userMappingResultSet = userMappingDao.queryForAll();
@@ -358,7 +371,7 @@ describe('Related Simple Attributes tests', function() {
     while (userMappingResultSet.moveToNext()) {
       userMappings.push(userMappingDao.getRowWithUserCustomRow(userMappingResultSet.getRow()));
     }
-    userMappingResultSet.close()
+    userMappingResultSet.close();
 
     var countOfBaseIds = userMappingDao.countByBaseIdWithUserMappingRow(userMappings[0]);
     var deleted = userMappingDao.deleteByBaseId(userMappings[0].getBaseId());
@@ -371,7 +384,6 @@ describe('Related Simple Attributes tests', function() {
       userMappings.push(userMappingDao.getRowWithUserCustomRow(userMappingResultSet.getRow()));
     }
     userMappingResultSet.close();
-
 
     var countOfRelatedIds = userMappingDao.countByRelatedIdWithUserMappingRow(userMappings[0]);
     deleted = userMappingDao.deleteByRelatedIdWithUserMappingRow(userMappings[0]);

@@ -1,33 +1,30 @@
-import { default as testSetup } from '../../../testSetup'
-import { RelatedTablesExtension} from '../../../../lib/extension/related/relatedTablesExtension'
+import { default as testSetup } from '../../../testSetup';
+import { RelatedTablesExtension } from '../../../../lib/extension/related/relatedTablesExtension';
 
-var UserMappingTable = require('../../../../lib/extension/related/userMappingTable').UserMappingTable
-  , RelatedTablesUtils = require('./relatedTablesUtils')
-  , should = require('chai').should()
-  , expect = require('chai').expect
-  , path = require('path');
+var UserMappingTable = require('../../../../lib/extension/related/userMappingTable').UserMappingTable,
+  RelatedTablesUtils = require('./relatedTablesUtils'),
+  should = require('chai').should(),
+  path = require('path');
 
-describe('Related Tables tests', function() {
-
-  describe('Related Tables Read Tests', function() {
+describe('Related Tables tests', function () {
+  describe('Related Tables Read Tests', function () {
     var geoPackage;
 
     var filename;
-    beforeEach('create the GeoPackage connection', async function() {
-
+    beforeEach('create the GeoPackage connection', async function () {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rte.gpkg');
-      // @ts-ignore
+
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
       geoPackage = result.geoPackage;
     });
 
-    afterEach('close the geoPackage connection', async function() {
+    afterEach('close the geoPackage connection', async function () {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
 
-    it('should read a relationship', function() {
+    it('should read a relationship', function () {
       var rte = new RelatedTablesExtension(geoPackage);
       rte.getOrCreateExtension();
       rte.has().should.be.equal(true);
@@ -84,7 +81,7 @@ describe('Related Tables tests', function() {
       }
     });
 
-    it('should get relationships for the base table name', function() {
+    it('should get relationships for the base table name', function () {
       const rte = new RelatedTablesExtension(geoPackage);
       const relationships = rte.getBaseTableRelations('cats_feature');
       relationships.length.should.be.equal(1);
@@ -94,7 +91,7 @@ describe('Related Tables tests', function() {
       relationships[0].getRelatedPrimaryColumn().should.be.equal('id');
     });
 
-    it('should get relationships for the base table name and baseId', function() {
+    it('should get relationships for the base table name and baseId', function () {
       const rte = new RelatedTablesExtension(geoPackage);
       rte.getOrCreateExtension();
       const relationships = rte.getRelatedRows('cats_feature', 1);
@@ -110,25 +107,24 @@ describe('Related Tables tests', function() {
     });
   });
 
-  describe('Related Tables Write Tests', function() {
+  describe('Related Tables Write Tests', function () {
     var geoPackage;
 
     var filename;
-    beforeEach('create the GeoPackage connection', async function() {
-
+    beforeEach('create the GeoPackage connection', async function () {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'gdal_sample.gpkg');
-      // @ts-ignore
+
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
       geoPackage = result.geoPackage;
     });
 
-    afterEach('close the geoPackage connection', async function() {
+    afterEach('close the geoPackage connection', async function () {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
 
-    it('should write a relationship', function() {
+    it('should write a relationship', function () {
       const rte = new RelatedTablesExtension(geoPackage);
       rte.has().should.be.equal(false);
 
@@ -153,8 +149,11 @@ describe('Related Tables tests', function() {
       baseIdColumn.isPrimaryKey().should.be.equal(false);
 
       try {
-
-        let extendedRelation = rte.addFeaturesRelationshipWithMappingTable(baseTableName, relatedTableName, userMappingTable);
+        let extendedRelation = rte.addFeaturesRelationshipWithMappingTable(
+          baseTableName,
+          relatedTableName,
+          userMappingTable,
+        );
         rte.has().should.be.equal(true);
         rte.hasExtensionForMappingTable(userMappingTable.getTableName()).should.be.equal(true);
         should.exist(extendedRelation);
@@ -162,12 +161,10 @@ describe('Related Tables tests', function() {
         relationships.length.should.be.equal(1);
         geoPackage.isTable(mappingTableName).should.be.equal(true);
 
-
         var baseDao = geoPackage.getFeatureDao(baseTableName);
         var relatedDao = geoPackage.getFeatureDao(relatedTableName);
         var baseResults = baseDao.count();
         var relatedResults = relatedDao.count();
-
 
         var userMappingDao = rte.getMappingDao(mappingTableName);
         var userMappingRow;
@@ -178,7 +175,6 @@ describe('Related Tables tests', function() {
           RelatedTablesUtils.populateUserRow(userMappingTable, userMappingRow, UserMappingTable.requiredColumns());
           userMappingDao.create(userMappingRow);
         }
-
 
         var count = userMappingDao.getCount();
         count.should.be.equal(10);
@@ -211,7 +207,7 @@ describe('Related Tables tests', function() {
         geoPackage.isTable(mappingTableName).should.be.equal(false);
         rte.removeExtension();
         rte.has().should.be.equal(false);
-      } catch(e) {
+      } catch (e) {
         console.log('error', e);
         false.should.be.equal(true);
       }

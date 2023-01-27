@@ -1,6 +1,3 @@
-/**
- * @module user/custom
- */
 import { UserColumn } from '../user/userColumn';
 import { GeoPackageDataType } from '../db/geoPackageDataType';
 import { DBValue } from '../db/dbValue';
@@ -101,7 +98,15 @@ export class AttributesColumn extends UserColumn {
     max?: number,
     autoincrement?: boolean,
   ): AttributesColumn {
-    return AttributesColumn.createColumnWithIndex(AttributesColumn.NO_INDEX, name, type, notNull, defaultValue, max, autoincrement);
+    return AttributesColumn.createColumnWithIndex(
+      AttributesColumn.NO_INDEX,
+      name,
+      type,
+      notNull,
+      defaultValue,
+      max,
+      autoincrement,
+    );
   }
 
   /**

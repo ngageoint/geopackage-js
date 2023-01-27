@@ -9,9 +9,7 @@ import { GeoPackageException } from '../../geoPackageException';
 import { DataColumnConstraintsDao } from './constraints/dataColumnConstraintsDao';
 
 /**
- * SchemaExtension module.
- * @module SchemaExtension
- * @see module:extension/BaseExtension
+ * SchemaExtension
  */
 export class SchemaExtension extends BaseExtension {
   public static readonly EXTENSION_SCHEMA_AUTHOR: string = 'gpkg';
@@ -93,7 +91,7 @@ export class SchemaExtension extends BaseExtension {
         created = this.geoPackage.getTableCreator().createDataColumns();
       }
     } catch (e) {
-      throw new GeoPackageException("Failed to check if DataColumns table exists and create it");
+      throw new GeoPackageException('Failed to check if DataColumns table exists and create it');
     }
     return created;
   }
@@ -133,7 +131,7 @@ export class SchemaExtension extends BaseExtension {
         }
       }
     } catch (e) {
-      throw new GeoPackageException("Failed to check if DataColumnConstraints table exists and create it");
+      throw new GeoPackageException('Failed to check if DataColumnConstraints table exists and create it');
     }
     return created;
   }

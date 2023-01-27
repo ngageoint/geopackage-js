@@ -1,7 +1,3 @@
-/**
- * tileTableReader module.
- * @module tiles/user/tileTableReader
- */
 import { UserTableReader } from '../../user/userTableReader';
 import { TileTable } from './tileTable';
 import { TileColumn } from './tileColumn';

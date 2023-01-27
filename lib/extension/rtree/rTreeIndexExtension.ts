@@ -21,7 +21,6 @@ import { GeoPackageConstants } from '../../geoPackageConstants';
  * RTreeIndex extension
  */
 export class RTreeIndexExtension extends BaseExtension {
-
   /**
    * Extension name
    */
@@ -33,12 +32,10 @@ export class RTreeIndexExtension extends BaseExtension {
    */
   public static readonly DEFINITION = 'http://www.geopackage.org/spec/#extension_rtree';
 
-
   /**
    * Connection
    */
   protected connection: GeoPackageConnection = null;
-
 
   private sqlScripts = {
     rtree_create: 'CREATE VIRTUAL TABLE "rtree_<t>_<c>" USING rtree(id, minx, maxx, miny, maxy)',
@@ -268,7 +265,11 @@ export class RTreeIndexExtension extends BaseExtension {
    * @param featureTable feature table
    */
   public createRTreeIndexWithFeatureTable(featureTable: FeatureTable): void {
-    this.createRTreeIndex(featureTable.getTableName(), featureTable.getGeometryColumnName(), featureTable.getPkColumnName());
+    this.createRTreeIndex(
+      featureTable.getTableName(),
+      featureTable.getGeometryColumnName(),
+      featureTable.getPkColumnName(),
+    );
   }
 
   /**
@@ -839,15 +840,14 @@ export class RTreeIndexExtension extends BaseExtension {
   ): void {
     const statement = this.sqlScripts[sqlName];
     const sql = this.substituteSqlArguments(statement, tableName, geometryColumnName, idColumnName, triggerName);
-    this._executeSQL(sql, triggerName != null);
+    this._executeSQL(sql);
   }
 
   /**
    * Execute the SQL statement
    * @param sql SQL statement
-   * @param trigger true if a trigger statement
    */
-  protected _executeSQL(sql: string, trigger: boolean): void {
+  protected _executeSQL(sql: string): void {
     this.connection.run(sql);
   }
 
@@ -871,9 +871,15 @@ export class RTreeIndexExtension extends BaseExtension {
   ): string {
     let substituted = sql.slice();
     substituted = substituted.replace(new RegExp(RTreeIndexExtensionConstants.TABLE_SUBSTITUTE, 'gm'), tableName);
-    substituted = substituted.replace(new RegExp(RTreeIndexExtensionConstants.GEOMETRY_COLUMN_SUBSTITUTE, 'gm'), geometryColumnName);
+    substituted = substituted.replace(
+      new RegExp(RTreeIndexExtensionConstants.GEOMETRY_COLUMN_SUBSTITUTE, 'gm'),
+      geometryColumnName,
+    );
     if (idColumnName != null) {
-      substituted = substituted.replace(new RegExp(RTreeIndexExtensionConstants.PK_COLUMN_SUBSTITUTE, 'gm'), idColumnName);
+      substituted = substituted.replace(
+        new RegExp(RTreeIndexExtensionConstants.PK_COLUMN_SUBSTITUTE, 'gm'),
+        idColumnName,
+      );
     }
     if (triggerName != null) {
       substituted = substituted.replace(new RegExp(RTreeIndexExtensionConstants.TRIGGER_SUBSTITUTE, 'gm'), triggerName);

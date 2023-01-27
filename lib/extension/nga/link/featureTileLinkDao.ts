@@ -37,11 +37,11 @@ export class FeatureTileLinkDao extends GeoPackageDao<FeatureTileLink, FeatureTi
   }
 
   /**
-   * Create a {module:extension/nga/contents.ContentsId} object
+   * Create a {ContentsId} object
    * @return {FeatureTileLink}
    */
   createObject(results?: Record<string, DBValue>): FeatureTileLink {
-    let c = new FeatureTileLink();
+    const c = new FeatureTileLink();
     if (results) {
       c.setFeatureTableName(results.feature_table_name as string);
       c.setTileTableName(results.tile_table_name as string);
@@ -159,7 +159,9 @@ export class FeatureTileLinkDao extends GeoPackageDao<FeatureTileLink, FeatureTi
   public queryForFeatureTableName(featureTableName: string): FeatureTileLink[] {
     let results = null;
     try {
-      results = this.queryForAllEq(FeatureTileLink.COLUMN_FEATURE_TABLE_NAME, featureTableName).map(result => this.createObject(result));
+      results = this.queryForAllEq(FeatureTileLink.COLUMN_FEATURE_TABLE_NAME, featureTableName).map((result) =>
+        this.createObject(result),
+      );
     } catch (e) {
       throw new GeoPackageException(
         'Failed to query for Feature Tile Link objects by Feature Table Name: ' + featureTableName,
@@ -177,7 +179,9 @@ export class FeatureTileLinkDao extends GeoPackageDao<FeatureTileLink, FeatureTi
   public queryForTileTableName(tileTableName: string): FeatureTileLink[] {
     let results = null;
     try {
-      results = this.queryForAllEq(FeatureTileLink.COLUMN_TILE_TABLE_NAME, tileTableName).map(result => this.createObject(result));
+      results = this.queryForAllEq(FeatureTileLink.COLUMN_TILE_TABLE_NAME, tileTableName).map((result) =>
+        this.createObject(result),
+      );
     } catch (e) {
       throw new GeoPackageException(
         'Failed to query for Feature Tile Link objects by Tile Table Name: ' + tileTableName,

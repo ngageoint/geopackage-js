@@ -6,16 +6,15 @@ import { ResultSet } from './resultSet';
 
 /**
  * This adapter uses sql.js to execute queries against the GeoPackage database
- * @module db/sqljsAdapter
  * @see {@link http://kripken.github.io/sql.js/documentation/|sqljs}
  */
 export class SqljsAdapter implements DBAdapter {
   static SQL: { Database: any };
   db: any;
   filePath: string | Buffer | Uint8Array;
-  static sqljsWasmLocateFile: (filename: string) => string = filename => filename;
+  static sqljsWasmLocateFile: (filename: string) => string = (filename) => filename;
 
-  static setSqljsWasmLocateFile(locateFile: (filename: string) => string) {
+  static setSqljsWasmLocateFile(locateFile: (filename: string) => string): void {
     SqljsAdapter.sqljsWasmLocateFile = locateFile;
   }
 
@@ -24,85 +23,89 @@ export class SqljsAdapter implements DBAdapter {
    */
   initialize(): Promise<this> {
     return new Promise<this>((resolve, reject) => {
-      new Promise(resolve => {
+      new Promise((resolve) => {
         if (SqljsAdapter.SQL == null) {
           initSqlJs({
             locateFile: SqljsAdapter.sqljsWasmLocateFile,
-          }).then((SQL: { Database: any }) => {
-            SqljsAdapter.SQL = SQL;
-            resolve(SQL);
-          }).catch(e => {
-            reject(e);
-          });
+          })
+            .then((SQL: { Database: any }) => {
+              SqljsAdapter.SQL = SQL;
+              resolve(SQL);
+            })
+            .catch((e) => {
+              reject(e);
+            });
         } else {
-          resolve(SqljsAdapter.SQL)
+          resolve(SqljsAdapter.SQL);
         }
-      }).then((SQL: { Database: any }) => {
-        if (this.filePath && typeof this.filePath === 'string') {
-          if (typeof process !== 'undefined' && process.version) {
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const fs = require('fs');
-            if (this.filePath.indexOf('http') === 0) {
+      })
+        .then((SQL: { Database: any }) => {
+          if (this.filePath && typeof this.filePath === 'string') {
+            if (typeof process !== 'undefined' && process.version) {
               // eslint-disable-next-line @typescript-eslint/no-var-requires
-              const http = require('http');
-              http
-                .get(this.filePath, (response: any) => {
-                  if (response.statusCode !== 200) {
-                    return reject(new Error('Unable to reach url: ' + this.filePath));
-                  }
-                  const body: any = [];
-                  response.on('data', (chunk: any) => body.push(chunk));
-                  response.on('end', () => {
-                    const t = new Uint8Array(Buffer.concat(body));
-                    this.db = new SQL.Database(t);
-                    resolve(this);
+              const fs = require('fs');
+              if (this.filePath.indexOf('http') === 0) {
+                // eslint-disable-next-line @typescript-eslint/no-var-requires
+                const http = require('http');
+                http
+                  .get(this.filePath, (response: any) => {
+                    if (response.statusCode !== 200) {
+                      return reject(new Error('Unable to reach url: ' + this.filePath));
+                    }
+                    const body: any = [];
+                    response.on('data', (chunk: any) => body.push(chunk));
+                    response.on('end', () => {
+                      const t = new Uint8Array(Buffer.concat(body));
+                      this.db = new SQL.Database(t);
+                      resolve(this);
+                    });
+                  })
+                  .on('error', (e: any) => {
+                    return reject(e);
                   });
-                })
-                .on('error', (e: any) => {
-                  return reject(e);
-                });
-            } else {
-              try {
-                fs.statSync(this.filePath);
-              } catch (e) {
-                this.db = new SQL.Database();
-                // var adapter = new SqljsAdapter(db);
+              } else {
+                try {
+                  fs.statSync(this.filePath);
+                } catch (e) {
+                  this.db = new SQL.Database();
+                  // var adapter = new SqljsAdapter(db);
+                  return resolve(this);
+                }
+                const filebuffer = fs.readFileSync(this.filePath);
+                const t = new Uint8Array(filebuffer);
+                this.db = new SQL.Database(t);
                 return resolve(this);
               }
-              const filebuffer = fs.readFileSync(this.filePath);
-              const t = new Uint8Array(filebuffer);
-              this.db = new SQL.Database(t);
-              return resolve(this);
+            } else {
+              // eslint-disable-next-line no-undef
+              const xhr = new XMLHttpRequest();
+              xhr.open('GET', this.filePath, true);
+              xhr.responseType = 'arraybuffer';
+              xhr.onload = (): void => {
+                if (xhr.status !== 200) {
+                  return reject(new Error('Unable to reach url: ' + this.filePath));
+                }
+                const uInt8Array = new Uint8Array(xhr.response);
+                this.db = new SQL.Database(uInt8Array);
+                return resolve(this);
+              };
+              xhr.onerror = (): void => {
+                return reject(new Error('Error reaching url: ' + this.filePath));
+              };
+              xhr.send();
             }
+          } else if (this.filePath) {
+            const byteArray = this.filePath;
+            this.db = new SQL.Database(byteArray);
+            return resolve(this);
           } else {
-            // eslint-disable-next-line no-undef
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', this.filePath, true);
-            xhr.responseType = 'arraybuffer';
-            xhr.onload = (): void => {
-              if (xhr.status !== 200) {
-                return reject(new Error('Unable to reach url: ' + this.filePath));
-              }
-              const uInt8Array = new Uint8Array(xhr.response);
-              this.db = new SQL.Database(uInt8Array);
-              return resolve(this);
-            };
-            xhr.onerror = (): void => {
-              return reject(new Error('Error reaching url: ' + this.filePath));
-            };
-            xhr.send();
+            this.db = new SQL.Database();
+            return resolve(this);
           }
-        } else if (this.filePath) {
-          const byteArray = this.filePath;
-          this.db = new SQL.Database(byteArray);
-          return resolve(this);
-        } else {
-          this.db = new SQL.Database();
-          return resolve(this);
-        }
-      }).catch(e => {
-        reject(e);
-      });
+        })
+        .catch((e) => {
+          reject(e);
+        });
     });
   }
 
@@ -114,11 +117,11 @@ export class SqljsAdapter implements DBAdapter {
   }
 
   size(): number {
-      throw new GeoPackageException('Method not implemented.');
+    throw new GeoPackageException('Method not implemented.');
   }
 
   readableSize(): string {
-      throw new GeoPackageException('Method not implemented.');
+    throw new GeoPackageException('Method not implemented.');
   }
 
   /**
@@ -214,7 +217,7 @@ export class SqljsAdapter implements DBAdapter {
       [Symbol.iterator](): IterableIterator<Record<string, DBValue>> {
         return this;
       },
-      next: function(): { value: Record<string, DBValue>; done: boolean } {
+      next: function (): { value: Record<string, DBValue>; done: boolean } {
         if (statement.step()) {
           return {
             value: statement.getAsObject(),
@@ -280,7 +283,7 @@ export class SqljsAdapter implements DBAdapter {
    * Prepares a SQL statement
    * @param sql
    */
-  prepareStatement (sql: string): any {
+  prepareStatement(sql: string): any {
     return this.db.prepare(sql);
   }
   /**
@@ -289,7 +292,7 @@ export class SqljsAdapter implements DBAdapter {
    * @param  {Object|Array} [params] bind parameters
    * @return {Number} last inserted row id
    */
-  bindAndInsert (statement: any, params?: [] | Record<string, DBValue>): number {
+  bindAndInsert(statement: any, params?: [] | Record<string, DBValue>): number {
     if (params && !(params instanceof Array)) {
       for (const key in params) {
         params['$' + key] = params[key];
@@ -301,7 +304,7 @@ export class SqljsAdapter implements DBAdapter {
    * Closes a prepared statement
    * @param statement
    */
-  closeStatement (statement: any) {
+  closeStatement(statement: any): void {
     statement.free();
   }
   /**
@@ -311,10 +314,9 @@ export class SqljsAdapter implements DBAdapter {
    * @return {Number} deleted rows
    */
   delete(sql: string, params?: [] | Record<string, DBValue>): number {
-    let rowsModified;
     const statement = this.db.prepare(sql, params);
     statement.step();
-    rowsModified = this.db.getRowsModified();
+    const rowsModified = this.db.getRowsModified();
     statement.free();
     return rowsModified;
   }
@@ -358,9 +360,8 @@ export class SqljsAdapter implements DBAdapter {
    * Enable or disable unsafe mode
    * @param enabled
    */
-  unsafe(enabled: boolean): void {
-
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function,@typescript-eslint/no-unused-vars
+  unsafe(enabled: boolean): void {}
 
   /**
    * Returns a result set for the given query
@@ -368,29 +369,33 @@ export class SqljsAdapter implements DBAdapter {
   query(sql: string, params?: [] | Record<string, DBValue>): ResultSet {
     let statement = this.db.prepare(sql);
     statement.bind(params);
-    return new ResultSet({
-      [Symbol.iterator](): IterableIterator<Record<string, DBValue>> {
-        return this;
+    return new ResultSet(
+      {
+        [Symbol.iterator](): IterableIterator<Record<string, DBValue>> {
+          return this;
+        },
+        next: function (): { value: Record<string, DBValue>; done: boolean } {
+          if (statement.step()) {
+            return {
+              value: statement.getAsObject(),
+              done: false,
+            };
+          } else {
+            statement.free();
+            return {
+              value: undefined,
+              done: true,
+            };
+          }
+        },
       },
-      next: function(): { value: Record<string, DBValue>; done: boolean } {
-        if (statement.step()) {
-          return {
-            value: statement.getAsObject(),
-            done: false,
-          };
-        } else {
+      {
+        close: (): void => {
           statement.free();
-          return {
-            value: undefined,
-            done: true,
-          };
-        }
+          statement = null;
+        },
       },
-    }, {
-      close: () => {
-        statement.free();
-        statement = null;
-      }
-    }, this);
+      this,
+    );
   }
 }

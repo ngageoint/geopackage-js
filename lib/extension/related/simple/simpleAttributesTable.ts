@@ -135,10 +135,7 @@ export class SimpleAttributesTable extends UserRelatedTable {
    * @param  {boolean} autoincrement
    * @return {UserColumn[]}
    */
-  static createRequiredColumns(
-    idColumnName = SimpleAttributesTable.COLUMN_ID,
-    autoincrement?: boolean,
-  ): UserColumn[] {
+  static createRequiredColumns(idColumnName = SimpleAttributesTable.COLUMN_ID, autoincrement?: boolean): UserColumn[] {
     return [SimpleAttributesTable.createIdColumn(idColumnName, autoincrement)];
   }
 
@@ -151,7 +148,6 @@ export class SimpleAttributesTable extends UserRelatedTable {
   static createIdColumn(idColumnName: string, autoincrement?: boolean): UserColumn {
     return UserCustomColumn.createPrimaryKeyColumn(idColumnName, autoincrement);
   }
-
 
   /**
    * Create the primary key id column with a specified column index

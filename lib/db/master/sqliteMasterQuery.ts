@@ -176,7 +176,7 @@ export class SQLiteMasterQuery {
    */
   static createOrForColumnValue(column: SQLiteMasterColumn, values: string[]): SQLiteMasterQuery {
     const query = this.createOr();
-    values.forEach(value => {
+    values.forEach((value) => {
       query.add(column, '=', value);
     });
     return query;
@@ -197,7 +197,7 @@ export class SQLiteMasterQuery {
     values: string[],
   ): SQLiteMasterQuery {
     const query = this.createOr();
-    values.forEach(value => {
+    values.forEach((value) => {
       query.add(column, operation, value);
     });
     return query;
@@ -212,7 +212,7 @@ export class SQLiteMasterQuery {
    */
   static createAndForColumnValue(column: SQLiteMasterColumn, values: string[]): SQLiteMasterQuery {
     const query = this.createAnd();
-    values.forEach(value => {
+    values.forEach((value) => {
       query.add(column, '=', value);
     });
     return query;
@@ -232,7 +232,7 @@ export class SQLiteMasterQuery {
     values: string[],
   ): SQLiteMasterQuery {
     const query = this.createAnd();
-    values.forEach(value => {
+    values.forEach((value) => {
       query.add(column, operation, value);
     });
     return query;

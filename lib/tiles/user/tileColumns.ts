@@ -1,7 +1,3 @@
-/**
- * @module tiles/user/tileColumn
- */
-
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { TileColumn } from './tileColumn';
 import { UserColumns } from '../../user/userColumns';

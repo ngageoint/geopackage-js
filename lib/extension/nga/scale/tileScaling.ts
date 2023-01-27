@@ -1,13 +1,8 @@
-/**
- * @memberOf module:extension/nga/scale
- * @class TileScaling
- */
 import { TileScalingType } from './tileScalingType';
 import { TileMatrixSet } from '../../../tiles/matrixset/tileMatrixSet';
 
 /**
  * Tile Scaling object, for scaling tiles from nearby zoom levels for missing
- * @constructor
  */
 export class TileScaling {
   /**

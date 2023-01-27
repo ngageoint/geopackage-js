@@ -118,9 +118,7 @@ export class MediaTableMetadata extends UserTableMetadata<UserCustomColumn> {
     let simpleAttributeColumns = this.getColumns();
     if (simpleAttributeColumns == null) {
       simpleAttributeColumns = [];
-      simpleAttributeColumns.push(
-        ...MediaTable.createRequiredColumns(this.getIdColumnName(), this.isAutoincrement()),
-      );
+      simpleAttributeColumns.push(...MediaTable.createRequiredColumns(this.getIdColumnName(), this.isAutoincrement()));
 
       const additional = this.getAdditionalColumns();
       if (additional != null) {

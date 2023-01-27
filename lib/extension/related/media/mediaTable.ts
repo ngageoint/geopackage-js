@@ -1,7 +1,3 @@
-/**
- * mediaTable module.
- * @module extension/relatedTables
- */
 import { UserRelatedTable } from '../userRelatedTable';
 import { RelationType } from '../relationType';
 import { UserColumn } from '../../../user/userColumn';

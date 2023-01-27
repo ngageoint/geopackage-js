@@ -1,7 +1,3 @@
-/**
- * @module tiles/user/tileTable
- */
-
 import { UserTable } from '../../user/userTable';
 import { TileColumn } from './tileColumn';
 import { TileColumns } from './tileColumns';
@@ -12,10 +8,7 @@ import { GeoPackageException } from '../../geoPackageException';
 
 /**
  * `TileTable` models [tile pyramid user tables](https://www.geopackage.org/spec121/index.html#tiles_user_tables).
- *
  * @class
- * @param {string} tableName
- * @param {TileColumn[]} columns
  */
 export class TileTable extends UserTable<TileColumn> {
   /**

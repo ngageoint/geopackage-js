@@ -4,6 +4,8 @@ const CopyPlugin = require('copy-webpack-plugin');
 const NodePolyfillWebpackPlugin = require('node-polyfill-webpack-plugin');
 
 const browserConfig = {
+  mode: 'production',
+  devtool: 'source-map',
   entry: './index.ts',
   plugins: [
     // new BundleAnalyzerPlugin({analyzerMode: 'static'}),
@@ -52,9 +54,7 @@ const browserConfig = {
       type: 'umd',
     },
   },
-  externals: ['better-sqlite3'],
-  devtool: 'source-map',
-  mode: 'production',
+  externals: ['better-sqlite3']
 };
 
 module.exports = [browserConfig];

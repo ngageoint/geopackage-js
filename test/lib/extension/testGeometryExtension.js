@@ -1,24 +1,23 @@
-import { GeometryType } from "@ngageoint/simple-features-js";
-import { GeometryExtensions } from "../../../lib/extension/geometryExtensions";
-import path from "path";
-import { GeometryCodes } from "@ngageoint/simple-features-wkb-js";
-import { ExtensionScopeType } from "../../../lib/extension/extensionScopeType";
+import { GeometryType } from '@ngageoint/simple-features-js';
+import { GeometryExtensions } from '../../../lib/extension/geometryExtensions';
+import path from 'path';
+import { GeometryCodes } from '@ngageoint/simple-features-wkb-js';
+import { ExtensionScopeType } from '../../../lib/extension/extensionScopeType';
 const assert = require('chai').assert;
 const testSetup = require('../../testSetup').default;
 
-describe('GeoPackage Extension tests', function() {
+describe('GeoPackage Extension tests', function () {
   var filename = path.join(__dirname, '..', '..', 'fixtures', 'import_db.gpkg');
   var testGeoPackage;
   var geoPackage;
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     const result = await copyAndOpenGeopackage(filename);
     testGeoPackage = result.path;
     geoPackage = result.geoPackage;
-
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     geoPackage.close();
     await testSetup.deleteGeoPackage(testGeoPackage);
   });
@@ -26,7 +25,7 @@ describe('GeoPackage Extension tests', function() {
   /**
    * Test the is extension check
    */
-  it('test isExtension', function() {
+  it('test isExtension', function () {
     assert.isFalse(GeometryExtensions.isExtension(GeometryType.GEOMETRY));
     assert.isFalse(GeometryExtensions.isExtension(GeometryType.POINT));
     assert.isFalse(GeometryExtensions.isExtension(GeometryType.LINESTRING));
@@ -51,7 +50,7 @@ describe('GeoPackage Extension tests', function() {
   /**
    * Test the is GeoPackage extension check
    */
-  it('test isGeoPackageExtension', function() {
+  it('test isGeoPackageExtension', function () {
     assert.isFalse(GeometryExtensions.isGeoPackageExtension(GeometryType.GEOMETRY));
     assert.isFalse(GeometryExtensions.isGeoPackageExtension(GeometryType.POINT));
     assert.isFalse(GeometryExtensions.isGeoPackageExtension(GeometryType.LINESTRING));
@@ -72,11 +71,10 @@ describe('GeoPackage Extension tests', function() {
     assert.isFalse(GeometryExtensions.isGeoPackageExtension(GeometryType.TRIANGLE));
   });
 
-
   /**
    * Test the GeoPackage get extension name
    */
-  it('test geometry extension name', function() {
+  it('test geometry extension name', function () {
     try {
       assert.fail(GeometryExtensions.getExtensionName(GeometryType.GEOMETRY));
     } catch (e) {
@@ -118,13 +116,34 @@ describe('GeoPackage Extension tests', function() {
       // expected
     }
 
-    assert.equal(expectedGeoPackageExtensionName(GeometryType.CIRCULARSTRING), GeometryExtensions.getExtensionName(GeometryType.CIRCULARSTRING));
-    assert.equal(expectedGeoPackageExtensionName(GeometryType.COMPOUNDCURVE), GeometryExtensions.getExtensionName(GeometryType.COMPOUNDCURVE));
-    assert.equal(expectedGeoPackageExtensionName(GeometryType.CURVEPOLYGON), GeometryExtensions.getExtensionName(GeometryType.CURVEPOLYGON));
-    assert.equal(expectedGeoPackageExtensionName(GeometryType.MULTICURVE), GeometryExtensions.getExtensionName(GeometryType.MULTICURVE));
-    assert.equal(expectedGeoPackageExtensionName(GeometryType.MULTISURFACE), GeometryExtensions.getExtensionName(GeometryType.MULTISURFACE));
-    assert.equal(expectedGeoPackageExtensionName(GeometryType.CURVE), GeometryExtensions.getExtensionName(GeometryType.CURVE));
-    assert.equal(expectedGeoPackageExtensionName(GeometryType.SURFACE), GeometryExtensions.getExtensionName(GeometryType.SURFACE));
+    assert.equal(
+      expectedGeoPackageExtensionName(GeometryType.CIRCULARSTRING),
+      GeometryExtensions.getExtensionName(GeometryType.CIRCULARSTRING),
+    );
+    assert.equal(
+      expectedGeoPackageExtensionName(GeometryType.COMPOUNDCURVE),
+      GeometryExtensions.getExtensionName(GeometryType.COMPOUNDCURVE),
+    );
+    assert.equal(
+      expectedGeoPackageExtensionName(GeometryType.CURVEPOLYGON),
+      GeometryExtensions.getExtensionName(GeometryType.CURVEPOLYGON),
+    );
+    assert.equal(
+      expectedGeoPackageExtensionName(GeometryType.MULTICURVE),
+      GeometryExtensions.getExtensionName(GeometryType.MULTICURVE),
+    );
+    assert.equal(
+      expectedGeoPackageExtensionName(GeometryType.MULTISURFACE),
+      GeometryExtensions.getExtensionName(GeometryType.MULTISURFACE),
+    );
+    assert.equal(
+      expectedGeoPackageExtensionName(GeometryType.CURVE),
+      GeometryExtensions.getExtensionName(GeometryType.CURVE),
+    );
+    assert.equal(
+      expectedGeoPackageExtensionName(GeometryType.SURFACE),
+      GeometryExtensions.getExtensionName(GeometryType.SURFACE),
+    );
 
     try {
       assert.fail(GeometryExtensions.getExtensionName(GeometryType.POLYHEDRALSURFACE));
@@ -141,15 +160,14 @@ describe('GeoPackage Extension tests', function() {
     } catch (e) {
       // expected
     }
-  })
+  });
 
   /**
    * Test the get extension name
    */
 
-    it('test extension name', function() {
-
-    let author = "nga";
+  it('test extension name', function () {
+    let author = 'nga';
 
     try {
       assert.fail(GeometryExtensions.getExtensionNameWithAuthor(GeometryType.GEOMETRY, author));
@@ -192,47 +210,83 @@ describe('GeoPackage Extension tests', function() {
       // expected
     }
 
-    assert.equal(expectedGeoPackageExtensionName(GeometryType.CIRCULARSTRING), GeometryExtensions.getExtensionNameWithAuthor(GeometryType.CIRCULARSTRING, author));
-    assert.equal(expectedGeoPackageExtensionName(GeometryType.COMPOUNDCURVE), GeometryExtensions.getExtensionNameWithAuthor(GeometryType.COMPOUNDCURVE, author));
-    assert.equal(expectedGeoPackageExtensionName(GeometryType.CURVEPOLYGON), GeometryExtensions.getExtensionNameWithAuthor(GeometryType.CURVEPOLYGON, author));
-    assert.equal(expectedGeoPackageExtensionName(GeometryType.MULTICURVE), GeometryExtensions.getExtensionNameWithAuthor(GeometryType.MULTICURVE, author));
-    assert.equal(expectedGeoPackageExtensionName(GeometryType.MULTISURFACE), GeometryExtensions.getExtensionNameWithAuthor(GeometryType.MULTISURFACE, author));
-    assert.equal(expectedGeoPackageExtensionName(GeometryType.CURVE), GeometryExtensions.getExtensionNameWithAuthor(GeometryType.CURVE, author));
-    assert.equal(expectedGeoPackageExtensionName(GeometryType.SURFACE), GeometryExtensions.getExtensionNameWithAuthor(GeometryType.SURFACE, author));
+    assert.equal(
+      expectedGeoPackageExtensionName(GeometryType.CIRCULARSTRING),
+      GeometryExtensions.getExtensionNameWithAuthor(GeometryType.CIRCULARSTRING, author),
+    );
+    assert.equal(
+      expectedGeoPackageExtensionName(GeometryType.COMPOUNDCURVE),
+      GeometryExtensions.getExtensionNameWithAuthor(GeometryType.COMPOUNDCURVE, author),
+    );
+    assert.equal(
+      expectedGeoPackageExtensionName(GeometryType.CURVEPOLYGON),
+      GeometryExtensions.getExtensionNameWithAuthor(GeometryType.CURVEPOLYGON, author),
+    );
+    assert.equal(
+      expectedGeoPackageExtensionName(GeometryType.MULTICURVE),
+      GeometryExtensions.getExtensionNameWithAuthor(GeometryType.MULTICURVE, author),
+    );
+    assert.equal(
+      expectedGeoPackageExtensionName(GeometryType.MULTISURFACE),
+      GeometryExtensions.getExtensionNameWithAuthor(GeometryType.MULTISURFACE, author),
+    );
+    assert.equal(
+      expectedGeoPackageExtensionName(GeometryType.CURVE),
+      GeometryExtensions.getExtensionNameWithAuthor(GeometryType.CURVE, author),
+    );
+    assert.equal(
+      expectedGeoPackageExtensionName(GeometryType.SURFACE),
+      GeometryExtensions.getExtensionNameWithAuthor(GeometryType.SURFACE, author),
+    );
 
-    assert.equal(expectedUserDefinedExtensionName(author, GeometryType.POLYHEDRALSURFACE), GeometryExtensions.getExtensionNameWithAuthor(GeometryType.POLYHEDRALSURFACE, author));
-    assert.equal(expectedUserDefinedExtensionName(author, GeometryType.TIN), GeometryExtensions.getExtensionNameWithAuthor(GeometryType.TIN, author));
-    assert.equal(expectedUserDefinedExtensionName(author, GeometryType.TRIANGLE), GeometryExtensions.getExtensionNameWithAuthor(GeometryType.TRIANGLE, author));
-  })
+    assert.equal(
+      expectedUserDefinedExtensionName(author, GeometryType.POLYHEDRALSURFACE),
+      GeometryExtensions.getExtensionNameWithAuthor(GeometryType.POLYHEDRALSURFACE, author),
+    );
+    assert.equal(
+      expectedUserDefinedExtensionName(author, GeometryType.TIN),
+      GeometryExtensions.getExtensionNameWithAuthor(GeometryType.TIN, author),
+    );
+    assert.equal(
+      expectedUserDefinedExtensionName(author, GeometryType.TRIANGLE),
+      GeometryExtensions.getExtensionNameWithAuthor(GeometryType.TRIANGLE, author),
+    );
+  });
 
   /**
    * Test the Geometry Extension creation
    */
-  it('test geometry extension', function() {
+  it('test geometry extension', function () {
     const extensions = new GeometryExtensions(geoPackage);
     const extensionsDao = geoPackage.getExtensionsDao();
     if (!extensionsDao.isTableExists()) {
       geoPackage.createExtensionsTable();
     }
     // Test non extension geometries
-    for (let i = GeometryCodes.getCodeForGeometryType(GeometryType.GEOMETRY); i <= GeometryCodes.getCodeForGeometryType(GeometryType.GEOMETRYCOLLECTION); i++) {
-
+    for (
+      let i = GeometryCodes.getCodeForGeometryType(GeometryType.GEOMETRY);
+      i <= GeometryCodes.getCodeForGeometryType(GeometryType.GEOMETRYCOLLECTION);
+      i++
+    ) {
       const geometryType = GeometryCodes.getGeometryType(i);
       try {
-        extensions.getOrCreateGeometryExtension("table_name", "column_name", geometryType);
-        assert.fail("Geometry Extension was created for " + geometryType);
+        extensions.getOrCreateGeometryExtension('table_name', 'column_name', geometryType);
+        assert.fail('Geometry Extension was created for ' + geometryType);
       } catch (e) {
         // Expected
       }
     }
 
     // Test user created extension geometries
-    for (let i = GeometryCodes.getCodeForGeometryType(GeometryType.POLYHEDRALSURFACE); i <= GeometryCodes.getCodeForGeometryType(GeometryType.TRIANGLE); i++) {
-
+    for (
+      let i = GeometryCodes.getCodeForGeometryType(GeometryType.POLYHEDRALSURFACE);
+      i <= GeometryCodes.getCodeForGeometryType(GeometryType.TRIANGLE);
+      i++
+    ) {
       const geometryType = GeometryCodes.getGeometryType(i);
       try {
-        extensions.getOrCreateGeometryExtension("table_name", "column_name", geometryType);
-        assert.fail("Geometry Extension was created for " + geometryType);
+        extensions.getOrCreateGeometryExtension('table_name', 'column_name', geometryType);
+        assert.fail('Geometry Extension was created for ' + geometryType);
       } catch (e) {
         // Expected
       }
@@ -240,11 +294,15 @@ describe('GeoPackage Extension tests', function() {
 
     // Test geometry extensions
     let count = extensionsDao.count();
-    for (let i = GeometryCodes.getCodeForGeometryType(GeometryType.CIRCULARSTRING); i <= GeometryCodes.getCodeForGeometryType(GeometryType.SURFACE); i++) {
+    for (
+      let i = GeometryCodes.getCodeForGeometryType(GeometryType.CIRCULARSTRING);
+      i <= GeometryCodes.getCodeForGeometryType(GeometryType.SURFACE);
+      i++
+    ) {
       const geometryType = GeometryCodes.getGeometryType(i);
-      const tableName = "table_" + GeometryType.nameFromType(geometryType);
-      const columnName = "geom";
-      const extension = extensions.getOrCreateGeometryExtension(tableName, columnName, geometryType );
+      const tableName = 'table_' + GeometryType.nameFromType(geometryType);
+      const columnName = 'geom';
+      const extension = extensions.getOrCreateGeometryExtension(tableName, columnName, geometryType);
       assert.isNotNull(extension);
       assert.isTrue(extensions.has(tableName, columnName, undefined, geometryType));
       assert.equal(++count, extensionsDao.count());
@@ -256,26 +314,29 @@ describe('GeoPackage Extension tests', function() {
       assert.equal(extension.getScope(), ExtensionScopeType.READ_WRITE);
       assert.equal(extension.getDefinition(), GeometryExtensions.GEOMETRY_TYPES_EXTENSION_DEFINITION);
     }
-  })
+  });
 
   /**
    * Test the User Geometry Extension creation
    */
-  it('should create geometry extension', function() {
+  it('should create geometry extension', function () {
     const extensions = new GeometryExtensions(geoPackage);
     const extensionsDao = geoPackage.getExtensionsDao();
     if (!extensionsDao.isTableExists()) {
       geoPackage.createExtensionsTable();
     }
-    const author = "nga";
+    const author = 'nga';
 
     // Test non extension geometries
-    for (let i = GeometryCodes.getCodeForGeometryType(GeometryType.GEOMETRY); i <= GeometryCodes.getCodeForGeometryType(GeometryType.GEOMETRYCOLLECTION); i++) {
-
+    for (
+      let i = GeometryCodes.getCodeForGeometryType(GeometryType.GEOMETRY);
+      i <= GeometryCodes.getCodeForGeometryType(GeometryType.GEOMETRYCOLLECTION);
+      i++
+    ) {
       const geometryType = GeometryCodes.getGeometryType(i);
       try {
-        extensions.getOrCreateGeometryExtension("table_name", "column_name", geometryType, author);
-        assert.fail("Geometry Extension was created for " + geometryType);
+        extensions.getOrCreateGeometryExtension('table_name', 'column_name', geometryType, author);
+        assert.fail('Geometry Extension was created for ' + geometryType);
       } catch (e) {
         // Expected
       }
@@ -283,11 +344,14 @@ describe('GeoPackage Extension tests', function() {
 
     // Test geometry extensions and user created extensions with author
     let count = extensionsDao.count();
-    for (let i = GeometryCodes.getCodeForGeometryType(GeometryType.CIRCULARSTRING); i <= GeometryCodes.getCodeForGeometryType(GeometryType.TRIANGLE); i++) {
-
+    for (
+      let i = GeometryCodes.getCodeForGeometryType(GeometryType.CIRCULARSTRING);
+      i <= GeometryCodes.getCodeForGeometryType(GeometryType.TRIANGLE);
+      i++
+    ) {
       const geometryType = GeometryCodes.getGeometryType(i);
-      const tableName = "table_" + GeometryType.nameFromType(geometryType);
-      const columnName = "geom";
+      const tableName = 'table_' + GeometryType.nameFromType(geometryType);
+      const columnName = 'geom';
       const extension = extensions.getOrCreateGeometryExtension(tableName, columnName, geometryType, author);
       assert.isNotNull(extension);
       assert.isTrue(extensions.has(tableName, columnName, author, geometryType));
@@ -308,7 +372,7 @@ describe('GeoPackage Extension tests', function() {
         assert.equal(extension.getDefinition(), GeometryExtensions.USER_GEOMETRY_TYPES_EXTENSION_DEFINITION);
       }
     }
-  })
+  });
 
   /**
    * Get the expected GeoPackage extension name
@@ -317,7 +381,7 @@ describe('GeoPackage Extension tests', function() {
    * @return
    */
   function expectedGeoPackageExtensionName(type) {
-    return expectedGeoPackageExtensionAuthor() + "_" + expectedGeoPackageExtensionNameNoAuthor(type);
+    return expectedGeoPackageExtensionAuthor() + '_' + expectedGeoPackageExtensionNameNoAuthor(type);
   }
 
   /**
@@ -326,7 +390,7 @@ describe('GeoPackage Extension tests', function() {
    * @return
    */
   function expectedGeoPackageExtensionAuthor() {
-    return "gpkg";
+    return 'gpkg';
   }
 
   /**
@@ -336,7 +400,7 @@ describe('GeoPackage Extension tests', function() {
    * @return
    */
   function expectedGeoPackageExtensionNameNoAuthor(type) {
-    return "geom_" + GeometryType.nameFromType(type);
+    return 'geom_' + GeometryType.nameFromType(type);
   }
 
   /**
@@ -346,8 +410,7 @@ describe('GeoPackage Extension tests', function() {
    * @param type
    * @return
    */
-   function expectedUserDefinedExtensionName(author, type) {
-    return author + "_geom_" + GeometryType.nameFromType(type);
+  function expectedUserDefinedExtensionName(author, type) {
+    return author + '_geom_' + GeometryType.nameFromType(type);
   }
-
 });

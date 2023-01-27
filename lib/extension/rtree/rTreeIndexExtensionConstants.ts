@@ -1,6 +1,3 @@
-import { Extensions } from '../extensions';
-import { GeoPackageConstants } from '../../geoPackageConstants';
-
 /**
  * RTreeIndex extension
  */

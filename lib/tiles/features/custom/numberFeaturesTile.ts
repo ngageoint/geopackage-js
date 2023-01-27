@@ -320,7 +320,7 @@ export class NumberFeaturesTile implements CustomFeaturesTile {
   ): Promise<GeoPackageImage> {
     // eslint-disable-next-line complexity
     await Canvas.initializeAdapter();
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const canvasProvided = tileCanvas != null;
       let canvas = tileCanvas;
       if (!canvasProvided) {
@@ -371,7 +371,7 @@ export class NumberFeaturesTile implements CustomFeaturesTile {
         }
       }
       Canvas.drawText(context, text, [centerX, centerY], this.textFont, this.textSize, this.textColor);
-      Canvas.toDataURL(canvas, 'image/png').then(result => {
+      Canvas.toDataURL(canvas, 'image/png').then((result) => {
         Canvas.disposeCanvas(canvas);
         resolve(Canvas.createImage(result));
       });

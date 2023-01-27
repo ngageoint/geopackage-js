@@ -13,7 +13,11 @@ export class GeoJSONUtils {
    * @param geometryTransform
    * @param dataColumnsMap
    */
-  public static convertFeatureRowIntoGeoJSONFeature(featureRow: FeatureRow, geometryTransform: GeometryTransform, dataColumnsMap?: Map<string, string>): Feature {
+  public static convertFeatureRowIntoGeoJSONFeature(
+    featureRow: FeatureRow,
+    geometryTransform: GeometryTransform,
+    dataColumnsMap?: Map<string, string>,
+  ): Feature {
     const geoJson = {
       id: undefined,
       type: 'Feature',
@@ -43,12 +47,14 @@ export class GeoJSONUtils {
           } else if (columnName.toLowerCase() === '_properties_id') {
             geoJson.properties[columnName.substring(12)] = value;
           } else {
-            geoJson.properties[dataColumnsMap != null && dataColumnsMap.has(columnName) ? dataColumnsMap.get(columnName) : columnName] = value;
+            geoJson.properties[
+              dataColumnsMap != null && dataColumnsMap.has(columnName) ? dataColumnsMap.get(columnName) : columnName
+            ] = value;
           }
         }
       }
       geoJson.id = geoJson.id || featureRow.getId();
     }
-    return geoJson
+    return geoJson;
   }
 }

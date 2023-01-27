@@ -8,7 +8,6 @@ import { GeoPackageDataType } from '../../../db/geoPackageDataType';
 import { AttributesDao } from '../../../attributes/attributesDao';
 import { AttributesRow } from '../../../attributes/attributesRow';
 import { GeoPackageException } from '../../../geoPackageException';
-import { DBValue } from '../../../db/dbValue';
 import { FieldValues } from '../../../dao/fieldValues';
 import { ExtensionScopeType } from '../../extensionScopeType';
 import { AttributesTableMetadata } from '../../../attributes/attributesTableMetadata';
@@ -164,8 +163,8 @@ export class PropertiesExtension extends BaseExtension {
           'SELECT DISTINCT ' + PropertiesExtension.COLUMN_PROPERTY + ' FROM ' + PropertiesExtension.TABLE_NAME,
           null,
         )
-        .map(result => {
-          return result as string
+        .map((result) => {
+          return result as string;
         });
     }
     return properties;

@@ -48,9 +48,9 @@ export class GeometryIndexDao extends GeoPackageDao<GeometryIndex, GeometryIndex
       if (values.length > 1) {
         throw new GeoPackageException(
           'More than one GeometryIndex returned for key. Table Name: ' +
-          key.getTableName() +
-          ', Geom Id: ' +
-          key.getGeomId(),
+            key.getTableName() +
+            ', Geom Id: ' +
+            key.getGeomId(),
         );
       }
       if (values.length === 1) {
@@ -62,7 +62,7 @@ export class GeometryIndexDao extends GeoPackageDao<GeometryIndex, GeometryIndex
 
   public createObject(result: Record<string, DBValue>): GeometryIndex {
     const geometryIndex = new GeometryIndex();
-    geometryIndex.setTableName(result['table_name'] as string)
+    geometryIndex.setTableName(result['table_name'] as string);
     geometryIndex.setGeomId(result['geom_id'] as number);
     geometryIndex.setMinX(result['min_x'] as number);
     geometryIndex.setMaxX(result['max_x'] as number);
@@ -128,7 +128,9 @@ export class GeometryIndexDao extends GeoPackageDao<GeometryIndex, GeometryIndex
   public queryForTableName(tableName: string): GeometryIndex[] {
     let results: GeometryIndex[] = [];
     try {
-      results = this.queryForAllEq(GeometryIndex.COLUMN_TABLE_NAME, tableName).map(result => this.createObject(result));
+      results = this.queryForAllEq(GeometryIndex.COLUMN_TABLE_NAME, tableName).map((result) =>
+        this.createObject(result),
+      );
     } catch (e) {
       throw new GeoPackageException('Failed to query for Geometry Index objects by Table Name: ' + tableName);
     }

@@ -8,7 +8,7 @@ export class Progress implements GeoPackageProgress {
    * Decimal format
    */
   protected decimalFormat = {
-    format: function(num: number): string {
+    format: function (num: number): string {
       return num.toFixed(2);
     },
   };

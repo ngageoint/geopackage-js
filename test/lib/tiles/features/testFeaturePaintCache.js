@@ -1,13 +1,12 @@
-const { AttributesTable } = require("../../../../lib/attributes/attributesTable");
-var FeaturePaintCache = require('../../../../lib/tiles/features/featurePaintCache').FeaturePaintCache
-  , StyleRow = require('../../../../lib/extension/nga/style/styleRow').StyleRow
-  , StyleTable = require('../../../../lib/extension/nga/style/styleTable').StyleTable
-  , Paint = require('../../../../lib/tiles/features/paint').Paint
-  , FeatureDrawType = require('../../../../lib/tiles/features/featureDrawType').FeatureDrawType
-  , should = require('chai').should();
+var FeaturePaintCache = require('../../../../lib/tiles/features/featurePaintCache').FeaturePaintCache,
+  StyleRow = require('../../../../lib/extension/nga/style/styleRow').StyleRow,
+  StyleTable = require('../../../../lib/extension/nga/style/styleTable').StyleTable,
+  Paint = require('../../../../lib/tiles/features/paint').Paint,
+  FeatureDrawType = require('../../../../lib/tiles/features/featureDrawType').FeatureDrawType,
+  should = require('chai').should();
 
-describe('FeaturePaintCache Tests', function() {
-  it('should create paint cache', function() {
+describe('FeaturePaintCache Tests', function () {
+  it('should create paint cache', function () {
     var featurePaintCache = new FeaturePaintCache();
     featurePaintCache.cacheSize.should.be.equal(FeaturePaintCache.DEFAULT_STYLE_PAINT_CACHE_SIZE);
     var cacheSize = 50;
@@ -15,7 +14,7 @@ describe('FeaturePaintCache Tests', function() {
     featurePaintCache.cacheSize.should.be.equal(cacheSize);
   });
 
-  it('should test paint cache should return paint for style row id', function() {
+  it('should test paint cache should return paint for style row id', function () {
     var featurePaintCache = new FeaturePaintCache();
     var paint = new Paint();
     var styleRowId = 0;
@@ -26,7 +25,7 @@ describe('FeaturePaintCache Tests', function() {
     should.not.exist(featurePaintCache.getFeaturePaint(styleRowId));
   });
 
-  it('should test paint cache should return paint for style row id', function() {
+  it('should test paint cache should return paint for style row id', function () {
     var featurePaintCache = new FeaturePaintCache();
     var paint = new Paint();
 
@@ -37,13 +36,13 @@ describe('FeaturePaintCache Tests', function() {
     }
     var styleRow = new MockStyleRow(new StyleTable(), null);
     should.not.exist(featurePaintCache.getFeaturePaintForStyleRow(styleRow));
-    featurePaintCache.setPaintForStyleRow(styleRow, FeatureDrawType.STROKE, paint)
+    featurePaintCache.setPaintForStyleRow(styleRow, FeatureDrawType.STROKE, paint);
     should.exist(featurePaintCache.getFeaturePaintForStyleRow(styleRow));
     should.exist(featurePaintCache.remove(styleRow.getId()));
     should.not.exist(featurePaintCache.getFeaturePaintForStyleRow(styleRow));
   });
 
-  it('should test paint cache should only store up to the cache size', function() {
+  it('should test paint cache should only store up to the cache size', function () {
     var cacheSize = 3;
     var featurePaintCache = new FeaturePaintCache(cacheSize);
     var paint = new Paint();
@@ -56,7 +55,7 @@ describe('FeaturePaintCache Tests', function() {
     Object.keys(featurePaintCache.paintCache).length.should.be.equal(cacheSize);
   });
 
-  it('should clear paint cache', function() {
+  it('should clear paint cache', function () {
     var cacheSize = 3;
     var featurePaintCache = new FeaturePaintCache(cacheSize);
     var testId = 0;
@@ -66,7 +65,7 @@ describe('FeaturePaintCache Tests', function() {
     Object.keys(featurePaintCache.paintCache).length.should.be.equal(0);
   });
 
-  it('should resize paint cache', function() {
+  it('should resize paint cache', function () {
     var cacheSize = 5;
     var featurePaintCache = new FeaturePaintCache(cacheSize);
     var paint = new Paint();

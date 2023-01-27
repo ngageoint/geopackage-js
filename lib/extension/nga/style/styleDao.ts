@@ -1,8 +1,3 @@
-/**
- * @memberOf module:extension/nga/style
- * @class StyleDao
- */
-
 import { StyleTable } from './styleTable';
 import { AttributesDao } from '../../../attributes/attributesDao';
 import { StyleRow } from './styleRow';

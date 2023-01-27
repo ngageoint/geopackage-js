@@ -1,6 +1,3 @@
-/**
- * @module user/custom
- */
 import { FeatureColumn } from './featureColumn';
 import { UserColumns } from '../../user/userColumns';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';

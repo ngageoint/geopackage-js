@@ -70,13 +70,14 @@ export class DataColumnsDao extends GeoPackageDao<DataColumns, TableColumnKey> {
     return {
       [Symbol.iterator](): IterableIterator<DataColumns> {
         return this;
-      }, next(): IteratorResult<DataColumns> {
+      },
+      next(): IteratorResult<DataColumns> {
         const result = iterator.next();
         return {
           value: createObject(result.value),
-          done: result.done
-        }
-      }
+          done: result.done,
+        };
+      },
     };
   }
   /**
@@ -152,7 +153,7 @@ export class DataColumnsDao extends GeoPackageDao<DataColumns, TableColumnKey> {
    * @return data columns
    */
   public queryByTable(tableName: string): DataColumns[] {
-    return this.queryForAllEq(DataColumns.COLUMN_TABLE_NAME, tableName).map(result => this.createObject(result));
+    return this.queryForAllEq(DataColumns.COLUMN_TABLE_NAME, tableName).map((result) => this.createObject(result));
   }
 
   /**

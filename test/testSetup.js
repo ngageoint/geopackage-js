@@ -1,98 +1,103 @@
-import { FeatureTableMetadata } from "../lib/features/user/featureTableMetadata";
-import { GeometryColumns } from "../lib/features/columns/geometryColumns";
-import { TableColumnKey } from "../lib/db/tableColumnKey";
-import { BoundingBox } from "../lib/boundingBox";
+import { FeatureTableMetadata } from '../lib/features/user/featureTableMetadata';
+import { GeometryColumns } from '../lib/features/columns/geometryColumns';
+import { TableColumnKey } from '../lib/db/tableColumnKey';
+import { BoundingBox } from '../lib/boundingBox';
 
-var path = require('path')
-  , assert = require('chai').assert
-  , Canvas = require('../lib/canvas/canvas').Canvas
-  , GeoPackage = require('../lib/geoPackage').GeoPackage
-  , crypto = require('crypto')
-  , ImageUtils = require('../lib/image/imageUtils').ImageUtils
-  , CanvasCompare = require('canvas-compare')
-  , GeoPackageManager = require('../').GeoPackageManager
-  , isNode = typeof(process) !== 'undefined' && process.version
-  , TestConstants = require('./testConstants')
-  , SchemaExtension = require('../lib/extension/schema/schemaExtension').SchemaExtension
-  , DataColumnConstraints = require('../lib/extension/schema/constraints/dataColumnConstraints').DataColumnConstraints
-  , DataColumns = require('../lib/extension/schema/columns/dataColumns').DataColumns
-  , ProjectionConstants = require('@ngageoint/projections-js').ProjectionConstants
-  , FeatureColumn = require('../lib/features/user/featureColumn').FeatureColumn
-  , FeatureTable = require('../lib/features/user/featureTable').FeatureTable
-  , GeoPackageDataType = require('../lib/db/geoPackageDataType').GeoPackageDataType
-  , TileTable = require('../lib/tiles/user/tileTable').TileTable
-  , GeoPackageGeometryData = require('../lib/geom/geoPackageGeometryData').GeoPackageGeometryData
-  , { GeometryType, UnsupportedOperationException, Point, LineString, Polygon } = require('@ngageoint/simple-features-js')
-  , DateConverter = require('../lib/db/dateConverter').DateConverter;
+var path = require('path'),
+  assert = require('chai').assert,
+  Canvas = require('../lib/canvas/canvas').Canvas,
+  GeoPackage = require('../lib/geoPackage').GeoPackage,
+  crypto = require('crypto'),
+  ImageUtils = require('../lib/image/imageUtils').ImageUtils,
+  CanvasCompare = require('canvas-compare'),
+  GeoPackageManager = require('../').GeoPackageManager,
+  isNode = typeof process !== 'undefined' && process.version,
+  TestConstants = require('./testConstants'),
+  SchemaExtension = require('../lib/extension/schema/schemaExtension').SchemaExtension,
+  DataColumnConstraints = require('../lib/extension/schema/constraints/dataColumnConstraints').DataColumnConstraints,
+  DataColumns = require('../lib/extension/schema/columns/dataColumns').DataColumns,
+  ProjectionConstants = require('@ngageoint/projections-js').ProjectionConstants,
+  FeatureColumn = require('../lib/features/user/featureColumn').FeatureColumn,
+  GeoPackageDataType = require('../lib/db/geoPackageDataType').GeoPackageDataType,
+  TileTable = require('../lib/tiles/user/tileTable').TileTable,
+  GeoPackageGeometryData = require('../lib/geom/geoPackageGeometryData').GeoPackageGeometryData,
+  {
+    GeometryType,
+    UnsupportedOperationException,
+    Point,
+    LineString,
+    Polygon,
+  } = require('@ngageoint/simple-features-js'),
+  DateConverter = require('../lib/db/dateConverter').DateConverter;
 
 var module = {
   exports: {},
 };
 
 if (isNode) {
-  process.on('uncaughtException', function() {
+  process.on('uncaughtException', function () {
     console.log('Caught exception');
   });
 } else {
   window.onerror = function () {
     console.log('Caught exception');
-  }
+  };
 }
 
 /**
  * Sample range data column constraint
  */
-module.exports.SAMPLE_RANGE_CONSTRAINT = "sampleRange";
+module.exports.SAMPLE_RANGE_CONSTRAINT = 'sampleRange';
 
 /**
  * Sample enum data column constraint
  */
-module.exports.SAMPLE_ENUM_CONSTRAINT = "sampleEnum";
+module.exports.SAMPLE_ENUM_CONSTRAINT = 'sampleEnum';
 
 /**
  * Sample glob data column constraint
  */
-module.exports.SAMPLE_GLOB_CONSTRAINT = "sampleGlob";
+module.exports.SAMPLE_GLOB_CONSTRAINT = 'sampleGlob';
 
 /**
  * Test integer column name
  */
-module.exports.TEST_INTEGER_COLUMN = "test_integer";
+module.exports.TEST_INTEGER_COLUMN = 'test_integer';
 
-module.exports.createTempName = function() {
-  return 'gp_'+crypto.randomBytes(4).readUInt32LE(0)+'.gpkg';
+module.exports.createTempName = function () {
+  return 'gp_' + crypto.randomBytes(4).readUInt32LE(0) + '.gpkg';
 };
 
-module.exports.copyGeopackage = function(original) {
+module.exports.copyGeopackage = function (original) {
   var copy = path.join(__dirname, 'tmp', module.exports.createTempName());
 
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve) {
     if (isNode) {
       var fs = require('fs-extra');
-      fs.copy(original, copy, function(err) {
+      fs.copy(original, copy, function () {
         resolve(copy);
       });
     } else {
       resolve(copy);
     }
-  })
+  });
 };
 
-module.exports.createTmpGeoPackage = async function() {
+module.exports.createTmpGeoPackage = async function () {
   var tmpGpPath = path.join(__dirname, 'tmp', module.exports.createTempName());
-  var geoPackage = await module.exports.createGeoPackage(tmpGpPath)
+  var geoPackage = await module.exports.createGeoPackage(tmpGpPath);
   return {
     geoPackage,
-    path: tmpGpPath
-  }
+    path: tmpGpPath,
+  };
 };
 
-module.exports.createGeoPackage = async function(gppath) {
+module.exports.createGeoPackage = async function (gppath) {
   if (isNode) {
     var fs = require('fs-extra');
     await fs.mkdirp(path.dirname(gppath));
     await fs.open(gppath, 'w');
-    return GeoPackageManager.create(gppath)
+    return GeoPackageManager.create(gppath);
   } else {
     return GeoPackageManager.create();
   }
@@ -103,21 +108,20 @@ module.exports.createGeoPackage = async function(gppath) {
  * @param gppath
  * @returns {Promise<GeoPackage>}
  */
-module.exports.createBareGeoPackage = async function(gppath) {
+module.exports.createBareGeoPackage = async function (gppath) {
   if (isNode) {
     var fs = require('fs-extra');
-    await fs.mkdirp(path.dirname(gppath))
+    await fs.mkdirp(path.dirname(gppath));
     await fs.open(gppath, 'w');
     let connection = await GeoPackageManager.connect(gppath);
     return new GeoPackage(path.basename(gppath), gppath, connection);
-  }
-  else {
+  } else {
     let connection = await GeoPackageManager.connect();
     return new GeoPackage('geoPackage', undefined, connection);
   }
 };
 
-module.exports.deleteGeoPackage = async function(gppath) {
+module.exports.deleteGeoPackage = async function (gppath) {
   if (isNode) {
     var fs = require('fs-extra');
     try {
@@ -126,7 +130,7 @@ module.exports.deleteGeoPackage = async function(gppath) {
   }
 };
 
-global.loadTile = module.exports.loadTile = async function(tilePath) {
+global.loadTile = module.exports.loadTile = async function (tilePath) {
   if (isNode) {
     var fs = require('fs-extra');
     return fs.readFile(tilePath);
@@ -136,13 +140,13 @@ global.loadTile = module.exports.loadTile = async function(tilePath) {
       xhr.open('GET', tilePath, true);
       xhr.responseType = 'arraybuffer';
 
-      xhr.onload = function(e) {
+      xhr.onload = function () {
         if (xhr.status !== 200) {
           return resolve();
         }
         return resolve(Buffer.from(this.response));
       };
-      xhr.onerror = function(e) {
+      xhr.onerror = function (e) {
         reject(e);
       };
       xhr.send();
@@ -150,13 +154,13 @@ global.loadTile = module.exports.loadTile = async function(tilePath) {
   }
 };
 
-module.exports.diffImages = function(actualTile, expectedTilePath, callback) {
+module.exports.diffImages = function (actualTile, expectedTilePath, callback) {
   module.exports.diffImagesWithDimensions(actualTile, expectedTilePath, 256, 256, callback);
 };
 
-module.exports.diffCanvas = async function(actualCanvas, expectedTilePath, callback) {
+module.exports.diffCanvas = async function (actualCanvas, expectedTilePath, callback) {
   if (isNode) {
-    return ImageUtils.getImage(expectedTilePath).then(img => {
+    return ImageUtils.getImage(expectedTilePath).then((img) => {
       var expectedCanvas = Canvas.create(256, 256);
       expectedCanvas.getContext('2d').drawImage(img.image, 0, 0);
       let same = actualCanvas.toDataURL() === expectedCanvas.toDataURL();
@@ -168,20 +172,20 @@ module.exports.diffCanvas = async function(actualCanvas, expectedTilePath, callb
       return same;
     });
   } else {
-    module.exports.loadTile(expectedTilePath, function(err, expectedTile) {
+    module.exports.loadTile(expectedTilePath, function (err, expectedTile) {
       var expectedBase64 = Buffer.from(expectedTile).toString('base64');
       CanvasCompare.setImageData(ImageData);
       CanvasCompare.canvasCompare({
         baseImageUrl: actualCanvas.toDataURL(),
-        targetImageUrl: 'data:image/png;base64,' + expectedBase64
+        targetImageUrl: 'data:image/png;base64,' + expectedBase64,
       })
-        .then(function(result) {
+        .then(function () {
           if (callback) {
             callback(null, true);
           }
           return true;
         })
-        .catch(function(reason) {
+        .catch(function () {
           if (callback) {
             callback(null, false);
           }
@@ -189,42 +193,40 @@ module.exports.diffCanvas = async function(actualCanvas, expectedTilePath, callb
         });
     });
   }
-
 };
 
-module.exports.diffCanvasesContexts = function(actualCtx, expectedCtx, width, height) {
+module.exports.diffCanvasesContexts = function (actualCtx, expectedCtx, width, height) {
   var actualData = actualCtx.getImageData(0, 0, width, height);
   var expectedData = expectedCtx.getImageData(0, 0, width, height);
-  if(actualData.data.length != expectedData.data.length)
-    return false;
-  for(var i = 0; i < actualData.data.length; ++i){
-    if(actualData.data[i] != expectedData.data[i]) {
+  if (actualData.data.length != expectedData.data.length) return false;
+  for (var i = 0; i < actualData.data.length; ++i) {
+    if (actualData.data[i] != expectedData.data[i]) {
       return false;
     }
   }
   return true;
 };
 
-module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath, width, height, callback) {
-  ImageUtils.getImage(actualTile).then(actualImage => {
+module.exports.diffImagesWithDimensions = function (actualTile, expectedTilePath, width, height, callback) {
+  ImageUtils.getImage(actualTile).then((actualImage) => {
     const actual = Canvas.create(width, height);
     let actualCtx = actual.getContext('2d');
     actualCtx.drawImage(actualImage.getImage(), 0, 0);
     const actualDataUrl = actual.toDataURL();
 
-    new Promise(resolve => {
+    new Promise((resolve) => {
       if (!isNode) {
-        module.exports.loadTile(expectedTilePath).then(expectedTileFileData => {
-          ImageUtils.getImage(Buffer.from(expectedTileFileData)).then(expectedImage => {
+        module.exports.loadTile(expectedTilePath).then((expectedTileFileData) => {
+          ImageUtils.getImage(Buffer.from(expectedTileFileData)).then((expectedImage) => {
             resolve(expectedImage);
           });
         });
       } else {
-        ImageUtils.getImage(expectedTilePath).then(expectedImage => {
+        ImageUtils.getImage(expectedTilePath).then((expectedImage) => {
           resolve(expectedImage);
         });
       }
-    }).then(expectedImage => {
+    }).then((expectedImage) => {
       const expected = Canvas.create(width, height);
       let expectedCtx = expected.getContext('2d');
       expectedCtx.drawImage(expectedImage.image, 0, 0);
@@ -246,7 +248,7 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
           if (h2Tags.length === 0) {
             currentTag = h1Tags.item(h1Tags.length - 1);
           } else {
-            currentTag = h2Tags.item(h2Tags.length -1).parentNode;
+            currentTag = h2Tags.item(h2Tags.length - 1).parentNode;
           }
           var div = document.createElement('div');
           var span1 = document.createElement('span');
@@ -272,13 +274,13 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
           CanvasCompare.setImageData(ImageData);
           CanvasCompare.canvasCompare({
             baseImageUrl: actual.toDataURL(),
-            targetImageUrl: expected.toDataURL()
+            targetImageUrl: expected.toDataURL(),
           })
-            .then(function(result) {
+            .then(function (result) {
               currentTag.appendChild(result.producePreview());
               callback(null, false);
             })
-            .catch(function(reason) {
+            .catch(function (reason) {
               console.error(reason);
               callback(null, false);
             });
@@ -309,30 +311,36 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
  * @return feature table
  * @throws SQLException
  */
-module.exports.createFeatureTable = function(geoPackage, contents, geometryColumn, geometryType) {
+module.exports.createFeatureTable = function (geoPackage, contents, geometryColumn, geometryType) {
   const additionalColumns = [];
-  additionalColumns.push(FeatureColumn.createColumn("test_text_limited", GeoPackageDataType.TEXT, false, 5));
-  additionalColumns.push(FeatureColumn.createColumn("test_blob_limited", GeoPackageDataType.BLOB, false, 7));
-  additionalColumns.push(FeatureColumn.createColumn("test_date", GeoPackageDataType.DATE));
-  additionalColumns.push(FeatureColumn.createColumn("test_datetime", GeoPackageDataType.DATETIME));
-  additionalColumns.push(FeatureColumn.createColumn("test_text", GeoPackageDataType.TEXT, false, ""));
-  additionalColumns.push(FeatureColumn.createColumn( "test_real", GeoPackageDataType.REAL));
-  additionalColumns.push(FeatureColumn.createColumn("test_boolean", GeoPackageDataType.BOOLEAN));
-  additionalColumns.push(FeatureColumn.createColumn("test_blob", GeoPackageDataType.BLOB));
+  additionalColumns.push(FeatureColumn.createColumn('test_text_limited', GeoPackageDataType.TEXT, false, 5));
+  additionalColumns.push(FeatureColumn.createColumn('test_blob_limited', GeoPackageDataType.BLOB, false, 7));
+  additionalColumns.push(FeatureColumn.createColumn('test_date', GeoPackageDataType.DATE));
+  additionalColumns.push(FeatureColumn.createColumn('test_datetime', GeoPackageDataType.DATETIME));
+  additionalColumns.push(FeatureColumn.createColumn('test_text', GeoPackageDataType.TEXT, false, ''));
+  additionalColumns.push(FeatureColumn.createColumn('test_real', GeoPackageDataType.REAL));
+  additionalColumns.push(FeatureColumn.createColumn('test_boolean', GeoPackageDataType.BOOLEAN));
+  additionalColumns.push(FeatureColumn.createColumn('test_blob', GeoPackageDataType.BLOB));
   additionalColumns.push(FeatureColumn.createColumn(module.exports.TEST_INTEGER_COLUMN, GeoPackageDataType.INTEGER));
-  const table = module.exports.buildFeatureTable(geoPackage, contents.getTableName(), geometryColumn, geometryType, additionalColumns);
+  const table = module.exports.buildFeatureTable(
+    geoPackage,
+    contents.getTableName(),
+    geometryColumn,
+    geometryType,
+    additionalColumns,
+  );
   const random = Math.random();
   const dataColumnsDao = SchemaExtension.getDataColumnsDao(geoPackage);
   const dataColumns = new DataColumns();
   dataColumns.setTableName(contents.getId());
   dataColumns.setColumnName(module.exports.TEST_INTEGER_COLUMN);
   dataColumns.setName(contents.getTableName());
-  dataColumns.setTitle("TEST_TITLE");
-  dataColumns.setDescription("TEST_DESCRIPTION");
-  dataColumns.setMimeType("TEST_MIME_TYPE");
-  if (random < (1.0 / 3.0)) {
+  dataColumns.setTitle('TEST_TITLE');
+  dataColumns.setDescription('TEST_DESCRIPTION');
+  dataColumns.setMimeType('TEST_MIME_TYPE');
+  if (random < 1.0 / 3.0) {
     dataColumns.setConstraintName(module.exports.SAMPLE_RANGE_CONSTRAINT);
-  } else if (random < (2.0 / 3.0)) {
+  } else if (random < 2.0 / 3.0) {
     dataColumns.setConstraintName(module.exports.SAMPLE_ENUM_CONSTRAINT);
   } else {
     dataColumns.setConstraintName(module.exports.SAMPLE_GLOB_CONSTRAINT);
@@ -340,7 +348,7 @@ module.exports.createFeatureTable = function(geoPackage, contents, geometryColum
   dataColumnsDao.create(dataColumns);
 
   return table;
-}
+};
 
 /**
  * Build an example feature table
@@ -352,8 +360,16 @@ module.exports.createFeatureTable = function(geoPackage, contents, geometryColum
  * @param additionalColumns
  * @return feature table
  */
-module.exports.buildFeatureTable = function(geoPackage, tableName, geometryColumnName, geometryType, additionalColumns) {
-  const srs = geoPackage.getSpatialReferenceSystemDao().getOrCreateCode(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+module.exports.buildFeatureTable = function (
+  geoPackage,
+  tableName,
+  geometryColumnName,
+  geometryType,
+  additionalColumns,
+) {
+  const srs = geoPackage
+    .getSpatialReferenceSystemDao()
+    .getOrCreateCode(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
 
   const geometryColumns = new GeometryColumns();
   geometryColumns.setId(new TableColumnKey(tableName, geometryColumnName));
@@ -364,8 +380,10 @@ module.exports.buildFeatureTable = function(geoPackage, tableName, geometryColum
 
   const boundingBox = new BoundingBox(-180, -90, 180, 90);
 
-  return geoPackage.createFeatureTableWithFeatureTableMetadata(FeatureTableMetadata.create(geometryColumns, additionalColumns, 'id', boundingBox));
-}
+  return geoPackage.createFeatureTableWithFeatureTableMetadata(
+    FeatureTableMetadata.create(geometryColumns, additionalColumns, 'id', boundingBox),
+  );
+};
 
 /**
  * Build an example tile table
@@ -373,10 +391,10 @@ module.exports.buildFeatureTable = function(geoPackage, tableName, geometryColum
  * @param tableName
  * @return tile table
  */
-module.exports.buildTileTable = function(tableName) {
+module.exports.buildTileTable = function (tableName) {
   const columns = TileTable.createRequiredColumns();
   return new TileTable(tableName, columns);
-}
+};
 
 /**
  * Add rows to the feature table
@@ -388,7 +406,15 @@ module.exports.buildTileTable = function(tableName) {
  * @param hasM
  * @param allowEmptyFeatures
  */
-module.exports.addRowsToFeatureTable = function(geoPackage, geometryColumns, table, numRows, hasZ, hasM, allowEmptyFeatures) {
+module.exports.addRowsToFeatureTable = function (
+  geoPackage,
+  geometryColumns,
+  table,
+  numRows,
+  hasZ,
+  hasM,
+  allowEmptyFeatures,
+) {
   const dao = geoPackage.getFeatureDaoWithGeometryColumns(geometryColumns);
   for (let i = 0; i < numRows; i++) {
     const newRow = dao.newRow();
@@ -413,7 +439,7 @@ module.exports.addRowsToFeatureTable = function(geoPackage, geometryColumns, tab
               geometry = module.exports.createPolygon(hasZ, hasM);
               break;
             default:
-              throw new UnsupportedOperationException("Not implemented for geometry type: " + column.getGeometryType());
+              throw new UnsupportedOperationException('Not implemented for geometry type: ' + column.getGeometryType());
           }
           const geometryData = GeoPackageGeometryData.createWithSrsId(geometryColumns.getSrsId(), geometry);
           newRow.setGeometry(geometryData);
@@ -432,7 +458,7 @@ module.exports.addRowsToFeatureTable = function(geoPackage, geometryColumns, tab
               value = Math.random() * 5000.0;
               break;
             case GeoPackageDataType.BOOLEAN:
-              value = Math.random() < .5;
+              value = Math.random() < 0.5;
               break;
             case GeoPackageDataType.INTEGER:
             case GeoPackageDataType.INT:
@@ -448,14 +474,16 @@ module.exports.addRowsToFeatureTable = function(geoPackage, geometryColumns, tab
             case GeoPackageDataType.DATE:
             case GeoPackageDataType.DATETIME:
               const date = new Date();
-              if (Math.random() < .5) {
+              if (Math.random() < 0.5) {
                 value = date;
               } else {
                 value = DateConverter.stringValue(date, column.getDataType());
               }
               break;
             default:
-              throw new UnsupportedOperationException("Not implemented for data type: " + GeoPackageDataType.nameFromType(column.getDataType()));
+              throw new UnsupportedOperationException(
+                'Not implemented for data type: ' + GeoPackageDataType.nameFromType(column.getDataType()),
+              );
           }
           newRow.setValue(column.getName(), value);
         }
@@ -463,7 +491,7 @@ module.exports.addRowsToFeatureTable = function(geoPackage, geometryColumns, tab
     }
     dao.create(newRow);
   }
-}
+};
 
 /**
  * Add rows to the tile table
@@ -471,7 +499,7 @@ module.exports.addRowsToFeatureTable = function(geoPackage, geometryColumns, tab
  * @param tileMatrix
  * @param tileData
  */
-module.exports.addRowsToTileTable = function(geoPackage, tileMatrix, tileData) {
+module.exports.addRowsToTileTable = function (geoPackage, tileMatrix, tileData) {
   const dao = geoPackage.getTileDao(tileMatrix.getTableName());
   for (let column = 0; column < tileMatrix.getMatrixWidth(); column++) {
     for (let row = 0; row < tileMatrix.getMatrixHeight(); row++) {
@@ -483,7 +511,7 @@ module.exports.addRowsToTileTable = function(geoPackage, tileMatrix, tileData) {
       dao.create(newRow);
     }
   }
-}
+};
 
 /**
  * Create a random point
@@ -492,18 +520,18 @@ module.exports.addRowsToTileTable = function(geoPackage, tileMatrix, tileData) {
  * @param hasM
  * @return Point
  */
-module.exports.createPoint = function(hasZ, hasM) {
-  const x = Math.random() * 180.0 * (Math.random() < .5 ? 1 : -1);
-  const y = Math.random() * ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE * (Math.random() < .5 ? 1 : -1);
+module.exports.createPoint = function (hasZ, hasM) {
+  const x = Math.random() * 180.0 * (Math.random() < 0.5 ? 1 : -1);
+  const y = Math.random() * ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE * (Math.random() < 0.5 ? 1 : -1);
   const point = new Point(hasZ, hasM, x, y);
   if (hasZ) {
-    point.z =  Math.random() * 1000.0;
+    point.z = Math.random() * 1000.0;
   }
   if (hasM) {
     point.m = Math.random() * 1000.0;
   }
   return point;
-}
+};
 
 /**
  * Create a random line string
@@ -513,9 +541,9 @@ module.exports.createPoint = function(hasZ, hasM) {
  * @param ring
  * @return LineString
  */
-module.exports.createLineString = function(hasZ, hasM, ring) {
+module.exports.createLineString = function (hasZ, hasM, ring) {
   const lineString = new LineString(hasZ, hasM);
-  const numPoints = 2 + (Math.round(Math.random() * 9));
+  const numPoints = 2 + Math.round(Math.random() * 9);
   for (let i = 0; i < numPoints; i++) {
     lineString.addPoint(module.exports.createPoint(hasZ, hasM));
   }
@@ -523,7 +551,7 @@ module.exports.createLineString = function(hasZ, hasM, ring) {
     lineString.addPoint(lineString.points[0]);
   }
   return lineString;
-}
+};
 
 /**
  * Create a random polygon
@@ -532,14 +560,14 @@ module.exports.createLineString = function(hasZ, hasM, ring) {
  * @param hasM
  * @return Polygon
  */
-module.exports.createPolygon = function(hasZ, hasM) {
+module.exports.createPolygon = function (hasZ, hasM) {
   const polygon = new Polygon(hasZ, hasM);
-  const numLineStrings = 1 + (Math.round(Math.random() * 5));
+  const numLineStrings = 1 + Math.round(Math.random() * 5);
   for (let i = 0; i < numLineStrings; i++) {
     polygon.addRing(module.exports.createLineString(hasZ, hasM, true));
   }
   return polygon;
-}
+};
 
 /**
  * Validate the integer value with the data type
@@ -547,11 +575,9 @@ module.exports.createPolygon = function(hasZ, hasM) {
  * @param value
  * @param dataType
  */
-module.exports.validateIntegerValue = function(value, dataType) {
+module.exports.validateIntegerValue = function (value, dataType) {
   if (dataType != null) {
-
     switch (dataType) {
-
       case BOOLEAN:
         TestCase.assertTrue(value instanceof Boolean);
         break;
@@ -569,12 +595,10 @@ module.exports.validateIntegerValue = function(value, dataType) {
         TestCase.assertTrue(value instanceof Long);
         break;
       default:
-        throw new GeoPackageException(
-          "Data Type " + dataType + " is not an integer type");
+        throw new GeoPackageException('Data Type ' + dataType + ' is not an integer type');
     }
-
   }
-}
+};
 
 /**
  * Validate the float value with the data type
@@ -582,7 +606,7 @@ module.exports.validateIntegerValue = function(value, dataType) {
  * @param value
  * @param dataType
  */
-module.exports.validateFloatValue = function(value, dataType) {
+module.exports.validateFloatValue = function (value, dataType) {
   if (dataType != null) {
     switch (dataType) {
       case FLOAT:
@@ -593,12 +617,10 @@ module.exports.validateFloatValue = function(value, dataType) {
         TestCase.assertTrue(value instanceof Double);
         break;
       default:
-        throw new GeoPackageException(
-          "Data Type " + dataType + " is not a float type");
+        throw new GeoPackageException('Data Type ' + dataType + ' is not a float type');
     }
-
   }
-}
+};
 
 /**
  * Create Data Column Constraints
@@ -606,7 +628,7 @@ module.exports.validateFloatValue = function(value, dataType) {
  * @param geoPackage
  * @throws SQLException
  */
-module.exports.createConstraints = function(geoPackage) {
+module.exports.createConstraints = function (geoPackage) {
   const schemaExtension = new SchemaExtension(geoPackage);
   schemaExtension.createDataColumnConstraintsTable();
 
@@ -624,84 +646,83 @@ module.exports.createConstraints = function(geoPackage) {
   const sampleEnum1 = new DataColumnConstraints();
   sampleEnum1.setConstraintName(SAMPLE_ENUM_CONSTRAINT);
   sampleEnum1.setConstraintType(DataColumnConstraintType.ENUM);
-  sampleEnum1.setValue("1");
+  sampleEnum1.setValue('1');
   dao.create(sampleEnum1);
 
   const sampleEnum3 = new DataColumnConstraints();
   sampleEnum3.setConstraintName(SAMPLE_ENUM_CONSTRAINT);
   sampleEnum3.setConstraintType(DataColumnConstraintType.ENUM);
-  sampleEnum3.setValue("3");
+  sampleEnum3.setValue('3');
   dao.create(sampleEnum3);
 
   const sampleEnum5 = new DataColumnConstraints();
   sampleEnum5.setConstraintName(SAMPLE_ENUM_CONSTRAINT);
   sampleEnum5.setConstraintType(DataColumnConstraintType.ENUM);
-  sampleEnum5.setValue("5");
+  sampleEnum5.setValue('5');
   dao.create(sampleEnum5);
 
   const sampleEnum7 = new DataColumnConstraints();
   sampleEnum7.setConstraintName(SAMPLE_ENUM_CONSTRAINT);
   sampleEnum7.setConstraintType(DataColumnConstraintType.ENUM);
-  sampleEnum7.setValue("7");
+  sampleEnum7.setValue('7');
   dao.create(sampleEnum7);
 
   const sampleEnum9 = new DataColumnConstraints();
   sampleEnum9.setConstraintName(SAMPLE_ENUM_CONSTRAINT);
   sampleEnum9.setConstraintType(DataColumnConstraintType.ENUM);
-  sampleEnum9.setValue("9");
+  sampleEnum9.setValue('9');
   dao.create(sampleEnum9);
 
   const sampleGlob = new DataColumnConstraints();
   sampleGlob.setConstraintName(SAMPLE_GLOB_CONSTRAINT);
   sampleGlob.setConstraintType(DataColumnConstraintType.GLOB);
-  sampleGlob.setValue("[1-2][0-9][0-9][0-9]");
+  sampleGlob.setValue('[1-2][0-9][0-9][0-9]');
   dao.create(sampleGlob);
-}
+};
 
 /**
  * Get the import db file
  *
  * @return file
  */
-module.exports.getImportDbFile = function() {
+module.exports.getImportDbFile = function () {
   return module.exports.getTestFile(TestConstants.IMPORT_DB_FILE_NAME);
-}
+};
 
 /**
  * Get the import db corrupt file
  * @return file
  */
-module.exports.getImportDbCorruptFile = function() {
+module.exports.getImportDbCorruptFile = function () {
   return module.exports.getTestFile(TestConstants.IMPORT_CORRUPT_DB_FILE_NAME);
-}
+};
 
 /**
  * Get the tile file
  *
  * @return file
  */
-module.exports.getTileFile = function() {
+module.exports.getTileFile = function () {
   return module.exports.getTestFile(TestConstants.TILE_FILE_NAME);
-}
+};
 
 /**
  * Get the file
  * @param fileName  file name
  * @return file
  */
-module.exports.getTestFile = function(fileName) {
- return module.exports.createGeoPackage(fileName);
-}
+module.exports.getTestFile = function (fileName) {
+  return module.exports.createGeoPackage(fileName);
+};
 
 /**
  * Validate the integrity and keys of the GeoPackage
  * @param geoPackage
  */
-module.exports.validateGeoPackage = function(geoPackage) {
+module.exports.validateGeoPackage = function (geoPackage) {
   assert.isNull(geoPackage.foreignKeyCheck());
   assert.isNull(geoPackage.integrityCheck());
   assert.isNull(geoPackage.quickCheck());
-}
-
+};
 
 export default module.exports;

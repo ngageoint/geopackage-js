@@ -1,13 +1,13 @@
-var should = require('chai').should()
-  , expect = require('chai').expect
-  , Canvas = require('../../../lib/canvas/canvas').Canvas
-  , path = require('path')
-  , CanvasKitCanvasAdapter = require('../../../lib/canvas/canvasKitCanvasAdapter').CanvasKitCanvasAdapter
-  , HtmlCanvasAdapter = require('../../../lib/canvas/htmlCanvasAdapter').HtmlCanvasAdapter;
+var should = require('chai').should(),
+  Canvas = require('../../../lib/canvas/canvas').Canvas,
+  path = require('path'),
+  CanvasKitCanvasAdapter = require('../../../lib/canvas/canvasKitCanvasAdapter').CanvasKitCanvasAdapter,
+  HtmlCanvasAdapter = require('../../../lib/canvas/htmlCanvasAdapter').HtmlCanvasAdapter;
 
 const isWeb = typeof window !== 'undefined';
 
-const pushPinBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARzQklUCAg' +
+const pushPinBase64 =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARzQklUCAg' +
   'ICHwIZIgAAApFSURBVHiczZt9bNXlFcc/zy1Q2sKthRZuKaUg9M3CfEEZQd1Y11ZTp3QEJb7sD8kiLLJp4rJkw0QTSQzMkMyBCWNGJJE6LaxDQEF0RUca' +
   'X3hxQN9bawXKSynllraX3pezP85ub8EC/d3+7r18kye9L7/f757zfc5zznnOeWqIPKYBzwG5gBPoA3qAM0Aj0AB8A3wfBVl+ABPh588Cqm6/3ZFRWipkZ' +
   'Rm6uoSuLmhqMtTWQn09+HxyEeQ4cBD4N/Af4FyEZYsKXgUj3d1GRBhynD9v5PPPjaxb55DSUoc4HEaA08B24GlgUmxVGBkqSkqMtLYOrfxQ48wZI9u2GX' +
@@ -40,7 +40,8 @@ const pushPinBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAY
   'w04ClixatIjMzMzB5n/TOr8g7CRg+vjx43E6nTQ2NgbNv8LG59/0qCwqKpK9e/dKgZ6M3hVrgaKNLfn5+ZKbmytAK5AWY3mijrVozu8GsmMsS0wwC1gPL' +
   'Ii1IFbwP8JK/c10jMO8AAAAAElFTkSuQmCC';
 
-const webPushPinBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAALUklEQVR4XuWbCXBV1RnHf+eB' +
+const webPushPinBase64 =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAALUklEQVR4XuWbCXBV1RnHf+eB' +
   'yiabhryALI5sMVojiEu1hWKMJYgJCKlkLAOouNDWZlTGKYgYoyjbgCSURaVpBYwEy9S4hMXgSHEqRlCTaFAxElmUpURL3PDdzv/e3BpjJO+Se2Nm+s3ce' +
   'W/eO/fc7/ufbz/nGoKnXsAdwACgI/AFcAz4BHgP2AW8CVQFz8oPn2ACfmhfYMsFF4R6pKRY9O5tOHrU4uhReP99wzvvQEUFHD9uVYNVBpQAxcBW4GDAvN' +
   'nTBw3AbDD3fP45dOhgNSjPkSOG8nLYvt2waRO8+KJFJGJJO7YBzwLPAZ8GBUbQABQkJ5vrli/X6kcnwqefGrZuhaIiyM83VFdHDgAbgDXAi9HNEv2ooAF' +
@@ -76,7 +77,8 @@ const webPushPinBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABA
   'ysqeB07ivbCmiuTtfj8B+Gt8fPxvI5GIVF8vMKlv1yzv/3oT+fuj/QRgjtMttvv1Snz0ZniLJz8B0Jvi6tisrn3xucULLwb/C3wZCn1ODyNFAAAAAElFT' +
   'kSuQmCC';
 
-const webPushPin = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAMDUlEQVR4XuWbDXBU1RXHf+/tbkKQT0' +
+const webPushPin =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAMDUlEQVR4XuWbDXBU1RXHf+/tbkKQT0' +
   'EIEQho+BCV8lEUba1YjYgQNFCikkGRGUAZrKJQHdGKiCKCKFBEcASsFQ0oxTIEKgxkBqKiEKCGIhCQjxBB+f4ICbtvX+e/L1tSvrIv2cXM9My8YcPe++4' +
   '9v3fuOeee+9Yg9tIceBKMNmDWgeBp4BTYB4DtwDZgE7A39lM5fwQjxoOmgJnTuXPc1XffbdG8uY9jx/wcPQo7d3rZts2moABOnrSOQXAzWOuBVcAa4OcY' +
   'zy10+1gDGA9xz504YVOrlv8cfTS0yeHDHjZvtlm3zsPKlQYrVwYpLrYOgPUl2IuBJcBPsYIRYwDGpz16xPV9551SWrSIRAWTn37ysHq1yfLlsGiRwYEDg' +
@@ -114,7 +116,8 @@ const webPushPin = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAA
   '3e97+umnefbZZ9m4cWM20LPaal42sWgC+Gv79u0H6NWY/Pz83WWbncvy+9+qQI4mgDecanGoXq/ER78Mr/YSTQApZT9Wmgd8We01L5vgfwDsYmp9ZiTvE' +
   'wAAAABJRU5ErkJggg==';
 
-const textBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAAAXNSR0IArs4c6QAAAARzQklUCAgICHw' +
+const textBase64 =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAAAXNSR0IArs4c6QAAAARzQklUCAgICHw' +
   'IZIgAAAPiSURBVHic7dhbiFVVGAfwn5pFgWVFGVRkmqaJZkgJifTQQ/UgFGXRTYoghG5IQVeKbiTWSyIadLWkAolKerFCK3oYIsskSjPpShJDRdlVy3pY' +
   'e3DP8ZyZc4ZxrPz/4HA463x7f9+Zvde31h4iIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIi4j9rxN4u4F9uMU7Dm0OVcHgHsYfjb7zRMD67Gl80S' +
   'DX1ZToexDvYgpdxHQ4cgtxDopMLAl9hHA6rjZ04eOX06Vy8jwNwKy7FcxiN34aohj1uvw7jf1LuzvH4vhqbipcGs6gmxuJx3IaFyoyErj2cd8h1OkMmYE' +
@@ -128,7 +131,8 @@ const textBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAA
   'haxy5U/5BI8rezhb28S97CyNhyrPI+swFXKs1Cnef9S/uXyDK7HW1X+KXpvMNrVrTwrba9qW42bq8/bB3C+vWap5n/8fdZAZ8hgGtZ/yL7j33BBoiYXJC' +
   'IiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIi/qf+Adu8yYZ5H7HEAAAAAElFTkSuQmCC';
 
-const webTextBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAGm0lEQVR4Xu2cdYimVRSHnzURscU' +
+const webTextBase64 =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAGm0lEQVR4Xu2cdYimVRSHnzURscU' +
   'WEztQFBVb7Ba7EzuwO1EUsbsLsQPs+EdMbOzCxEbsxuKB88LHMDPsnW+83l3PhWV3vjnvPef9PffE/f7YMeRqSoExTUWTwZBAGjsECSSBNKZAY+FkhiSQ' +
   'xhRoLJzMkATSmAKNhZMZkkAaU6CxcDJDEkhjCjQWTmZIAmlMgcbCyQxJII0p0Fg4mSEJpDEFGgsnMySBNKZAY+FkhiSQxhRoLJzMkATSmAKNhZMZkkAaU' +
   '6CxcDJDEkhjCjQWTmZIAmlMgcbCyQxJII0p0Fg4mSEJpDEFGgsnMySBNKZAY+FkhiSQxhRoLJzMkATSmAKNhZMZkkD+FQUmAmYFvge+CQ8zAZ/34c3Dug' +
@@ -150,7 +154,7 @@ const webTextBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAY
   'oGUqFXBNoFUELnERQIpUauCbQKpIHKJiwRSolYF2wRSQeQSFwmkRK0KtgmkgsglLhJIiVoVbBNIBZFLXCSQErUq2CaQCiKXuEggJWpVsE0gFUQucZFASt' +
   'SqYPsPyfIwdMABxUcAAAAASUVORK5CYII=';
 
-describe('Canvas tests', function() {
+describe('Canvas tests', function () {
   beforeEach(function (done) {
     if (isWeb) {
       Canvas.registerCanvasAdapter(HtmlCanvasAdapter);
@@ -165,7 +169,7 @@ describe('Canvas tests', function() {
     }
   });
 
-  it('should register the canvas adapter', function() {
+  it('should register the canvas adapter', function () {
     if (isWeb) {
       Canvas.registerCanvasAdapter(HtmlCanvasAdapter);
       (Canvas.adapter instanceof HtmlCanvasAdapter).should.be.equal(true);
@@ -175,7 +179,7 @@ describe('Canvas tests', function() {
     }
   });
 
-  it('should initialize the canvas adapter', function(done) {
+  it('should initialize the canvas adapter', function (done) {
     if (isWeb) {
       Canvas.registerCanvasAdapter(HtmlCanvasAdapter);
       HtmlCanvasAdapter.initialized = false;
@@ -184,16 +188,19 @@ describe('Canvas tests', function() {
       CanvasKitCanvasAdapter.initialized = false;
     }
     Canvas.adapterInitialized().should.be.equal(false);
-    Canvas.initializeAdapter().then(() => {
-      Canvas.adapterInitialized().should.be.equal(true);
-    }).catch(e => {
-      console.error(e);
-    }).finally(() => {
-      done();
-    })
+    Canvas.initializeAdapter()
+      .then(() => {
+        Canvas.adapterInitialized().should.be.equal(true);
+      })
+      .catch((e) => {
+        console.error(e);
+      })
+      .finally(() => {
+        done();
+      });
   });
 
-  it('should fail to make canvas when adapter has yet to be initialized', function(done) {
+  it('should fail to make canvas when adapter has yet to be initialized', function (done) {
     try {
       Canvas.create(100, 100);
     } catch (e) {
@@ -203,26 +210,26 @@ describe('Canvas tests', function() {
     }
   });
 
-  it('should make a canvas', function(done) {
+  it('should make a canvas', function (done) {
     const canvas = Canvas.create(256, 256);
     should.exist(canvas);
     Canvas.disposeCanvas(canvas);
     done();
   });
 
-  it('should fail to make an image', function(done) {
+  it('should fail to make an image', function (done) {
     if (isWeb) {
       HtmlCanvasAdapter.initialized = false;
     } else {
       CanvasKitCanvasAdapter.initialized = false;
     }
-    Canvas.createImage(pushPinBase64).catch(e => {
+    Canvas.createImage(pushPinBase64).catch((e) => {
       e.message.should.be.equal('Canvas adapter not initialized.');
       done();
     });
   });
 
-  it('should draw an image from a base64 png string', function(done) {
+  it('should draw an image from a base64 png string', function (done) {
     this.timeout(5000);
     Canvas.createImage(isWeb ? webPushPinBase64 : pushPinBase64).then((image) => {
       const canvas = Canvas.create(64, 64);
@@ -234,7 +241,7 @@ describe('Canvas tests', function() {
     });
   });
 
-  it('should draw an image from a web address', function(done) {
+  it('should draw an image from a web address', function (done) {
     this.timeout(5000);
     const canvas = Canvas.create(64, 64);
     Canvas.createImage('http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png').then((image) => {
@@ -245,7 +252,7 @@ describe('Canvas tests', function() {
     });
   });
 
-  it('should draw an image from a file', function(done) {
+  it('should draw an image from a file', function (done) {
     this.timeout(5000);
     const canvas = Canvas.create(64, 64);
     Canvas.createImage(path.join(__dirname, '..', '..', 'fixtures', 'pushpin.png')).then((image) => {
@@ -256,56 +263,58 @@ describe('Canvas tests', function() {
     });
   });
 
-  it('should fail to load a bad base64 image', function(done) {
+  it('should fail to load a bad base64 image', function (done) {
     this.timeout(5000);
-    Canvas.createImage('data:image/png;base64,badimage').catch(e => {
+    Canvas.createImage('data:image/png;base64,badimage').catch((e) => {
       if (isWeb) {
-        e.type.should.be.equal('error')
+        e.type.should.be.equal('error');
       } else {
-        e.message.should.be.equal('Failed to create image.')
+        e.message.should.be.equal('Failed to create image.');
       }
       done();
     });
   });
 
-  it('should fail to load a bad url', function(done) {
+  it('should fail to load a bad url', function (done) {
     this.timeout(10000);
-    Canvas.createImage('http://maps.google.com/mapfiles/kml/pushpin/bad-pushpin.png').catch(e => {
+    Canvas.createImage('http://maps.google.com/mapfiles/kml/pushpin/bad-pushpin.png').catch((e) => {
       if (isWeb) {
-        e.type.should.be.equal('error')
+        e.type.should.be.equal('error');
       } else {
-        e.message.should.be.equal('Failed to create image.')
+        e.message.should.be.equal('Failed to create image.');
       }
       done();
     });
   });
 
-  it('should fail to load a bad file', function(done) {
+  it('should fail to load a bad file', function (done) {
     this.timeout(5000);
-    Canvas.createImage(path.join(__dirname, '..', '..', 'fixtures', 'pushpin_not_found.png')).catch(e => {
+    Canvas.createImage(path.join(__dirname, '..', '..', 'fixtures', 'pushpin_not_found.png')).catch((e) => {
       if (isWeb) {
-        e.type.should.be.equal('error')
+        e.type.should.be.equal('error');
       } else {
-        e.message.should.be.equal('Failed to create image.')
+        e.message.should.be.equal('Failed to create image.');
       }
       done();
     });
   });
 
-  it('should measure the text', function(done) {
+  it('should measure the text', function (done) {
     this.timeout(5000);
     const canvas = Canvas.create(100, 100);
     const ctx = canvas.getContext('2d');
-    Canvas.measureText(ctx, null, 16, 'MapCacheMapCache').should.be.equal(Canvas.measureText(ctx, null, 16, 'MapCache') * 2);
+    Canvas.measureText(ctx, null, 16, 'MapCacheMapCache').should.be.equal(
+      Canvas.measureText(ctx, null, 16, 'MapCache') * 2,
+    );
     Canvas.disposeCanvas(canvas);
     done();
   });
 
-  it('should draw the text', function(done) {
+  it('should draw the text', function (done) {
     this.timeout(5000);
     const canvas = Canvas.create(100, 100);
     const ctx = canvas.getContext('2d');
-    Canvas.drawText(ctx,'MapCache', [50, 50], 'Noto Mono', 16, 'rgba(0, 0, 0, 255)');
+    Canvas.drawText(ctx, 'MapCache', [50, 50], 'Noto Mono', 16, 'rgba(0, 0, 0, 255)');
     canvas.toDataURL().should.be.equal(isWeb ? webTextBase64 : textBase64);
     Canvas.disposeCanvas(canvas);
     done();

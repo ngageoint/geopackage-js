@@ -1,37 +1,36 @@
-import { default as testSetup } from '../../testSetup'
-import { ContentsDataType } from "../../../lib/contents/contentsDataType";
-import { DataColumnConstraintType } from "../../../lib/extension/schema/constraints/dataColumnConstraintType";
+import { default as testSetup } from '../../testSetup';
+import { ContentsDataType } from '../../../lib/contents/contentsDataType';
+import { DataColumnConstraintType } from '../../../lib/extension/schema/constraints/dataColumnConstraintType';
 
-var DataColumns = require('../../../lib/extension/schema/columns/dataColumns').DataColumns
-  , DataColumnConstraints = require('../../../lib/extension/schema/constraints/dataColumnConstraints').DataColumnConstraints
-  , GeoPackageTableCreator = require('../../../lib/db/geoPackageTableCreator').GeoPackageTableCreator
-  , DataColumnsDao = require('../../../lib/extension/schema/columns/dataColumnsDao').DataColumnsDao
-  , DataColumnConstraintsDao = require('../../../lib/extension/schema/constraints/dataColumnConstraintsDao').DataColumnConstraintsDao
-  , Contents = require('../../../lib/contents/contents').Contents
-  , path = require('path')
-  , should = require('chai').should();
+var DataColumns = require('../../../lib/extension/schema/columns/dataColumns').DataColumns,
+  DataColumnConstraints =
+    require('../../../lib/extension/schema/constraints/dataColumnConstraints').DataColumnConstraints,
+  GeoPackageTableCreator = require('../../../lib/db/geoPackageTableCreator').GeoPackageTableCreator,
+  DataColumnsDao = require('../../../lib/extension/schema/columns/dataColumnsDao').DataColumnsDao,
+  DataColumnConstraintsDao =
+    require('../../../lib/extension/schema/constraints/dataColumnConstraintsDao').DataColumnConstraintsDao,
+  path = require('path'),
+  should = require('chai').should();
 
-describe('Data Columns tests', function() {
-
+describe('Data Columns tests', function () {
   var geoPackage;
 
   var originalFilename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
   var filename;
 
-  beforeEach('create the GeoPackage connection', async function() {
+  beforeEach('create the GeoPackage connection', async function () {
     filename = path.join(__dirname, '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
-    // @ts-ignore
     let result = await copyAndOpenGeopackage(originalFilename);
     filename = result.path;
     geoPackage = result.geoPackage;
   });
 
-  afterEach('should close the geoPackage', async function() {
+  afterEach('should close the geoPackage', async function () {
     geoPackage.close();
     await testSetup.deleteGeoPackage(filename);
   });
 
-  it('should get the data column for property_0', function() {
+  it('should get the data column for property_0', function () {
     var dc = new DataColumnsDao(geoPackage);
     var dataColumn = dc.getDataColumn('FEATURESriversds', 'property_0');
     dataColumn.getTableName().should.be.equal('FEATURESriversds');
@@ -43,7 +42,7 @@ describe('Data Columns tests', function() {
     should.not.exist(dataColumn.getConstraintName());
   });
 
-  it('should get the contents for the data column for property_0', function() {
+  it('should get the contents for the data column for property_0', function () {
     var dc = new DataColumnsDao(geoPackage);
     var dataColumn = dc.getDataColumn('FEATURESriversds', 'property_0');
     var contents = dc.getContents(dataColumn);
@@ -59,13 +58,13 @@ describe('Data Columns tests', function() {
     should.not.exist(contents.getDescription());
   });
 
-  it('should get the data column for geom', function() {
+  it('should get the data column for geom', function () {
     var dc = new DataColumnsDao(geoPackage);
     var dataColumn = dc.getDataColumn('FEATURESriversds', 'geom');
     should.not.exist(dataColumn);
   });
 
-  it('should create a data column', function() {
+  it('should create a data column', function () {
     var dao = new DataColumnsDao(geoPackage);
     var dc = new DataColumns();
     dc.setTableName('FEATURESriversds');
@@ -88,7 +87,7 @@ describe('Data Columns tests', function() {
     dataColumn.getConstraintName().should.be.equal('test constraint');
   });
 
-  it('should query by the constraint name to retrieve a data column', function() {
+  it('should query by the constraint name to retrieve a data column', function () {
     var dao = new DataColumnsDao(geoPackage);
     var dc = new DataColumns();
     dc.setTableName('FEATURESriversds');
@@ -111,7 +110,7 @@ describe('Data Columns tests', function() {
     }
   });
 
-  it('should create a data column constraint', function() {
+  it('should create a data column constraint', function () {
     var tc = new GeoPackageTableCreator(geoPackage);
     tc.createDataColumnConstraints();
     var dao = new DataColumnConstraintsDao(geoPackage);
@@ -136,7 +135,7 @@ describe('Data Columns tests', function() {
     }
   });
 
-  it('should create a data column constraint and query unique', function() {
+  it('should create a data column constraint and query unique', function () {
     try {
       var tc = new GeoPackageTableCreator(geoPackage);
       tc.createDataColumnConstraints();
@@ -150,7 +149,11 @@ describe('Data Columns tests', function() {
       dc.setMaxIsInclusive(true);
       dc.setDescription('constraint description');
       dao.create(dc);
-      var dataColumnConstraint = dao.queryUnique('test constraint', DataColumnConstraintType.nameFromType(DataColumnConstraintType.RANGE), null);
+      var dataColumnConstraint = dao.queryUnique(
+        'test constraint',
+        DataColumnConstraintType.nameFromType(DataColumnConstraintType.RANGE),
+        null,
+      );
       dataColumnConstraint.getConstraintName().should.be.equal('test constraint');
       dataColumnConstraint.getConstraintType().should.be.equal(DataColumnConstraintType.RANGE);
       should.not.exist(dataColumnConstraint.getValue());
@@ -160,7 +163,7 @@ describe('Data Columns tests', function() {
       dataColumnConstraint.getMaxIsInclusive().should.be.equal(1);
       dataColumnConstraint.getDescription().should.be.equal('constraint description');
     } catch (e) {
-      console.error(e)
+      console.error(e);
     }
   });
 });

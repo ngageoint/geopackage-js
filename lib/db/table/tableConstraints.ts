@@ -105,7 +105,7 @@ export class TableConstraints {
    * @param constraints column constraints
    */
   addColumnConstraintsMap(constraints: Map<string, ColumnConstraints>): void {
-    constraints.forEach(columnConstraints => {
+    constraints.forEach((columnConstraints) => {
       this.addColumnConstraints(columnConstraints);
     });
   }

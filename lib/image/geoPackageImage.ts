@@ -1,4 +1,3 @@
-import { Image } from '../../@types/canvaskit';
 import { Canvas } from '../canvas/canvas';
 
 /**
@@ -63,7 +62,9 @@ export class GeoPackageImage {
   public getPixel(x: number, y: number): number {
     const imageData = this.getImageData().data;
     const offset = y * this.width + x;
-    return imageData[offset + 3] << 24 | imageData[offset] << 16 | imageData[offset + 1] << 8 | imageData[offset + 2];
+    return (
+      (imageData[offset + 3] << 24) | (imageData[offset] << 16) | (imageData[offset + 1] << 8) | imageData[offset + 2]
+    );
   }
 
   public isPixelTransparent(x: number, y: number): boolean {

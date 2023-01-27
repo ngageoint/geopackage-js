@@ -1,7 +1,3 @@
-/**
- * SimpleAttributesDao module.
- * @module extension/relatedTables
- */
 import { SimpleAttributesTable } from './simpleAttributesTable';
 import { SimpleAttributesRow } from './simpleAttributesRow';
 import { UserCustomDao } from '../../../user/custom/userCustomDao';

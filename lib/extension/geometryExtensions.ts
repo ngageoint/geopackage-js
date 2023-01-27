@@ -38,7 +38,8 @@ export class GeometryExtensions extends BaseExtension {
    */
   public static isExtension(geometryType: GeometryType): boolean {
     return (
-      GeometryCodes.getCodeForGeometryType(geometryType) > GeometryCodes.getCodeForGeometryType(GeometryType.GEOMETRYCOLLECTION)
+      GeometryCodes.getCodeForGeometryType(geometryType) >
+      GeometryCodes.getCodeForGeometryType(GeometryType.GEOMETRYCOLLECTION)
     );
   }
 
@@ -62,7 +63,8 @@ export class GeometryExtensions extends BaseExtension {
    */
   public static isGeoPackageExtension(geometryType: GeometryType): boolean {
     return (
-      GeometryCodes.getCodeForGeometryType(geometryType) >= GeometryCodes.getCodeForGeometryType(GeometryType.CIRCULARSTRING) &&
+      GeometryCodes.getCodeForGeometryType(geometryType) >=
+        GeometryCodes.getCodeForGeometryType(GeometryType.CIRCULARSTRING) &&
       GeometryCodes.getCodeForGeometryType(geometryType) <= GeometryCodes.getCodeForGeometryType(GeometryType.SURFACE)
     );
   }
@@ -89,7 +91,10 @@ export class GeometryExtensions extends BaseExtension {
     geometryType: GeometryType,
     author?: string,
   ): Extensions {
-    const extensionName = author != null ? GeometryExtensions.getExtensionNameWithAuthor(geometryType, author) : GeometryExtensions.getExtensionName(geometryType);
+    const extensionName =
+      author != null
+        ? GeometryExtensions.getExtensionNameWithAuthor(geometryType, author)
+        : GeometryExtensions.getExtensionName(geometryType);
     const description = GeometryExtensions.isGeoPackageExtension(geometryType)
       ? GeometryExtensions.GEOMETRY_TYPES_EXTENSION_DEFINITION
       : GeometryExtensions.USER_GEOMETRY_TYPES_EXTENSION_DEFINITION;
@@ -133,11 +138,13 @@ export class GeometryExtensions extends BaseExtension {
       throw new GeoPackageException('GeometryType is not an extension: ' + GeometryType.nameFromType(geometryType));
     }
 
-    return (GeometryExtensions.isGeoPackageExtension(geometryType)
-        ? GeoPackageConstants.EXTENSION_AUTHOR
-        : author) + Extensions.EXTENSION_NAME_DIVIDER
-      + GeoPackageConstants.GEOMETRY_EXTENSION_PREFIX
-      + Extensions.EXTENSION_NAME_DIVIDER + GeometryType.nameFromType(geometryType);
+    return (
+      (GeometryExtensions.isGeoPackageExtension(geometryType) ? GeoPackageConstants.EXTENSION_AUTHOR : author) +
+      Extensions.EXTENSION_NAME_DIVIDER +
+      GeoPackageConstants.GEOMETRY_EXTENSION_PREFIX +
+      Extensions.EXTENSION_NAME_DIVIDER +
+      GeometryType.nameFromType(geometryType)
+    );
   }
 
   /**
@@ -159,13 +166,18 @@ export class GeometryExtensions extends BaseExtension {
     }
 
     if (!GeometryExtensions.isGeoPackageExtension(geometryType)) {
-      throw new GeoPackageException('GeometryType is not a GeoPackage extension, User-Defined requires an author: ' + GeometryType.nameFromType(geometryType));
+      throw new GeoPackageException(
+        'GeometryType is not a GeoPackage extension, User-Defined requires an author: ' +
+          GeometryType.nameFromType(geometryType),
+      );
     }
 
-    return GeoPackageConstants.EXTENSION_AUTHOR +
+    return (
+      GeoPackageConstants.EXTENSION_AUTHOR +
       Extensions.EXTENSION_NAME_DIVIDER +
       GeoPackageConstants.GEOMETRY_EXTENSION_PREFIX +
       Extensions.EXTENSION_NAME_DIVIDER +
-      GeometryType.nameFromType(geometryType);
+      GeometryType.nameFromType(geometryType)
+    );
   }
 }

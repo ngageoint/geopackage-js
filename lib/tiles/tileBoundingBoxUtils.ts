@@ -7,7 +7,7 @@ import { GeometryTransform } from '@ngageoint/simple-features-proj-js/dist/lib/G
 import { ImageRectangle } from './imageRectangle';
 
 /**
- * This module exports utility functions for [slippy map (XYZ)](https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames)
+ * This class exports utility functions for [slippy map (XYZ)](https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames)
  * tile calculations.
  */
 export class TileBoundingBoxUtils {
@@ -227,10 +227,10 @@ export class TileBoundingBoxUtils {
    */
   public static getWebMercatorBoundingBoxWithTileGrid(tileGrid: TileGrid, zoom: number): BoundingBox {
     const tileSize = TileBoundingBoxUtils.tileSizeWithZoom(zoom);
-    const minLon = (-1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) + (tileGrid.getMinX() * tileSize);
-    const maxLon = (-1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) + ((tileGrid.getMaxX() + 1) * tileSize);
-    const minLat = ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH - ((tileGrid.getMaxY() + 1) * tileSize);
-    const maxLat = ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH - (tileGrid.getMinY() * tileSize);
+    const minLon = -1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH + tileGrid.getMinX() * tileSize;
+    const maxLon = -1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH + (tileGrid.getMaxX() + 1) * tileSize;
+    const minLat = ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH - (tileGrid.getMaxY() + 1) * tileSize;
+    const maxLat = ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH - tileGrid.getMinY() * tileSize;
     return new BoundingBox(minLon, minLat, maxLon, maxLat);
   }
 
@@ -1068,15 +1068,20 @@ export class TileBoundingBoxUtils {
     const tilesPerLon = TileBoundingBoxUtils.tilesPerWGS84LonSide(zoom);
     const tileSizeLat = TileBoundingBoxUtils.tileSizeLatPerWGS84Side(tilesPerLat);
     const tileSizeLon = TileBoundingBoxUtils.tileSizeLonPerWGS84Side(tilesPerLon);
-    const minX = Math.floor((boundingBox.getMinLongitude() + ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH) / tileSizeLon);
+    const minX = Math.floor(
+      (boundingBox.getMinLongitude() + ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH) / tileSizeLon,
+    );
     const tempMaxX = (boundingBox.getMaxLongitude() + ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH) / tileSizeLon;
     let maxX = Math.floor(tempMaxX);
     if (tempMaxX % 1 === 0) {
       maxX--;
     }
     maxX = Math.min(maxX, tilesPerLon - 1);
-    const minY = Math.floor(((boundingBox.getMaxLatitude() - ProjectionConstants.WGS84_HALF_WORLD_LAT_HEIGHT) * -1) / tileSizeLat);
-    const tempMaxY = ((boundingBox.getMinLatitude() - ProjectionConstants.WGS84_HALF_WORLD_LAT_HEIGHT) * -1) / tileSizeLat;
+    const minY = Math.floor(
+      ((boundingBox.getMaxLatitude() - ProjectionConstants.WGS84_HALF_WORLD_LAT_HEIGHT) * -1) / tileSizeLat,
+    );
+    const tempMaxY =
+      ((boundingBox.getMinLatitude() - ProjectionConstants.WGS84_HALF_WORLD_LAT_HEIGHT) * -1) / tileSizeLat;
     let maxY = Math.floor(tempMaxY);
     if (tempMaxY % 1 === 0) {
       maxY--;
@@ -1096,13 +1101,19 @@ export class TileBoundingBoxUtils {
     const tilesPerSide = this.tilesPerSide(zoom);
     const tileSize = this.tileSize(tilesPerSide);
 
-    const minX = Math.floor((webMercatorBoundingBox.getMinLongitude() + ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize);
-    const tempMaxX = (webMercatorBoundingBox.getMaxLongitude() + ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize;
+    const minX = Math.floor(
+      (webMercatorBoundingBox.getMinLongitude() + ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize,
+    );
+    const tempMaxX =
+      (webMercatorBoundingBox.getMaxLongitude() + ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize;
     let maxX = Math.floor(tempMaxX - ProjectionConstants.WEB_MERCATOR_PRECISION);
     maxX = Math.min(maxX, tilesPerSide - 1);
 
-    const minY = Math.floor(((webMercatorBoundingBox.getMaxLatitude() - ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) * -1) / tileSize);
-    const tempMaxY = ((webMercatorBoundingBox.getMinLatitude() - ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) * -1) / tileSize;
+    const minY = Math.floor(
+      ((webMercatorBoundingBox.getMaxLatitude() - ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) * -1) / tileSize,
+    );
+    const tempMaxY =
+      ((webMercatorBoundingBox.getMinLatitude() - ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) * -1) / tileSize;
     let maxY = Math.floor(tempMaxY - ProjectionConstants.WEB_MERCATOR_PRECISION);
     maxY = Math.min(maxY, tilesPerSide - 1);
 

@@ -1,8 +1,3 @@
-/**
- * @memberOf module:extension/nga/style
- * @class StyleMappingTable
- */
-
 import { UserMappingTable } from '../../related/userMappingTable';
 import { GeoPackageDataType } from '../../../db/geoPackageDataType';
 import { UserColumn } from '../../../user/userColumn';

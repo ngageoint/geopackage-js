@@ -1,20 +1,17 @@
-import {GeoPackage} from '../../../lib/geoPackage';
-import { MetadataScopeType } from "../../../lib/extension/metadata/metadataScopeType";
+import { GeoPackage } from '../../../lib/geoPackage';
+import { MetadataScopeType } from '../../../lib/extension/metadata/metadataScopeType';
 
-var should = require('chai').should()
-  , Metadata = require('../../../lib/extension/metadata/metadata').Metadata
-  , MetadataDao = require('../../../lib/extension/metadata/metadataDao').MetadataDao;
+var should = require('chai').should(),
+  MetadataDao = require('../../../lib/extension/metadata/metadataDao').MetadataDao;
 
-describe('Metadata tests', function() {
-
-  it('should create a Metadata object', function() {
+describe('Metadata tests', function () {
+  it('should create a Metadata object', function () {
     var md = new MetadataDao(new GeoPackage(null, null, null));
     var metadata = md.createObject();
     should.exist(metadata);
   });
 
-  it('should test getting scope information', function() {
-    var m1 = new Metadata();
+  it('should test getting scope information', function () {
     var info;
     info = MetadataScopeType.getScopeInformation(MetadataScopeType.UNDEFINED);
     info.name.should.be.equal(MetadataScopeType.UNDEFINED);
@@ -94,7 +91,9 @@ describe('Metadata tests', function() {
     info = MetadataScopeType.getScopeInformation(MetadataScopeType.SERVICE);
     info.name.should.be.equal(MetadataScopeType.SERVICE);
     info.code.should.be.equal('014');
-    info.definition.should.be.equal('Information applies to a capability which a service provider entity makes available to a service user entity through a set of interfaces that define a behaviour, such as a use case');
+    info.definition.should.be.equal(
+      'Information applies to a capability which a service provider entity makes available to a service user entity through a set of interfaces that define a behaviour, such as a use case',
+    );
 
     info = MetadataScopeType.getScopeInformation(MetadataScopeType.COLLECTION_HARDWARE);
     info.name.should.be.equal(MetadataScopeType.COLLECTION_HARDWARE);

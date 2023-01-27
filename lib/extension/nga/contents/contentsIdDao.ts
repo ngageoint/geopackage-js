@@ -2,6 +2,7 @@ import { ContentsId } from './contentsId';
 import { DBValue } from '../../../db/dbValue';
 import { GeoPackageDao } from '../../../db/geoPackageDao';
 import type { GeoPackage } from '../../../geoPackage';
+import { Contents } from '../../../contents/contents';
 
 /**
  * Contents Id Data Access Object
@@ -26,8 +27,8 @@ export class ContentsIdDao extends GeoPackageDao<ContentsId, number> {
   }
 
   /**
-   * Create a {module:extension/nga/contents.ContentsId} object
-   * @return {module:extension/nga/contents.ContentsId}
+   * Create a {ContentsId} object
+   * @return {ContentsId}
    */
   createObject(results?: Record<string, DBValue>): ContentsId {
     const c = new ContentsId();
@@ -42,7 +43,7 @@ export class ContentsIdDao extends GeoPackageDao<ContentsId, number> {
    * Get the contents for the contents id table
    * @param contentsId
    */
-  public getContents(contentsId: ContentsId) {
+  public getContents(contentsId: ContentsId): Contents {
     return this.geoPackage.getContentsDao().queryForIdWithKey(contentsId.getTableName());
   }
 

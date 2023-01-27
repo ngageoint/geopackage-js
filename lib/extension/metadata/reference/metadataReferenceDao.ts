@@ -4,11 +4,12 @@ import { DBValue } from '../../../db/dbValue';
 import { GeoPackageDao } from '../../../db/geoPackageDao';
 import type { GeoPackage } from '../../../geoPackage';
 import { ReferenceScopeType } from './referenceScopeType';
+import { MetadataReferenceKey } from './metadataReferenceKey';
 
 /**
  * Metadata Reference Data Access Object
  */
-export class MetadataReferenceDao extends GeoPackageDao<MetadataReference, void> {
+export class MetadataReferenceDao extends GeoPackageDao<MetadataReference, MetadataReferenceKey> {
   readonly gpkgTableName: string = MetadataReference.TABLE_NAME;
   readonly idColumns: string[] = [MetadataReference.COLUMN_FILE_ID, MetadataReference.COLUMN_PARENT_ID];
 
@@ -47,8 +48,7 @@ export class MetadataReferenceDao extends GeoPackageDao<MetadataReference, void>
   public deleteByMetadata(fileId: number): number {
     const where = this.buildWhereWithFieldAndValue(MetadataReference.COLUMN_FILE_ID, fileId);
     const whereArgs = this.buildWhereArgs(fileId);
-    const deleted = this.deleteWhere(where, whereArgs);
-    return deleted;
+    return this.deleteWhere(where, whereArgs);
   }
 
   /**
@@ -99,7 +99,11 @@ export class MetadataReferenceDao extends GeoPackageDao<MetadataReference, void>
     return this.deleteWhere(where, whereArgs);
   }
 
-  queryForIdWithKey(key: void): MetadataReference {
-    return undefined;
+  /**
+   * Query for MetaadataReference using the key
+   * @param key
+   */
+  queryForIdWithKey(key: MetadataReferenceKey): MetadataReference {
+    return this.queryForMultiId([key.getColumnFileId(), key.getColumnParentId()]);
   }
 }

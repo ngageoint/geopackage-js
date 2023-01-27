@@ -28,5 +28,4 @@ export class FeatureTableIndexConstants {
    */
   public static readonly EXTENSION_DEFINITION =
     'http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html';
-
 }

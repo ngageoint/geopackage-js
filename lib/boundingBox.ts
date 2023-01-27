@@ -300,7 +300,12 @@ export class BoundingBox {
    * @return geometry envelope
    */
   public static buildEnvelopeFromBoundingBox(boundingBox: BoundingBox): GeometryEnvelope {
-    return new GeometryEnvelope(boundingBox.minLongitude, boundingBox.minLatitude, boundingBox.maxLongitude, boundingBox.maxLatitude);
+    return new GeometryEnvelope(
+      boundingBox.minLongitude,
+      boundingBox.minLatitude,
+      boundingBox.maxLongitude,
+      boundingBox.maxLatitude,
+    );
   }
 
   /**
@@ -472,11 +477,14 @@ export class BoundingBox {
    */
   public transform(transform: GeometryTransform | ProjectionTransform): BoundingBox {
     const geometryTransform = transform instanceof GeometryTransform ? transform : GeometryTransform.create(transform);
-    let transformed: BoundingBox = this;
-    if (transform.getFromProjection().equalsProjection(transform.getToProjection())) {
-      transformed = this.copy();
-    } else {
-      if (Projections.getUnits(geometryTransform.getFromProjection().toString()) === 'degrees' && geometryTransform.getToProjection().equals(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR.toString())) {
+    let transformed: BoundingBox = this.copy();
+    if (!transform.getFromProjection().equalsProjection(transform.getToProjection())) {
+      if (
+        Projections.getUnits(geometryTransform.getFromProjection().toString()) === 'degrees' &&
+        geometryTransform
+          .getToProjection()
+          .equals(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR.toString())
+      ) {
         transformed = BoundingBox.boundDegreesBoundingBoxWithWebMercatorLimits(this);
       }
       const envelope = BoundingBox.buildEnvelope(transformed);
@@ -710,7 +718,7 @@ export class BoundingBox {
    * @param from
    * @param to
    */
-  public projectBoundingBox(from: Projection, to: Projection) {
+  public projectBoundingBox(from: Projection, to: Projection): BoundingBox {
     return this.transform(new ProjectionTransform(from, to));
   }
 

@@ -5,10 +5,6 @@ import { AttributesColumn } from './attributesColumn';
 
 /**
  * Attribute Row containing the values from a single result set row
- * @class AttributesRow
- * @param  {AttributeTable} attributeTable attribute table
- * @param  {module:db/geoPackageDataType[]} columnTypes  column types
- * @param  {ColumnValues[]} values      values
  */
 export class AttributesRow extends UserRow<AttributesColumn, AttributesTable> {
   /**

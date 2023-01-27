@@ -43,7 +43,6 @@ import { TileGenerator } from './lib/tiles/tileGenerator';
 import { TileGrid } from './lib/tiles/tileGrid';
 import { TileRetriever } from './lib/tiles/tileRetriever';
 import { TileUtils } from './lib/tiles/tileUtils';
-import { UrlTileGenerator } from './lib/tiles/urlTileGenerator';
 
 // tiles/user
 import { TileColumn } from './lib/tiles/user/tileColumn';
@@ -379,7 +378,6 @@ export {
   TileGrid,
   TileRetriever,
   TileUtils,
-  UrlTileGenerator,
   TileColumn,
   TileColumns,
   TileConnection,

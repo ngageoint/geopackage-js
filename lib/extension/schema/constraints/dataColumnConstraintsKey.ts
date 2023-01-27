@@ -76,6 +76,10 @@ export class DataColumnConstraintsKey {
    * {@inheritDoc}
    */
   public equals(obj: DataColumnConstraintsKey): boolean {
-    return this.getConstraintType() === obj.getConstraintName() && this.getConstraintType() === obj.getConstraintType() && this.getValue() === obj.getValue();
+    return (
+      this.getConstraintType() === obj.getConstraintName() &&
+      this.getConstraintType() === obj.getConstraintType() &&
+      this.getValue() === obj.getValue()
+    );
   }
 }

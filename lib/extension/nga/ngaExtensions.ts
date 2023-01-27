@@ -188,7 +188,9 @@ export class NGAExtensions extends ExtensionManagement {
         extensionsDao.deleteByExtensionAndTableName(TileTableScaling.EXTENSION_NAME, table);
       }
     } catch (e) {
-      throw new GeoPackageException('Failed to delete Tile Scaling. GeoPackage: ' + this.geoPackage.getName() + ', Table: ' + table);
+      throw new GeoPackageException(
+        'Failed to delete Tile Scaling. GeoPackage: ' + this.geoPackage.getName() + ', Table: ' + table,
+      );
     }
   }
 
@@ -207,7 +209,9 @@ export class NGAExtensions extends ExtensionManagement {
         extensionsDao.deleteByExtension(TileTableScaling.EXTENSION_NAME);
       }
     } catch (e) {
-      throw new GeoPackageException('Failed to delete Tile Scaling extension and table. GeoPackage: ' + this.geoPackage.getName());
+      throw new GeoPackageException(
+        'Failed to delete Tile Scaling extension and table. GeoPackage: ' + this.geoPackage.getName(),
+      );
     }
   }
 
@@ -428,7 +432,9 @@ export class NGAExtensions extends ExtensionManagement {
         featureTileLinkDao.deleteByTableName(table);
       }
     } catch (e) {
-      throw new GeoPackageException("Failed to delete Feature Tile Link. GeoPackage: " + this.geoPackage.getName() + ", Table: " + table);
+      throw new GeoPackageException(
+        'Failed to delete Feature Tile Link. GeoPackage: ' + this.geoPackage.getName() + ', Table: ' + table,
+      );
     }
   }
 
@@ -448,8 +454,8 @@ export class NGAExtensions extends ExtensionManagement {
       }
     } catch (e) {
       throw new GeoPackageException(
-        "Failed to delete Feature Tile Link extension and table. GeoPackage: "
-        + this.geoPackage.getName());
+        'Failed to delete Feature Tile Link extension and table. GeoPackage: ' + this.geoPackage.getName(),
+      );
     }
   }
 

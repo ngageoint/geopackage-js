@@ -11,7 +11,7 @@ import { OffscreenCanvasAdapter } from '../canvas/offscreenCanvasAdapter';
 export class Context {
   static isNode: boolean = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
   static isBrowser: boolean = typeof window !== 'undefined' && typeof window.document !== 'undefined';
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   static isWebWorker: boolean = typeof importScripts !== 'undefined';
 

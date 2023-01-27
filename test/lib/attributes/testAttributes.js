@@ -1,22 +1,22 @@
-var testSetup = require('../../testSetup').default
-  , Verification = require('../../verification')
-  , DataColumns = require('../../../lib/extension/schema/columns/dataColumns').DataColumns
-  , DataColumnsDao = require('../../../lib/extension/schema/columns/dataColumnsDao').DataColumnsDao
-  , AttributesDao = require('../../../lib/attributes/attributesDao').AttributesDao
-  , AttributesTableReader = require('../../../lib/attributes/attributesTableReader').AttributesTableReader
-  , AttributesTable = require('../../../lib/attributes/attributesTable').AttributesTable
-  , GeoPackageDataType = require('../../../lib/db/geoPackageDataType').GeoPackageDataType
-  , Contents = require('../../../lib/contents/contents').Contents
-  , ConstraintType = require('../../../lib/db/table/constraintType').ConstraintType
-  , Constraints = require('../../../lib/db/table/constraints').Constraints
-  , should = require('chai').should();
-const { AttributesColumn } = require("../../../lib/attributes/attributesColumn");
-const { AttributesTableMetadata } = require("../../../lib/attributes/attributesTableMetadata");
-const { ContentsDataType } = require("../../../lib/contents/contentsDataType");
-const { SchemaExtension } = require("../../../lib/extension/schema/schemaExtension");
-const { UserCustomColumn } = require("../../../lib/user/custom/userCustomColumn");
+var testSetup = require('../../testSetup').default,
+  Verification = require('../../verification'),
+  DataColumns = require('../../../lib/extension/schema/columns/dataColumns').DataColumns,
+  DataColumnsDao = require('../../../lib/extension/schema/columns/dataColumnsDao').DataColumnsDao,
+  AttributesDao = require('../../../lib/attributes/attributesDao').AttributesDao,
+  AttributesTableReader = require('../../../lib/attributes/attributesTableReader').AttributesTableReader,
+  AttributesTable = require('../../../lib/attributes/attributesTable').AttributesTable,
+  GeoPackageDataType = require('../../../lib/db/geoPackageDataType').GeoPackageDataType,
+  Contents = require('../../../lib/contents/contents').Contents,
+  ConstraintType = require('../../../lib/db/table/constraintType').ConstraintType,
+  Constraints = require('../../../lib/db/table/constraints').Constraints,
+  should = require('chai').should();
+const { AttributesColumn } = require('../../../lib/attributes/attributesColumn');
+const { AttributesTableMetadata } = require('../../../lib/attributes/attributesTableMetadata');
+const { ContentsDataType } = require('../../../lib/contents/contentsDataType');
+const { SchemaExtension } = require('../../../lib/extension/schema/schemaExtension');
+const { UserCustomColumn } = require('../../../lib/user/custom/userCustomColumn');
 
-describe('GeoPackage Attribute table create tests', function() {
+describe('GeoPackage Attribute table create tests', function () {
   var testGeoPackage;
   var tableName = 'test_attributes.test';
   var geoPackage;
@@ -26,48 +26,48 @@ describe('GeoPackage Attribute table create tests', function() {
       {
         name: null,
         order: AttributesColumn.NOT_NULL_CONSTRAINT_ORDER,
-        sql: "NOT NULL",
-        type: ConstraintType.NOT_NULL
+        sql: 'NOT NULL',
+        type: ConstraintType.NOT_NULL,
       },
       {
         name: null,
-        sql: "PRIMARY KEY",
+        sql: 'PRIMARY KEY',
         order: AttributesColumn.PRIMARY_KEY_CONSTRAINT_ORDER,
-        type: ConstraintType.PRIMARY_KEY
+        type: ConstraintType.PRIMARY_KEY,
       },
       {
         name: null,
         order: AttributesColumn.AUTOINCREMENT_CONSTRAINT_ORDER,
-        sql: "AUTOINCREMENT",
-        type: ConstraintType.AUTOINCREMENT
-      }
+        sql: 'AUTOINCREMENT',
+        type: ConstraintType.AUTOINCREMENT,
+      },
     ],
     typedConstraints: {
-      "0": [
+      0: [
         {
           name: null,
           order: AttributesColumn.PRIMARY_KEY_CONSTRAINT_ORDER,
-          sql: "PRIMARY KEY",
+          sql: 'PRIMARY KEY',
           type: ConstraintType.PRIMARY_KEY,
-        }
+        },
       ],
-      "4": [
+      4: [
         {
           name: null,
           order: AttributesColumn.NOT_NULL_CONSTRAINT_ORDER,
-          sql: "NOT NULL",
+          sql: 'NOT NULL',
           type: ConstraintType.NOT_NULL,
-        }
+        },
       ],
-      "7": [
+      7: [
         {
           name: null,
           order: AttributesColumn.AUTOINCREMENT_CONSTRAINT_ORDER,
-          sql: "AUTOINCREMENT",
+          sql: 'AUTOINCREMENT',
           type: ConstraintType.AUTOINCREMENT,
-        }
-      ]
-    }
+        },
+      ],
+    },
   };
 
   const emptyConstraints = {
@@ -75,55 +75,57 @@ describe('GeoPackage Attribute table create tests', function() {
     typedConstraints: {},
   };
 
-  const defaultConstraints = value => {
+  const defaultConstraints = (value) => {
     return {
-      constraints: [{
-        name: null,
-        order: AttributesColumn.DEFAULT_VALUE_CONSTRAINT_ORDER,
-        sql: "DEFAULT " + value,
-        type: ConstraintType.DEFAULT
-      }],
+      constraints: [
+        {
+          name: null,
+          order: AttributesColumn.DEFAULT_VALUE_CONSTRAINT_ORDER,
+          sql: 'DEFAULT ' + value,
+          type: ConstraintType.DEFAULT,
+        },
+      ],
       typedConstraints: {
-        "5": [
+        5: [
           {
             name: null,
             order: AttributesColumn.DEFAULT_VALUE_CONSTRAINT_ORDER,
-            sql: "DEFAULT " + value,
+            sql: 'DEFAULT ' + value,
             type: ConstraintType.DEFAULT,
-          }
-        ]
+          },
+        ],
       },
     };
-  }
+  };
 
   const notNullConstraints = {
     constraints: [
       {
         name: null,
         order: AttributesColumn.NOT_NULL_CONSTRAINT_ORDER,
-        sql: "NOT NULL",
-        type: ConstraintType.NOT_NULL
+        sql: 'NOT NULL',
+        type: ConstraintType.NOT_NULL,
       },
     ],
     typedConstraints: {
-      "4": [
+      4: [
         {
           name: null,
           order: AttributesColumn.NOT_NULL_CONSTRAINT_ORDER,
-          sql: "NOT NULL",
+          sql: 'NOT NULL',
           type: ConstraintType.NOT_NULL,
-        }
+        },
       ],
-    }
+    },
   };
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     let created = await testSetup.createTmpGeoPackage();
     testGeoPackage = created.path;
     geoPackage = created.geoPackage;
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     try {
       geoPackage.close();
       await testSetup.deleteGeoPackage(testGeoPackage);
@@ -132,17 +134,25 @@ describe('GeoPackage Attribute table create tests', function() {
     }
   });
 
-  it('should create an attribute table only', async function() {
+  it('should create an attribute table only', async function () {
     geoPackage.hasAttributeTable(tableName).should.be.equal(false);
     var columns = [];
     columns.push(AttributesColumn.createPrimaryKeyColumnWithIndex(0, 'id'));
-    columns.push(AttributesColumn.createColumnWithIndex(6, 'test_text_limited.test', GeoPackageDataType.TEXT, false, null, 5));
-    columns.push(AttributesColumn.createColumnWithIndex(7, 'test_blob_limited.test', GeoPackageDataType.BLOB, false, null, 7));
-    columns.push(AttributesColumn.createColumnWithIndex(1, 'test_text.test', GeoPackageDataType.TEXT, false, ""));
+    columns.push(
+      AttributesColumn.createColumnWithIndex(6, 'test_text_limited.test', GeoPackageDataType.TEXT, false, null, 5),
+    );
+    columns.push(
+      AttributesColumn.createColumnWithIndex(7, 'test_blob_limited.test', GeoPackageDataType.BLOB, false, null, 7),
+    );
+    columns.push(AttributesColumn.createColumnWithIndex(1, 'test_text.test', GeoPackageDataType.TEXT, false, ''));
     columns.push(AttributesColumn.createColumnWithIndex(2, 'test_real.test', GeoPackageDataType.REAL, false, null));
-    columns.push(AttributesColumn.createColumnWithIndex(3, 'test_boolean.test', GeoPackageDataType.BOOLEAN, false, null));
+    columns.push(
+      AttributesColumn.createColumnWithIndex(3, 'test_boolean.test', GeoPackageDataType.BOOLEAN, false, null),
+    );
     columns.push(AttributesColumn.createColumnWithIndex(4, 'test_blob.test', GeoPackageDataType.BLOB, false, null));
-    columns.push(AttributesColumn.createColumnWithIndex(5, 'test_integer.test', GeoPackageDataType.INTEGER, false, null));
+    columns.push(
+      AttributesColumn.createColumnWithIndex(5, 'test_integer.test', GeoPackageDataType.INTEGER, false, null),
+    );
     geoPackage.createAttributesTable(new AttributesTable(tableName, columns));
     var contentsVerified = Verification.verifyContentsForTable(geoPackage, tableName);
     contentsVerified.should.be.equal(false);
@@ -154,18 +164,26 @@ describe('GeoPackage Attribute table create tests', function() {
     attributesTableExists.should.be.equal(false);
   });
 
-  it('should create an attribute table and associated contents', async function() {
+  it('should create an attribute table and associated contents', async function () {
     geoPackage.hasAttributeTable(tableName).should.be.equal(false);
     var columns = [];
     columns.push(AttributesColumn.createPrimaryKeyColumnWithIndex(0, 'id'));
-    columns.push(AttributesColumn.createColumnWithIndex(6, 'test_text_limited.test', GeoPackageDataType.TEXT, false, null, 5));
-    columns.push(AttributesColumn.createColumnWithIndex(7, 'test_blob_limited.test', GeoPackageDataType.BLOB, false, null, 7));
-    columns.push(AttributesColumn.createColumnWithIndex(1, 'test_text.test', GeoPackageDataType.TEXT, false, ""));
+    columns.push(
+      AttributesColumn.createColumnWithIndex(6, 'test_text_limited.test', GeoPackageDataType.TEXT, false, null, 5),
+    );
+    columns.push(
+      AttributesColumn.createColumnWithIndex(7, 'test_blob_limited.test', GeoPackageDataType.BLOB, false, null, 7),
+    );
+    columns.push(AttributesColumn.createColumnWithIndex(1, 'test_text.test', GeoPackageDataType.TEXT, false, ''));
     columns.push(AttributesColumn.createColumnWithIndex(2, 'test_real.test', GeoPackageDataType.REAL, false, null));
-    columns.push(AttributesColumn.createColumnWithIndex(3, 'test_boolean.test', GeoPackageDataType.BOOLEAN, false, null));
+    columns.push(
+      AttributesColumn.createColumnWithIndex(3, 'test_boolean.test', GeoPackageDataType.BOOLEAN, false, null),
+    );
     columns.push(AttributesColumn.createColumnWithIndex(4, 'test_blob.test', GeoPackageDataType.BLOB, false, null));
-    columns.push(AttributesColumn.createColumnWithIndex(5, 'test_integer.test', GeoPackageDataType.INTEGER, false, null));
-    const table = new AttributesTable(tableName, columns)
+    columns.push(
+      AttributesColumn.createColumnWithIndex(5, 'test_integer.test', GeoPackageDataType.INTEGER, false, null),
+    );
+    const table = new AttributesTable(tableName, columns);
     geoPackage.createAttributesTable(table);
     // setup contents
     const contents = new Contents();
@@ -184,16 +202,24 @@ describe('GeoPackage Attribute table create tests', function() {
     attributesTableExists.should.be.equal(false);
   });
 
-  it('should create an attribute table and contents', async function() {
+  it('should create an attribute table and contents', async function () {
     geoPackage.hasAttributeTable(tableName).should.be.equal(false);
     var columns = [];
-    columns.push(AttributesColumn.createColumnWithIndex(6, 'test_text_limited.test', GeoPackageDataType.TEXT, false, null, 5));
-    columns.push(AttributesColumn.createColumnWithIndex(7, 'test_blob_limited.test', GeoPackageDataType.BLOB, false, null, 7));
-    columns.push(AttributesColumn.createColumnWithIndex(1, 'test_text.test', GeoPackageDataType.TEXT, false, ""));
+    columns.push(
+      AttributesColumn.createColumnWithIndex(6, 'test_text_limited.test', GeoPackageDataType.TEXT, false, null, 5),
+    );
+    columns.push(
+      AttributesColumn.createColumnWithIndex(7, 'test_blob_limited.test', GeoPackageDataType.BLOB, false, null, 7),
+    );
+    columns.push(AttributesColumn.createColumnWithIndex(1, 'test_text.test', GeoPackageDataType.TEXT, false, ''));
     columns.push(AttributesColumn.createColumnWithIndex(2, 'test_real.test', GeoPackageDataType.REAL, false, null));
-    columns.push(AttributesColumn.createColumnWithIndex(3, 'test_boolean.test', GeoPackageDataType.BOOLEAN, false, null));
+    columns.push(
+      AttributesColumn.createColumnWithIndex(3, 'test_boolean.test', GeoPackageDataType.BOOLEAN, false, null),
+    );
     columns.push(AttributesColumn.createColumnWithIndex(4, 'test_blob.test', GeoPackageDataType.BLOB, false, null));
-    columns.push(AttributesColumn.createColumnWithIndex(5, 'test_integer.test', GeoPackageDataType.INTEGER, false, null));
+    columns.push(
+      AttributesColumn.createColumnWithIndex(5, 'test_integer.test', GeoPackageDataType.INTEGER, false, null),
+    );
     geoPackage.createAttributesTableWithMetadata(AttributesTableMetadata.create(tableName, columns));
     var contentsVerified = Verification.verifyContentsForTable(geoPackage, tableName);
     contentsVerified.should.be.equal(true);
@@ -202,7 +228,7 @@ describe('GeoPackage Attribute table create tests', function() {
     geoPackage.hasAttributeTable(tableName).should.be.equal(true);
   });
 
-  it('should create an attribute table using an attribute table metadata', function() {
+  it('should create an attribute table using an attribute table metadata', function () {
     var attributesColumns = [];
     attributesColumns.push(AttributesColumn.createColumn('Name', GeoPackageDataType.TEXT));
     attributesColumns.push(AttributesColumn.createColumn('Number', GeoPackageDataType.INTEGER));
@@ -232,65 +258,66 @@ describe('GeoPackage Attribute table create tests', function() {
     var result = reader.readAttributeTable(geoPackage);
     var columns = result.getUserColumns().getColumns();
     var plainObject = JSON.parse(JSON.stringify(columns));
-    plainObject.should.deep.include.members([{
-      constraints: notNullPrimaryKeyConstraints,
-      index: 0,
-      type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
-      name: 'id',
-      dataType: 5,
-      max: null,
-      notNull: true,
-      primaryKey: true,
-      autoincrement: true,
-    },
-    {
-      index: 1,
-      constraints: {
-        constraints: [],
-        typedConstraints: {},
+    plainObject.should.deep.include.members([
+      {
+        constraints: notNullPrimaryKeyConstraints,
+        index: 0,
+        type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
+        name: 'id',
+        dataType: 5,
+        max: null,
+        notNull: true,
+        primaryKey: true,
+        autoincrement: true,
       },
-      name: 'Name',
-      max: null,
-      dataType: 9,
-      notNull: false,
-      primaryKey: false,
-      autoincrement: false,
-      type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT)
-    },
-    {
-      index: 2,
-      constraints: {
-        constraints: [],
-        typedConstraints: {},
+      {
+        index: 1,
+        constraints: {
+          constraints: [],
+          typedConstraints: {},
+        },
+        name: 'Name',
+        max: null,
+        dataType: 9,
+        notNull: false,
+        primaryKey: false,
+        autoincrement: false,
+        type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
       },
-      name: 'Number',
-      max: null,
-      dataType: 5,
-      notNull: false,
-      primaryKey: false,
-      autoincrement: false,
-      type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER)
-    }]);
+      {
+        index: 2,
+        constraints: {
+          constraints: [],
+          typedConstraints: {},
+        },
+        name: 'Number',
+        max: null,
+        dataType: 5,
+        notNull: false,
+        primaryKey: false,
+        autoincrement: false,
+        type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
+      },
+    ]);
 
     var dc = new DataColumnsDao(geoPackage);
     var dataColumn = dc.getDataColumns('NewTable', 'Name');
     dataColumn.should.be.deep.equal(nameDataCol);
   });
 
-  it('should create a media table', function() {
-   try {
-
-   } catch (e) {
-     console.error(e);
-   }
+  it('should create a media table', function () {
+    try {
+    } catch (e) {
+      console.error(e);
+    }
   });
 
-  it('should create a simple attribute table', function() {
+  it('should create a simple attribute table', function () {
     try {
       var attributesColumns = [];
       attributesColumns.push(UserCustomColumn.createColumn('Name', GeoPackageDataType.TEXT, true));
       attributesColumns.push(UserCustomColumn.createColumn('Number', GeoPackageDataType.INTEGER, true));
-      geoPackage.createSimpleAttributesTable('SimpleTable', attributesColumns)
+      geoPackage.createSimpleAttributesTable('SimpleTable', attributesColumns);
       var reader = new AttributesTableReader('SimpleTable');
       var result = reader.readAttributeTable(geoPackage);
       var columns = result.getUserColumns().getColumns();
@@ -328,60 +355,60 @@ describe('GeoPackage Attribute table create tests', function() {
           max: null,
           type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
           constraints: notNullConstraints,
-        }
+        },
       ]);
     } catch (e) {
       console.error(e);
     }
   });
 
-  it('should not allow two primary key columns', function() {
+  it('should not allow two primary key columns', function () {
     var columns = [];
     columns.push(AttributesColumn.createPrimaryKeyColumn('id'));
     columns.push(AttributesColumn.createPrimaryKeyColumn('idagain'));
-    (function() {
+    (function () {
       new AttributesTable(tableName, columns);
     }).should.throw();
   });
 
-  it('should not allow missing column indexes', function() {
+  it('should not allow missing column indexes', function () {
     var columns = [];
 
     columns.push(AttributesColumn.createPrimaryKeyColumnWithIndex(1, 'id'));
     columns.push(AttributesColumn.createPrimaryKeyColumnWithIndex(2, 'idagain'));
 
-    (function() {
+    (function () {
       new AttributesTable(tableName, columns);
     }).should.throw();
   });
 
-  it('should fail to create an attribute table with an incorrect contents type', function() {
+  it('should fail to create an attribute table with an incorrect contents type', function () {
     var columns = [];
 
     columns.push(AttributesColumn.createPrimaryKeyColumn('id'));
     columns.push(AttributesColumn.createColumn('test_text_limited.test', GeoPackageDataType.TEXT, false, null, 5));
     columns.push(AttributesColumn.createColumn('test_blob_limited.test', GeoPackageDataType.BLOB, false, null, 7));
-    columns.push(AttributesColumn.createColumn('test_text.test', GeoPackageDataType.TEXT, false, ""));
+    columns.push(AttributesColumn.createColumn('test_text.test', GeoPackageDataType.TEXT, false, ''));
     columns.push(AttributesColumn.createColumn('test_real.test', GeoPackageDataType.REAL, false, null));
     columns.push(AttributesColumn.createColumn('test_boolean.test', GeoPackageDataType.BOOLEAN, false, null));
     columns.push(AttributesColumn.createColumn('test_blob.test', GeoPackageDataType.BLOB, false, null));
     columns.push(AttributesColumn.createColumn('test_integer.test', GeoPackageDataType.INTEGER, false, null));
 
     var table = new AttributesTable('table', columns);
-    (function() {
+    (function () {
       var contents = new Contents();
       contents.data_type = 'invalid';
       table.setContents(contents);
     }).should.throw();
   });
 
-  it('should fail to create an attribute dao with no contents', function() {
+  it('should fail to create an attribute dao with no contents', function () {
     var columns = [];
 
     columns.push(AttributesColumn.createPrimaryKeyColumn('id'));
     columns.push(AttributesColumn.createColumn('test_text_limited.test', GeoPackageDataType.TEXT, false, null, 5));
     columns.push(AttributesColumn.createColumn('test_blob_limited.test', GeoPackageDataType.BLOB, false, null, 7));
-    columns.push(AttributesColumn.createColumn('test_text.test', GeoPackageDataType.TEXT, false, ""));
+    columns.push(AttributesColumn.createColumn('test_text.test', GeoPackageDataType.TEXT, false, ''));
     columns.push(AttributesColumn.createColumn('test_real.test', GeoPackageDataType.REAL, false, null));
     columns.push(AttributesColumn.createColumn('test_boolean.test', GeoPackageDataType.BOOLEAN, false, null));
     columns.push(AttributesColumn.createColumn('test_blob.test', GeoPackageDataType.BLOB, false, null));
@@ -389,14 +416,14 @@ describe('GeoPackage Attribute table create tests', function() {
 
     var table = new AttributesTable(geoPackage.getConnection(), columns);
 
-    (function() {
+    (function () {
       new AttributesDao(geoPackage, table);
     }).should.throw();
   });
 
-  it('should create a attribute table and read the information about it', function() {
+  it('should create a attribute table and read the information about it', function () {
     var columns = [];
-    columns.push(AttributesColumn.createColumn('test_text.test', GeoPackageDataType.TEXT, false, "default"));
+    columns.push(AttributesColumn.createColumn('test_text.test', GeoPackageDataType.TEXT, false, 'default'));
     columns.push(AttributesColumn.createColumn('test_real.test', GeoPackageDataType.REAL, false, null));
     columns.push(AttributesColumn.createColumn('test_boolean.test', GeoPackageDataType.BOOLEAN, false, null));
     columns.push(AttributesColumn.createColumn('test_blob.test', GeoPackageDataType.BLOB, false, null));
@@ -410,7 +437,7 @@ describe('GeoPackage Attribute table create tests', function() {
     schemaExtension.createDataColumnsTable();
     schemaExtension.createDataColumnConstraintsTable();
 
-    const dataColumnsDao = geoPackage.getDataColumnsDao()
+    const dataColumnsDao = geoPackage.getDataColumnsDao();
     var dc = new DataColumns();
     dc.setTableName('test_attributes.test');
     dc.setColumnName('test_text_limited.test');
@@ -443,12 +470,12 @@ describe('GeoPackage Attribute table create tests', function() {
           name: 'test_text.test',
           dataType: 9,
           notNull: false,
-          defaultValue: '\'default\'',
+          defaultValue: "'default'",
           primaryKey: false,
           autoincrement: false,
           max: null,
           type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
-          constraints: defaultConstraints('\'default\''),
+          constraints: defaultConstraints("'default'"),
         },
         {
           index: 2,
@@ -516,26 +543,27 @@ describe('GeoPackage Attribute table create tests', function() {
           autoincrement: false,
           type: GeoPackageDataType.nameFromType(GeoPackageDataType.BLOB),
           constraints: emptyConstraints,
-        }]);
+        },
+      ]);
       var dataColumn = dataColumnsDao.getDataColumns('test_attributes.test', 'test_text_limited.test');
       dataColumn.should.be.deep.equal(dc);
     } catch (e) {
-      console.error(e)
+      console.error(e);
     }
   });
 
-  it('GeoPackage attribute CRUD tests - should create an attribute', function() {
+  it('GeoPackage attribute CRUD tests - should create an attribute', function () {
     var columns = [];
     columns.push(AttributesColumn.createColumn('test_text_limited', GeoPackageDataType.TEXT, false, null, 5));
     columns.push(AttributesColumn.createColumn('test_blob_limited', GeoPackageDataType.BLOB, false, null, 7));
     columns.push(AttributesColumn.createColumn('test_boolean2', GeoPackageDataType.BOOLEAN, false, null));
-    columns.push(AttributesColumn.createColumn('test_text.test', GeoPackageDataType.TEXT, false, ""));
+    columns.push(AttributesColumn.createColumn('test_text.test', GeoPackageDataType.TEXT, false, ''));
     columns.push(AttributesColumn.createColumn('test_real', GeoPackageDataType.REAL, false, null));
     columns.push(AttributesColumn.createColumn('test_boolean', GeoPackageDataType.BOOLEAN, false, null));
     columns.push(AttributesColumn.createColumn('test_blob', GeoPackageDataType.BLOB, false, null));
     columns.push(AttributesColumn.createColumn('test_integer', GeoPackageDataType.INTEGER, false, null));
-    columns.push(AttributesColumn.createColumn('test space', GeoPackageDataType.TEXT, false, ""));
-    columns.push(AttributesColumn.createColumn('test-dash', GeoPackageDataType.TEXT, false, ""));
+    columns.push(AttributesColumn.createColumn('test space', GeoPackageDataType.TEXT, false, ''));
+    columns.push(AttributesColumn.createColumn('test-dash', GeoPackageDataType.TEXT, false, ''));
 
     geoPackage.createAttributesTableWithMetadata(AttributesTableMetadata.create(tableName, columns));
     var contentsVerified = Verification.verifyContentsForTable(geoPackage, tableName);
@@ -573,18 +601,18 @@ describe('GeoPackage Attribute table create tests', function() {
     attributesResultSet.close();
   });
 
-  it('GeoPackage attribute CRUD tests - should delete the attribute', function() {
+  it('GeoPackage attribute CRUD tests - should delete the attribute', function () {
     var columns = [];
     columns.push(AttributesColumn.createColumn('test_text_limited', GeoPackageDataType.TEXT, false, null, 5));
     columns.push(AttributesColumn.createColumn('test_blob_limited', GeoPackageDataType.BLOB, false, null, 7));
     columns.push(AttributesColumn.createColumn('test_boolean2', GeoPackageDataType.BOOLEAN, false, null));
-    columns.push(AttributesColumn.createColumn('test_text.test', GeoPackageDataType.TEXT, false, ""));
+    columns.push(AttributesColumn.createColumn('test_text.test', GeoPackageDataType.TEXT, false, ''));
     columns.push(AttributesColumn.createColumn('test_real', GeoPackageDataType.REAL, false, null));
     columns.push(AttributesColumn.createColumn('test_boolean', GeoPackageDataType.BOOLEAN, false, null));
     columns.push(AttributesColumn.createColumn('test_blob', GeoPackageDataType.BLOB, false, null));
     columns.push(AttributesColumn.createColumn('test_integer', GeoPackageDataType.INTEGER, false, null));
-    columns.push(AttributesColumn.createColumn('test space', GeoPackageDataType.TEXT, false, ""));
-    columns.push(AttributesColumn.createColumn('test-dash', GeoPackageDataType.TEXT, false, ""));
+    columns.push(AttributesColumn.createColumn('test space', GeoPackageDataType.TEXT, false, ''));
+    columns.push(AttributesColumn.createColumn('test-dash', GeoPackageDataType.TEXT, false, ''));
     geoPackage.createAttributesTableWithMetadata(AttributesTableMetadata.create(tableName, columns));
     var contentsVerified = Verification.verifyContentsForTable(geoPackage, tableName);
     contentsVerified.should.be.equal(true);

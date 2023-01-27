@@ -1,7 +1,3 @@
-/**
- * featureTable module.
- * @module features/user/featureTable
- */
 import { UserTable } from '../../user/userTable';
 import { FeatureColumn } from './featureColumn';
 import { FeatureColumns } from './featureColumns';
@@ -133,7 +129,9 @@ export class FeatureTable extends UserTable<FeatureColumn> {
     // Verify the Contents have a features data type
     const dataType = contents.getDataType();
     if (dataType === null || dataType === undefined || dataType !== ContentsDataType.FEATURES) {
-      throw new GeoPackageException('The Contents of a FeatureTable must have a data type of ' + ContentsDataType.FEATURES);
+      throw new GeoPackageException(
+        'The Contents of a FeatureTable must have a data type of ' + ContentsDataType.FEATURES,
+      );
     }
   }
 }

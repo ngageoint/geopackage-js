@@ -2,19 +2,17 @@ import { FeatureRow } from '../../features/user/featureRow';
 import { GeoPackageGeometryData } from '../../geom/geoPackageGeometryData';
 
 /**
- * Feature Paint Cache.
- * @module tiles/features
- */
-
-/**
- * Constructor, created with cache size of {@link #DEFAULT_GEOMETRY_CACHE_SIZE}
- * @constructor
+ * GeometryCache
  */
 export class GeometryCache {
   public static readonly DEFAULT_GEOMETRY_CACHE_SIZE = 100;
   geometryCache: Record<number, GeoPackageGeometryData>;
   accessHistory: number[];
 
+  /**
+   * Constructor, created with cache size of {@link #DEFAULT_GEOMETRY_CACHE_SIZE}
+   * @constructor
+   */
   constructor(public cacheSize: number = GeometryCache.DEFAULT_GEOMETRY_CACHE_SIZE) {
     // this.cacheSize = size !== null ? size : GeometryCache.DEFAULT_GEOMETRY_CACHE_SIZE;
     this.geometryCache = {};

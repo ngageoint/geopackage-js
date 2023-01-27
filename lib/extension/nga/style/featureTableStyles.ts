@@ -36,7 +36,10 @@ export class FeatureTableStyles {
     } else {
       this.tableName = tableNameOrTable;
     }
-    this.featureStyleExtension = new FeatureStyleExtension(this.geoPackage, this.geoPackage.getRelatedTablesExtension());
+    this.featureStyleExtension = new FeatureStyleExtension(
+      this.geoPackage,
+      this.geoPackage.getRelatedTablesExtension(),
+    );
     this.cachedTableFeatureStyles = new FeatureStyles();
   }
   /**
@@ -545,9 +548,7 @@ export class FeatureTableStyles {
    * @param {FeatureStyles} featureStyles default feature styles
    * @return {Promise}
    */
-  setTableFeatureStyles(
-    featureStyles: FeatureStyles,
-  ): {
+  setTableFeatureStyles(featureStyles: FeatureStyles): {
     tableStyles: {
       styleDefault: number;
       styles: number[];
@@ -571,9 +572,7 @@ export class FeatureTableStyles {
    * @param {Styles} styles default styles
    * @return {Promise}
    */
-  setTableStyles(
-    styles: Styles,
-  ): {
+  setTableStyles(styles: Styles): {
     styleDefault: number;
     styles: number[];
     deleted: number;
@@ -611,9 +610,7 @@ export class FeatureTableStyles {
    * @param {Icons} icons default icons
    * @return {any}
    */
-  setTableIcons(
-    icons: Icons,
-  ): {
+  setTableIcons(icons: Icons): {
     iconDefault: number;
     icons: number[];
     deleted: number;

@@ -3,11 +3,6 @@ import { GeoPackageException } from '../geoPackageException';
 import { SQLUtils } from './sqlUtils';
 
 /**
- * SQLite query builder module.
- * @module db/sqliteQueryBuilder
- */
-
-/**
  * Utility class to build sql queries
  * @class
  */

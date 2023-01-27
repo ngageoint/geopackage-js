@@ -1,7 +1,3 @@
-/**
- * userMappingTable module.
- * @module extension/relatedTables
- */
 import { UserColumn } from '../../user/userColumn';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { UserCustomTable } from '../../user/custom/userCustomTable';
@@ -56,10 +52,7 @@ export class UserMappingTable extends UserCustomTable {
    * @return {UserColumn[]}
    */
   static createRequiredColumns(): UserColumn[] {
-    return [
-      UserMappingTable.createBaseIdColumn(),
-      UserMappingTable.createRelatedIdColumn(),
-    ];
+    return [UserMappingTable.createBaseIdColumn(), UserMappingTable.createRelatedIdColumn()];
   }
   /**
    * Create the required columns with starting column index
@@ -85,7 +78,12 @@ export class UserMappingTable extends UserCustomTable {
    * @return {UserColumn}
    */
   static createBaseIdColumnWithIndex(index: number): UserColumn {
-    return UserCustomColumn.createColumnWithIndex(index, UserMappingTable.COLUMN_BASE_ID, GeoPackageDataType.INTEGER, true);
+    return UserCustomColumn.createColumnWithIndex(
+      index,
+      UserMappingTable.COLUMN_BASE_ID,
+      GeoPackageDataType.INTEGER,
+      true,
+    );
   }
   /**
    * Create the related id column
@@ -100,7 +98,12 @@ export class UserMappingTable extends UserCustomTable {
    * @return {UserColumn}
    */
   static createRelatedIdColumnWithIndex(index?: number): UserColumn {
-    return UserCustomColumn.createColumnWithIndex(index, UserMappingTable.COLUMN_RELATED_ID, GeoPackageDataType.INTEGER, true);
+    return UserCustomColumn.createColumnWithIndex(
+      index,
+      UserMappingTable.COLUMN_RELATED_ID,
+      GeoPackageDataType.INTEGER,
+      true,
+    );
   }
   /**
    * Get the required columns

@@ -33,11 +33,9 @@ export class ShadedFeaturesTile implements CustomFeaturesTile {
    */
   private drawUnindexedTiles: boolean;
 
-
   public constructor() {
     this.drawUnindexedTiles = true;
   }
-
 
   /**
    * Get the tile border stroke width
@@ -143,7 +141,7 @@ export class ShadedFeaturesTile implements CustomFeaturesTile {
     canvas?: EmulatedCanvas2D | HTMLCanvasElement,
   ): Promise<GeoPackageImage> {
     await Canvas.initializeAdapter();
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       let tileCanvas;
       let dispose = false;
       if (canvas !== undefined && canvas !== null) {
@@ -165,7 +163,7 @@ export class ShadedFeaturesTile implements CustomFeaturesTile {
         context.lineWidth = this.tileBorderStrokeWidth;
         context.strokeRect(0, 0, tileWidth, tileHeight);
       }
-      Canvas.toDataURL(tileCanvas, 'image/png').then(result => {
+      Canvas.toDataURL(tileCanvas, 'image/png').then((result) => {
         if (dispose) {
           Canvas.disposeCanvas(tileCanvas);
         }

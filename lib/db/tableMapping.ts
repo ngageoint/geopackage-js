@@ -48,7 +48,7 @@ export class TableMapping {
   constructor(fromTableName: string, toTableName: string, columns: UserColumn[]) {
     this._fromTable = fromTableName;
     this._toTable = toTableName;
-    columns.forEach(column => {
+    columns.forEach((column) => {
       this.addMappedColumn(
         new MappedColumn(column.getName(), column.getName(), column.getDefaultValue(), column.getDataType()),
       );
@@ -57,7 +57,7 @@ export class TableMapping {
 
   static fromTableInfo(tableInfo: TableInfo): TableMapping {
     const tableMapping = new TableMapping(tableInfo.getTableName(), tableInfo.getTableName(), []);
-    tableInfo.getColumns().forEach(column => {
+    tableInfo.getColumns().forEach((column) => {
       tableMapping.addMappedColumn(
         new MappedColumn(column.getName(), column.getName(), column.getDefaultValue(), column.getDataType()),
       );

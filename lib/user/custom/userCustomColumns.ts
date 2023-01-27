@@ -1,6 +1,3 @@
-/**
- * @module user/custom
- */
 import { UserCustomColumn } from './userCustomColumn';
 import { UserColumns } from '../userColumns';
 
@@ -43,12 +40,7 @@ export class UserCustomColumns extends UserColumns<UserCustomColumn> {
    * @param requiredColumns list of required columns
    * @param custom custom column specification
    */
-  public constructor(
-    tableName: string,
-    columns: UserCustomColumn[],
-    requiredColumns?: string[],
-    custom?: boolean,
-  );
+  public constructor(tableName: string, columns: UserCustomColumn[], requiredColumns?: string[], custom?: boolean);
 
   /**
    * Copy Constructor
@@ -121,7 +113,7 @@ export class UserCustomColumns extends UserColumns<UserCustomColumn> {
       const search = new Set<string>(this.requiredColumns);
       const found = {};
       // Find the required columns
-      this.getColumns().forEach(column => {
+      this.getColumns().forEach((column) => {
         const columnName = column.getName();
         const columnIndex = column.getIndex();
         if (search.has(columnName)) {
@@ -132,7 +124,7 @@ export class UserCustomColumns extends UserColumns<UserCustomColumn> {
       });
 
       // Verify the required columns were found
-      search.forEach(requiredColumn => {
+      search.forEach((requiredColumn) => {
         this.missingCheck(found[requiredColumn], requiredColumn);
       });
     }

@@ -1,8 +1,6 @@
 /**
  * GeoPackage Constants module.
- * @module dao/geoPackageConstants
  */
-
 export class GeoPackageConstants {
   /**
    * Extension to GeoPackage files

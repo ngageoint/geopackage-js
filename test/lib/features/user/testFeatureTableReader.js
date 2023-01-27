@@ -1,28 +1,26 @@
-import { default as testSetup } from '../../../testSetup'
+import { default as testSetup } from '../../../testSetup';
 
-var FeatureTableReader = require('../../../../lib/features/user/featureTableReader').FeatureTableReader
-  , GeometryColumnsDao = require('../../../../lib/features/columns/geometryColumnsDao').GeometryColumnsDao
-  , path = require('path')
-  , should = require('chai').should();
+var FeatureTableReader = require('../../../../lib/features/user/featureTableReader').FeatureTableReader,
+  GeometryColumnsDao = require('../../../../lib/features/columns/geometryColumnsDao').GeometryColumnsDao,
+  path = require('path');
 
-describe('FeatureTableReader tests', function() {
+describe('FeatureTableReader tests', function () {
   var geoPackage;
   var filename;
-  beforeEach('create the GeoPackage connection', async function() {
+  beforeEach('create the GeoPackage connection', async function () {
     var sampleFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'gdal_sample.gpkg');
 
-    // @ts-ignore
     let result = await copyAndOpenGeopackage(sampleFilename);
     filename = result.path;
     geoPackage = result.geoPackage;
   });
 
-  afterEach('close the geoPackage connection', async function() {
+  afterEach('close the geoPackage connection', async function () {
     geoPackage.close();
     await testSetup.deleteGeoPackage(filename);
   });
 
-  it('should read the table', function() {
+  it('should read the table', function () {
     var reader = new FeatureTableReader('point2d');
     var table = reader.readTable(geoPackage.getConnection());
     table.getTableName().should.be.equal('point2d');
@@ -40,7 +38,7 @@ describe('FeatureTableReader tests', function() {
     table.getGeometryColumn().getName().should.be.equal('geom');
   });
 
-  it('should read the table with geometry columns', function() {
+  it('should read the table with geometry columns', function () {
     var gcd = new GeometryColumnsDao(geoPackage);
     var geometryColumns = gcd.queryForTableName('point2d');
     var reader = new FeatureTableReader(geometryColumns);
@@ -60,5 +58,4 @@ describe('FeatureTableReader tests', function() {
 
     table.getGeometryColumn().getName().should.be.equal('geom');
   });
-
 });

@@ -3,6 +3,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const NodePolyfillWebpackPlugin = require('node-polyfill-webpack-plugin');
 
 module.exports = {
+  mode: 'development',
   entry: './test/browserTests.js',
   plugins: [
     new NodePolyfillWebpackPlugin(),
@@ -46,5 +47,6 @@ module.exports = {
       type: 'umd',
     },
   },
+  externals: ['better-sqlite3'],
   devtool: 'source-map',
 };

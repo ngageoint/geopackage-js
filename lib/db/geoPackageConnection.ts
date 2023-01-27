@@ -8,7 +8,6 @@ import { SQLiteMasterColumn } from './master/sqliteMasterColumn';
 import { SQLUtils } from './sqlUtils';
 import type { ResultSet } from './resultSet';
 import type { DBAdapter } from './dbAdapter';
-import { GeoPackageDataType } from './geoPackageDataType';
 
 /**
  * Represents a connection to the GeoPackage database
@@ -101,7 +100,6 @@ export class GeoPackageConnection {
     return this.connectionSource.query(sql, params);
   }
 
-
   /**
    * Queries for a single result
    * @param sql
@@ -118,7 +116,7 @@ export class GeoPackageConnection {
    * @param args
    * @param limit
    */
-  public queryResults(sql: string, args?: String[], limit?: number) {
+  public queryResults(sql: string, args?: String[], limit?: number): Array<Array<any>> {
     return SQLUtils.queryResults(this.connectionSource, sql, args, limit);
   }
 
@@ -225,7 +223,13 @@ export class GeoPackageConnection {
    * @param where
    * @param whereArgs
    */
-  countColumn(table: string, distinct = false, column?: string, where?: string, whereArgs?: [] | Record<string, any>): number {
+  countColumn(
+    table: string,
+    distinct = false,
+    column?: string,
+    where?: string,
+    whereArgs?: [] | Record<string, any>,
+  ): number {
     return this.aggregateFunction('COUNT', table, distinct, column, where, whereArgs);
   }
   /**
@@ -269,7 +273,13 @@ export class GeoPackageConnection {
    * @return true if exists
    */
   public tableExists(tableName: string): boolean {
-    return SQLiteMaster.count(this, [SQLiteMasterType.TABLE], SQLiteMasterQuery.createForColumnValue(SQLiteMasterColumn.TBL_NAME, tableName)) > 0;
+    return (
+      SQLiteMaster.count(
+        this,
+        [SQLiteMasterType.TABLE],
+        SQLiteMasterQuery.createForColumnValue(SQLiteMasterColumn.TBL_NAME, tableName),
+      ) > 0
+    );
   }
 
   /**
@@ -278,7 +288,13 @@ export class GeoPackageConnection {
    * @return true if exists
    */
   public viewExists(viewName: string): boolean {
-    return SQLiteMaster.count(this, [SQLiteMasterType.VIEW], SQLiteMasterQuery.createForColumnValue(SQLiteMasterColumn.TBL_NAME, viewName)) > 0;
+    return (
+      SQLiteMaster.count(
+        this,
+        [SQLiteMasterType.VIEW],
+        SQLiteMasterQuery.createForColumnValue(SQLiteMasterColumn.TBL_NAME, viewName),
+      ) > 0
+    );
   }
 
   /**
@@ -287,7 +303,13 @@ export class GeoPackageConnection {
    * @return true if exists
    */
   public tableOrViewExists(name: string): boolean {
-    return SQLiteMaster.count(this, [SQLiteMasterType.TABLE, SQLiteMasterType.VIEW], SQLiteMasterQuery.createForColumnValue(SQLiteMasterColumn.TBL_NAME, name)) > 0;
+    return (
+      SQLiteMaster.count(
+        this,
+        [SQLiteMasterType.TABLE, SQLiteMasterType.VIEW],
+        SQLiteMasterQuery.createForColumnValue(SQLiteMasterColumn.TBL_NAME, name),
+      ) > 0
+    );
   }
 
   /**
@@ -326,7 +348,6 @@ export class GeoPackageConnection {
     return this.connectionSource.get('PRAGMA application_id').application_id;
   }
 
-
   /**
    * Query for the foreign keys value
    *
@@ -343,7 +364,7 @@ export class GeoPackageConnection {
    *            true to turn on, false to turn off
    * @return previous foreign keys value
    */
-  public setForeignKeys(on: boolean) {
+  public setForeignKeys(on: boolean): boolean {
     return SQLUtils.setForeignKeys(this, on);
   }
 
@@ -379,38 +400,45 @@ export class GeoPackageConnection {
    * @param args arguments
    * @return value or null
    */
-  public aggregateFunction(func: string, table: string, distinct: boolean, column: string, where: string, args: any[] | Record<string, any>): any {
+  public aggregateFunction(
+    func: string,
+    table: string,
+    distinct: boolean,
+    column: string,
+    where: string,
+    args: any[] | Record<string, any>,
+  ): any {
     const query = [];
-    query.push("SELECT ");
+    query.push('SELECT ');
     query.push(func);
-    query.push("(");
+    query.push('(');
     if (column != null) {
       if (distinct) {
-        query.push("DISTINCT ");
+        query.push('DISTINCT ');
       }
       query.push(SQLUtils.quoteWrap(column));
     } else {
-      query.push("*");
+      query.push('*');
     }
-    query.push(") FROM ");
+    query.push(') FROM ');
     query.push(SQLUtils.quoteWrap(table));
     if (where != null) {
-      query.push(" WHERE ");
+      query.push(' WHERE ');
       query.push(where);
     }
     const sql = query.join('');
     return SQLUtils.querySingleResultWithColumnIndex(this, sql, args, 0);
   }
 
- /**
-  * Get the min result of the column
-  * @param table table name
-  * @param column column name
-  * @param where where clause
-  * @param args where arguments
-  * @return min or null
-  */
-    public min(table: string, column: string, where: string, args: any[]): number {
+  /**
+   * Get the min result of the column
+   * @param table table name
+   * @param column column name
+   * @param where where clause
+   * @param args where arguments
+   * @return min or null
+   */
+  public min(table: string, column: string, where: string, args: any[]): number {
     return this.aggregateFunction('MIN', table, false, column, where, args) as number;
   }
   /**

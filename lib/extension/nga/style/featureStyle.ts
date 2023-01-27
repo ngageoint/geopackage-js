@@ -3,22 +3,22 @@ import { IconRow } from './iconRow';
 
 /**
  * FeatureStyle constructor
- * @param {module:extension/nga/style.StyleRow} styleRow
- * @param {module:extension/nga/style.IconRow} iconRow
+ * @param {StyleRow} styleRow
+ * @param {IconRow} iconRow
  * @constructor
  */
 export class FeatureStyle {
   constructor(public styleRow: StyleRow, public iconRow: IconRow) {}
   /**
    * Set style
-   * @param {module:extension/nga/style.StyleRow} styleRow
+   * @param {StyleRow} styleRow
    */
   set style(styleRow: StyleRow) {
     this.styleRow = styleRow;
   }
   /**
    * Get style
-   * @returns {module:extension/nga/style.StyleRow}
+   * @returns {StyleRow}
    */
   get style(): StyleRow {
     return this.styleRow;
@@ -32,14 +32,14 @@ export class FeatureStyle {
   }
   /**
    * Set icon
-   * @param {module:extension/nga/style.IconRow} iconRow
+   * @param {IconRow} iconRow
    */
   set icon(iconRow: IconRow) {
     this.iconRow = iconRow;
   }
   /**
    * Get icon
-   * @returns {module:extension/nga/style.IconRow}
+   * @returns {IconRow}
    */
   get icon(): IconRow {
     return this.iconRow;

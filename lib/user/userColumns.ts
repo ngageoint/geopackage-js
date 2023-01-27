@@ -109,7 +109,7 @@ export abstract class UserColumns<TColumn extends UserColumn> {
 
       // Check for missing indices and duplicates
       const needsIndex = [];
-      this.columns.forEach(column => {
+      this.columns.forEach((column) => {
         if (column.hasIndex()) {
           const index = column.getIndex();
           if (indices.has(index)) {
@@ -124,7 +124,7 @@ export abstract class UserColumns<TColumn extends UserColumn> {
 
       // Update columns that need an index
       let currentIndex = -1;
-      needsIndex.forEach(column => {
+      needsIndex.forEach((column) => {
         while (indices.has(++currentIndex)) {}
         column.setIndex(currentIndex);
       });
@@ -436,7 +436,7 @@ export abstract class UserColumns<TColumn extends UserColumn> {
    * @return columns
    */
   columnsOfType(type: GeoPackageDataType): TColumn[] {
-    return this.columns.filter(column => column.getDataType() === type);
+    return this.columns.filter((column) => column.getDataType() === type);
   }
 
   /**
@@ -499,7 +499,7 @@ export abstract class UserColumns<TColumn extends UserColumn> {
    */
   dropColumnWithIndex(index: number): void {
     this.columns.splice(index, 1);
-    this.columns.forEach(column => column.resetIndex());
+    this.columns.forEach((column) => column.resetIndex());
     this.updateColumns();
   }
 

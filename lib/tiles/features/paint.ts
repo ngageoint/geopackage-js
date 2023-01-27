@@ -1,6 +1,5 @@
 /**
  * Paint module.
- * @module tiles/features
  */
 export class Paint {
   private color = '#000000FF';

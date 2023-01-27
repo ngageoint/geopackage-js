@@ -14,8 +14,9 @@ import { GeoPackageConnection } from '../db/geoPackageConnection';
 export interface UserResult<
   TColumn extends UserColumn,
   TTable extends UserTable<TColumn>,
-  TRow extends UserRow<TColumn, TTable>
-> extends Result, IterableIterator<TRow> {
+  TRow extends UserRow<TColumn, TTable>,
+> extends Result,
+    IterableIterator<TRow> {
   /**
    * Get a row using the column types and values
    *

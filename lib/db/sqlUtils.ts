@@ -38,10 +38,7 @@ export class SQLUtils {
   static createTableSQL(table: UserTable<UserColumn>): string {
     // Build the create table sql
     let sql = '';
-    sql = sql
-      .concat('CREATE TABLE ')
-      .concat(StringUtils.quoteWrap(table.getTableName()))
-      .concat(' (');
+    sql = sql.concat('CREATE TABLE ').concat(StringUtils.quoteWrap(table.getTableName())).concat(' (');
 
     // Add each column to the sql
     const columns = table.getUserColumns().getColumns();
@@ -58,7 +55,7 @@ export class SQLUtils {
     table
       .getConstraints()
       .all()
-      .forEach(constraint => {
+      .forEach((constraint) => {
         sql = sql.concat(',\n  ');
         sql = sql.concat(constraint.buildSql());
       });
@@ -88,16 +85,13 @@ export class SQLUtils {
 
     sql = sql.concat(column.getType());
     if (column.hasMax()) {
-      sql = sql
-        .concat('(')
-        .concat(column.getMax().toString())
-        .concat(')');
+      sql = sql.concat('(').concat(column.getMax().toString()).concat(')');
     }
 
     column
       .getConstraints()
       .all()
-      .forEach(constraint => {
+      .forEach((constraint) => {
         sql = sql.concat(' ');
         sql = sql.concat(column.buildConstraintSql(constraint));
       });
@@ -393,7 +387,7 @@ export class SQLUtils {
     }
 
     if (updatedSql !== null && updatedSql !== undefined) {
-      tableMapping.getMappedColumns().forEach(column => {
+      tableMapping.getMappedColumns().forEach((column) => {
         if (column.hasNewName()) {
           const updated = SQLUtils.replaceName(updatedSql, column.fromColumn, column.toColumn);
           if (updated !== null && updated !== undefined) {
@@ -560,7 +554,11 @@ export class SQLUtils {
    * @param selectionArgs selection arguments
    * @return result set
    */
-  public static query(connection: GeoPackageConnection | DBAdapter, sql: string, selectionArgs: [] | Record<string, any>): ResultSet {
+  public static query(
+    connection: GeoPackageConnection | DBAdapter,
+    sql: string,
+    selectionArgs: [] | Record<string, any>,
+  ): ResultSet {
     return connection.query(sql, selectionArgs);
   }
 
@@ -573,7 +571,12 @@ export class SQLUtils {
    * @param limit result row limit
    * @return results
    */
-  public static queryResults(connection: GeoPackageConnection | DBAdapter, sql: string, args: [] | Record<string, any>, limit: number): Array<Array<any>> {
+  public static queryResults(
+    connection: GeoPackageConnection | DBAdapter,
+    sql: string,
+    args: [] | Record<string, any>,
+    limit: number,
+  ): Array<Array<any>> {
     const result = SQLUtils.wrapQuery(connection, sql, args);
     const value = ResultUtils.buildResults(result, limit);
     result.close();
@@ -588,7 +591,12 @@ export class SQLUtils {
    * @param whereArgs where arguments
    * @return number the count of rows
    */
-  public static count(connection: GeoPackageConnection, tableName: string, where: string, whereArgs: [] | Record<string, any>): number {
+  public static count(
+    connection: GeoPackageConnection,
+    tableName: string,
+    where: string,
+    whereArgs: [] | Record<string, any>,
+  ): number {
     return connection.connectionSource.count(tableName, where, whereArgs);
   }
 
@@ -600,56 +608,55 @@ export class SQLUtils {
    * @return count if known, -1 if not able to determine
    */
   public static countSqlQuery(connection: GeoPackageConnection | DBAdapter, sql: string, selectionArgs: any[]): number {
-    let sqlCommands = [];
+    const sqlCommands = [];
 
     const upperCaseSQL = sql.toUpperCase();
-    let afterSelectIndex = upperCaseSQL.indexOf("SELECT") + "SELECT".length;
-    let upperCaseAfterSelect = upperCaseSQL.substring(afterSelectIndex).trim();
+    const afterSelectIndex = upperCaseSQL.indexOf('SELECT') + 'SELECT'.length;
+    const upperCaseAfterSelect = upperCaseSQL.substring(afterSelectIndex).trim();
 
-    if (upperCaseAfterSelect.startsWith("COUNT")) {
+    if (upperCaseAfterSelect.startsWith('COUNT')) {
       sqlCommands.push(sql);
     } else {
-
-      let fromIndex = upperCaseSQL.indexOf("FROM");
-      if (upperCaseAfterSelect.startsWith("DISTINCT")) {
-
-        let commaIndex = upperCaseSQL.indexOf(",");
+      const fromIndex = upperCaseSQL.indexOf('FROM');
+      if (upperCaseAfterSelect.startsWith('DISTINCT')) {
+        const commaIndex = upperCaseSQL.indexOf(',');
         if (commaIndex < 0 || commaIndex >= fromIndex) {
+          sqlCommands.push(
+            SQLUtils.adjustCount(
+              'SELECT COUNT(' + sql.substring(afterSelectIndex, fromIndex) + ') ' + sql.substring(fromIndex),
+            ),
+          );
 
-          sqlCommands.push(SQLUtils.adjustCount("SELECT COUNT("
-            + sql.substring(afterSelectIndex, fromIndex) + ") "
-            + sql.substring(fromIndex)));
-
-          const isNull = ["SELECT COUNT(*) > 0 "];
-          const columnIsNull = sql.substring(upperCaseSQL.indexOf("DISTINCT") + "DISTINCT".length, fromIndex) + "IS NULL";
-          const whereIndex = upperCaseSQL.indexOf("WHERE");
-          let endIndex = sql.indexOf(";");
+          const isNull = ['SELECT COUNT(*) > 0 '];
+          const columnIsNull =
+            sql.substring(upperCaseSQL.indexOf('DISTINCT') + 'DISTINCT'.length, fromIndex) + 'IS NULL';
+          const whereIndex = upperCaseSQL.indexOf('WHERE');
+          let endIndex = sql.indexOf(';');
           if (endIndex < 0) {
             endIndex = sql.length;
           }
           if (whereIndex >= 0) {
-            isNull.push(sql.substring(fromIndex, whereIndex + "WHERE".length));
+            isNull.push(sql.substring(fromIndex, whereIndex + 'WHERE'.length));
             isNull.push(columnIsNull);
-            isNull.push(" AND ( ");
-            isNull.push(sql.substring(whereIndex + "WHERE".length, endIndex));
-            isNull.push(" )");
+            isNull.push(' AND ( ');
+            isNull.push(sql.substring(whereIndex + 'WHERE'.length, endIndex));
+            isNull.push(' )');
           } else {
             isNull.push(sql.substring(fromIndex, endIndex));
-            isNull.push(" WHERE");
+            isNull.push(' WHERE');
             isNull.push(columnIsNull);
           }
           sqlCommands.push(SQLUtils.adjustCount(isNull.join('')));
         }
-
       } else if (fromIndex != -1) {
-        sqlCommands.push(SQLUtils.adjustCount("SELECT COUNT(*) " + sql.substring(fromIndex)));
+        sqlCommands.push(SQLUtils.adjustCount('SELECT COUNT(*) ' + sql.substring(fromIndex)));
       }
     }
 
     let count = -1;
     if (sqlCommands.length === 0) {
       // Unable to count
-      console.info("Unable to count query without result iteration. SQL: " + sql + ", args: " + selectionArgs);
+      console.info('Unable to count query without result iteration. SQL: ' + sql + ', args: ' + selectionArgs);
     } else {
       count = 0;
       for (const sqlCommand of sqlCommands) {
@@ -659,7 +666,7 @@ export class SQLUtils {
             count += value as number;
           }
         } catch (e) {
-          console.warn("Unable to count query without result iteration. SQL: " + sql + ", args: " + selectionArgs);
+          console.warn('Unable to count query without result iteration. SQL: ' + sql + ', args: ' + selectionArgs);
           count = -1;
         }
       }
@@ -674,9 +681,9 @@ export class SQLUtils {
    */
   private static adjustCount(sql: string): string {
     const upperCase = sql.toUpperCase();
-    let limitIndex = upperCase.indexOf(" LIMIT ");
+    const limitIndex = upperCase.indexOf(' LIMIT ');
     if (limitIndex >= 0) {
-      let lastParenthesis = sql.lastIndexOf(')');
+      const lastParenthesis = sql.lastIndexOf(')');
       if (lastParenthesis == -1 || limitIndex > lastParenthesis) {
         sql = sql.substring(0, limitIndex);
       }
@@ -701,7 +708,11 @@ export class SQLUtils {
    * @param selectionArgs selection arguments
    * @return result
    */
-  public static wrapQuery(connection: GeoPackageConnection | DBAdapter, sql: string, selectionArgs: [] | Record<string, any>): ResultSetResult {
+  public static wrapQuery(
+    connection: GeoPackageConnection | DBAdapter,
+    sql: string,
+    selectionArgs: [] | Record<string, any>,
+  ): ResultSetResult {
     return new ResultSetResult(this.query(connection, sql, selectionArgs));
   }
 
@@ -713,9 +724,14 @@ export class SQLUtils {
    * @param columnName column name
    * @return result, null if no result
    */
-  public static querySingleResult(connection: GeoPackageConnection, sql: string, args: [] | Record<string, any>, columnName: string): any {
+  public static querySingleResult(
+    connection: GeoPackageConnection,
+    sql: string,
+    args: [] | Record<string, any>,
+    columnName: string,
+  ): any {
     const result = SQLUtils.wrapQuery(connection, sql, args);
-    const value =  ResultUtils.buildSingleResult(result, columnName);
+    const value = ResultUtils.buildSingleResult(result, columnName);
     result.close();
     return value;
   }
@@ -728,7 +744,12 @@ export class SQLUtils {
    * @param columnIdx column index
    * @return result, null if no result
    */
-  public static querySingleResultWithColumnIndex(connection: GeoPackageConnection | DBAdapter, sql: string, args: [] | Record<string, any>, columnIdx: number = 0): any {
+  public static querySingleResultWithColumnIndex(
+    connection: GeoPackageConnection | DBAdapter,
+    sql: string,
+    args: [] | Record<string, any>,
+    columnIdx = 0,
+  ): any {
     const result = SQLUtils.wrapQuery(connection, sql, args);
     const value = ResultUtils.buildSingleResultWithColumnIndex(result, columnIdx);
     result.close();
@@ -756,20 +777,26 @@ export class SQLUtils {
    * @param whereArgs where arguments
    * @return updated count
    */
-  public static update(connection: GeoPackageConnection, table: string, values: ContentValues, whereClause: string, whereArgs: DBValue[]): number {
+  public static update(
+    connection: GeoPackageConnection,
+    table: string,
+    values: ContentValues,
+    whereClause: string,
+    whereArgs: DBValue[],
+  ): number {
     const update = [];
-    update.push("update ");
+    update.push('update ');
     update.push(SQLUtils.quoteWrap(table));
-    update.push(" set ");
+    update.push(' set ');
     const setValuesSize = values.size();
-    const argsSize = (whereArgs == null) ? setValuesSize : (setValuesSize + whereArgs.length);
+    const argsSize = whereArgs == null ? setValuesSize : setValuesSize + whereArgs.length;
     const args = [];
     let i = 0;
     for (const colName of values.keySet()) {
-      update.push((i > 0) ? "," : "");
+      update.push(i > 0 ? ',' : '');
       update.push(SQLUtils.quoteWrap(colName));
       args.push(values.get(colName));
-      update.push(" = ?");
+      update.push(' = ?');
       i++;
     }
     if (whereArgs != null) {
@@ -778,7 +805,7 @@ export class SQLUtils {
       }
     }
     if (whereClause != null) {
-      update.push(" WHERE ");
+      update.push(' WHERE ');
       update.push(whereClause);
     }
     const sql = update.join('');
@@ -798,7 +825,7 @@ export class SQLUtils {
       return this.insertOrThrow(connection, table, values);
     } catch (e) {
       console.error(e);
-      console.warn("Error inserting into table: " + table + ", Values: " + values);
+      console.warn('Error inserting into table: ' + table + ', Values: ' + values);
       return -1;
     }
   }
@@ -815,19 +842,19 @@ export class SQLUtils {
     insert.push('insert into ');
     insert.push(SQLUtils.quoteWrap(table));
     insert.push(' (');
-    let args = [];
-    let size = (values != null && values.size() > 0) ? values.size() : 0;
+    const args = [];
+    const size = values != null && values.size() > 0 ? values.size() : 0;
     let i = 0;
     for (const colName of values.keySet()) {
-      insert.push((i > 0) ? "," : "");
+      insert.push(i > 0 ? ',' : '');
       insert.push(SQLUtils.quoteWrap(colName));
       args.push(values.get(colName));
       i++;
     }
     insert.push(')');
-    insert.push(" values (");
+    insert.push(' values (');
     for (i = 0; i < size; i++) {
-      insert.push((i > 0) ? ",?" : "?");
+      insert.push(i > 0 ? ',?' : '?');
     }
     insert.push(')');
     const sql = insert.join('');

@@ -1,7 +1,3 @@
-/**
- * userTableReader module.
- * @module user/userTableReader
- */
 import { UserTable } from './userTable';
 import { UserColumn } from './userColumn';
 import { GeoPackageConnection } from '../db/geoPackageConnection';
@@ -51,7 +47,7 @@ export abstract class UserTableReader<TColumn extends UserColumn, TTable extends
 
     const constraints = SQLiteMaster.queryForConstraints(db, this.tableName);
 
-    tableInfo.getColumns().forEach(tableColumn => {
+    tableInfo.getColumns().forEach((tableColumn) => {
       if (tableColumn.getDataType() === null || tableColumn.getDataType() === undefined) {
         throw new GeoPackageException('Unsupported column data type ' + tableColumn.getType());
       }

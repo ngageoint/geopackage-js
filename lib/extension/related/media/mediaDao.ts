@@ -5,11 +5,6 @@ import { UserCustomResultSet } from '../../../user/custom/userCustomResultSet';
 import { UserCustomRow } from '../../../user/custom/userCustomRow';
 
 /**
- * MediaDao module.
- * @module extension/relatedTables
- */
-
-/**
  * User Media DAO for reading user media data tables
  * @class
  */

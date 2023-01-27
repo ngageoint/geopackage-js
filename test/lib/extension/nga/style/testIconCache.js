@@ -1,28 +1,27 @@
-import { default as testSetup } from '../../../../testSetup'
-import { GeometryType } from "@ngageoint/simple-features-js";
-import { FeatureColumn } from "../../../../../lib/features/user/featureColumn";
-import { GeoPackageDataType } from "../../../../../lib/db/geoPackageDataType";
+import { default as testSetup } from '../../../../testSetup';
+import { GeometryType } from '@ngageoint/simple-features-js';
+import { FeatureColumn } from '../../../../../lib/features/user/featureColumn';
+import { GeoPackageDataType } from '../../../../../lib/db/geoPackageDataType';
 
-var FeatureTableStyles = require('../../../../../lib/extension/nga/style/featureTableStyles').FeatureTableStyles
-  , IconCache = require('../../../../../lib/extension/nga/style/iconCache').IconCache
-  , should = require('chai').should()
-  , path = require('path')
-  , ImageUtils = require('../../../../../lib/image/imageUtils').ImageUtils
-  , Canvas = require('../../../../../lib/canvas/canvas').Canvas;
+var FeatureTableStyles = require('../../../../../lib/extension/nga/style/featureTableStyles').FeatureTableStyles,
+  IconCache = require('../../../../../lib/extension/nga/style/iconCache').IconCache,
+  should = require('chai').should(),
+  path = require('path'),
+  ImageUtils = require('../../../../../lib/image/imageUtils').ImageUtils,
+  Canvas = require('../../../../../lib/canvas/canvas').Canvas;
 
-var isWeb = !(typeof(process) !== 'undefined' && process.version);
+var isWeb = !(typeof process !== 'undefined' && process.version);
 
-describe('IconCache Tests', function() {
+describe('IconCache Tests', function () {
   var testGeoPackage;
   var geoPackage;
   var featureTableName = 'feature_table';
-  // @ts-ignore
-  var featureTable;
+
   var featureTableStyles;
   var iconImage;
   var iconImageBuffer;
 
-  var randomIcon = function(featureTableStyles, noWidth = false, noHeight = false, noAnchors = false) {
+  var randomIcon = function (featureTableStyles, noWidth = false, noHeight = false, noAnchors = false) {
     var iconRow = featureTableStyles.getIconDao().newRow();
     iconRow.setData(iconImageBuffer);
     iconRow.setContentType('image/png');
@@ -42,7 +41,7 @@ describe('IconCache Tests', function() {
   };
 
   var compareImages = function (imageA, imageB) {
-    return new Promise(function(resolve) {
+    return new Promise(function (resolve) {
       var actualCanvas, actualCtx, expectedCanvas, expectedCtx;
       actualCanvas = Canvas.create(imageA.getWidth(), imageA.getHeight());
       actualCtx = actualCanvas.getContext('2d');
@@ -51,7 +50,6 @@ describe('IconCache Tests', function() {
       actualCtx.drawImage(imageA.getImage(), 0, 0);
       expectedCtx.drawImage(imageB.getImage(), 0, 0);
 
-      // @ts-ignore
       const result = actualCanvas.toDataURL() === expectedCanvas.toDataURL();
       Canvas.disposeCanvas(actualCanvas);
       Canvas.disposeCanvas(expectedCanvas);
@@ -61,15 +59,15 @@ describe('IconCache Tests', function() {
     });
   };
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     let created = await testSetup.createTmpGeoPackage();
     testGeoPackage = created.path;
     geoPackage = created.geoPackage;
   });
 
-  beforeEach('create the GeoPackage connection and setup the FeatureStyleExtension', async function() {
+  beforeEach('create the GeoPackage connection and setup the FeatureStyleExtension', async function () {
     // create a feature table first
-    featureTable = testSetup.buildFeatureTable(geoPackage, featureTableName, 'geom', GeometryType.GEOMETRY, [
+    testSetup.buildFeatureTable(geoPackage, featureTableName, 'geom', GeometryType.GEOMETRY, [
       FeatureColumn.createColumn('name', GeoPackageDataType.TEXT, false, ''),
       FeatureColumn.createColumn('_feature_id', GeoPackageDataType.TEXT, false, ''),
       FeatureColumn.createColumn('_properties_id', GeoPackageDataType.TEXT, false, ''),
@@ -81,17 +79,17 @@ describe('IconCache Tests', function() {
     featureTableStyles.getFeatureStyleExtension().getContentsId().getOrCreateExtension();
     featureTableStyles.createIconRelationship();
     iconImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', '..', 'fixtures', 'point.png'));
-    // @ts-ignore
+
     iconImageBuffer = await loadTile(path.join(__dirname, '..', '..', '..', '..', 'fixtures', 'point.png'));
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     geoPackage.close();
     Canvas.disposeImage(iconImage);
     await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
-  it('should create icon cache', function() {
+  it('should create icon cache', function () {
     var iconCache = new IconCache();
     iconCache.cacheSize.should.be.equal(IconCache.DEFAULT_CACHE_SIZE);
     var cacheSize = 50;
@@ -99,7 +97,7 @@ describe('IconCache Tests', function() {
     iconCache.cacheSize.should.be.equal(cacheSize);
   });
 
-  it('should test icon cache should return icon for icon row', function() {
+  it('should test icon cache should return icon for icon row', function () {
     var iconCache = new IconCache();
     var iconRow = randomIcon(featureTableStyles);
     iconRow.setId(0, true);
@@ -112,7 +110,7 @@ describe('IconCache Tests', function() {
     should.not.exist(iconCache.removeIconForIconRow(iconRow));
   });
 
-  it('should test icon cache should only store up to the cache size', function() {
+  it('should test icon cache should only store up to the cache size', function () {
     var cacheSize = 3;
     var iconCache = new IconCache(cacheSize);
     // test access history stuff
@@ -125,7 +123,7 @@ describe('IconCache Tests', function() {
     Object.keys(iconCache.iconCache).length.should.be.equal(cacheSize);
   });
 
-  it('should clear icon cache', function() {
+  it('should clear icon cache', function () {
     var cacheSize = 3;
     var iconCache = new IconCache(cacheSize);
     var iconRow = randomIcon(featureTableStyles);
@@ -136,7 +134,7 @@ describe('IconCache Tests', function() {
     Object.keys(iconCache.iconCache).length.should.be.equal(0);
   });
 
-  it('should resize icon cache', function() {
+  it('should resize icon cache', function () {
     var cacheSize = 5;
     var iconCache = new IconCache(cacheSize);
     // test access history stuff
@@ -165,64 +163,83 @@ describe('IconCache Tests', function() {
     };
   };
 
-  it('should create icon and cache it', mochaAsync(async () => {
-    var iconCache = new IconCache();
-    var iconRow = randomIcon(featureTableStyles);
-    iconRow.setId(0, true);
-    var image = await iconCache.createIcon(iconRow);
-    var result = await compareImages(image, iconImage);
-    result.should.be.equal(true);
-    should.exist(iconCache.getIconForIconRow(iconRow));
-  }));
+  it(
+    'should create icon and cache it',
+    mochaAsync(async () => {
+      var iconCache = new IconCache();
+      var iconRow = randomIcon(featureTableStyles);
+      iconRow.setId(0, true);
+      var image = await iconCache.createIcon(iconRow);
+      var result = await compareImages(image, iconImage);
+      result.should.be.equal(true);
+      should.exist(iconCache.getIconForIconRow(iconRow));
+    }),
+  );
 
-  it('should create icon but not cache it', mochaAsync(async () => {
-    var iconCache = new IconCache();
-    var iconRow = randomIcon(featureTableStyles);
-    iconRow.setId(0, true);
-    var image = await iconCache.createIconNoCache(iconRow);
-    var result = await compareImages(image, iconImage);
-    result.should.be.equal(true);
-    should.not.exist(iconCache.getIconForIconRow(iconRow));
-  }));
+  it(
+    'should create icon but not cache it',
+    mochaAsync(async () => {
+      var iconCache = new IconCache();
+      var iconRow = randomIcon(featureTableStyles);
+      iconRow.setId(0, true);
+      var image = await iconCache.createIconNoCache(iconRow);
+      var result = await compareImages(image, iconImage);
+      result.should.be.equal(true);
+      should.not.exist(iconCache.getIconForIconRow(iconRow));
+    }),
+  );
 
-  it('should create scaled icon but not cache it', mochaAsync(async () => {
-    var iconCache = new IconCache();
-    var iconRow = randomIcon(featureTableStyles);
-    iconRow.setId(0, true);
-    var expectedImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', '..', 'fixtures', isWeb ? 'web' : '', 'point_2x.png'));
-    var image = await iconCache.createScaledIconNoCache(iconRow, 2.0);
-    should.not.exist(iconCache.getIconForIconRow(iconRow));
-    var result = await compareImages(expectedImage, image);
-    result.should.be.equal(true);
-  }));
+  it(
+    'should create scaled icon but not cache it',
+    mochaAsync(async () => {
+      var iconCache = new IconCache();
+      var iconRow = randomIcon(featureTableStyles);
+      iconRow.setId(0, true);
+      var expectedImage = await ImageUtils.getImage(
+        path.join(__dirname, '..', '..', '..', '..', 'fixtures', isWeb ? 'web' : '', 'point_2x.png'),
+      );
+      var image = await iconCache.createScaledIconNoCache(iconRow, 2.0);
+      should.not.exist(iconCache.getIconForIconRow(iconRow));
+      var result = await compareImages(expectedImage, image);
+      result.should.be.equal(true);
+    }),
+  );
 
-  it('should create scaled icon and cache it', mochaAsync(async () => {
-    var iconCache = new IconCache();
-    var iconRow = randomIcon(featureTableStyles);
-    iconRow.setId(0, true);
-    var expectedImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', '..', 'fixtures', isWeb ? 'web' : '', 'point_2x.png'));
-    var image = await iconCache.createScaledIcon(iconRow, 2.0);
-    var result = await compareImages(expectedImage, image);
-    result.should.be.equal(true);
-    should.exist(iconCache.getIconForIconRow(iconRow));
-  }));
+  it(
+    'should create scaled icon and cache it',
+    mochaAsync(async () => {
+      var iconCache = new IconCache();
+      var iconRow = randomIcon(featureTableStyles);
+      iconRow.setId(0, true);
+      var expectedImage = await ImageUtils.getImage(
+        path.join(__dirname, '..', '..', '..', '..', 'fixtures', isWeb ? 'web' : '', 'point_2x.png'),
+      );
+      var image = await iconCache.createScaledIcon(iconRow, 2.0);
+      var result = await compareImages(expectedImage, image);
+      result.should.be.equal(true);
+      should.exist(iconCache.getIconForIconRow(iconRow));
+    }),
+  );
 
-  it('should automatically determine dimensions of an icon with no explicit width/height', mochaAsync(async () => {
-    var iconCache = new IconCache();
-    var iconRow = featureTableStyles.getIconDao().newRow();
-    iconRow.setData(iconImageBuffer);
-    iconRow.setContentType('image/png');
-    iconRow.setName("Icon Name");
-    iconRow.setDescription("Icon Description");
-    iconRow.setWidth(iconImage.getWidth());
+  it(
+    'should automatically determine dimensions of an icon with no explicit width/height',
+    mochaAsync(async () => {
+      var iconCache = new IconCache();
+      var iconRow = featureTableStyles.getIconDao().newRow();
+      iconRow.setData(iconImageBuffer);
+      iconRow.setContentType('image/png');
+      iconRow.setName('Icon Name');
+      iconRow.setDescription('Icon Description');
+      iconRow.setWidth(iconImage.getWidth());
 
-    let image = await iconCache.createScaledIcon(iconRow, 1.0);
-    image.getWidth().should.be.equal(iconImage.getWidth());
-    image.getHeight().should.be.equal(iconImage.getHeight());
+      let image = await iconCache.createScaledIcon(iconRow, 1.0);
+      image.getWidth().should.be.equal(iconImage.getWidth());
+      image.getHeight().should.be.equal(iconImage.getHeight());
 
-    iconRow.setWidth(undefined);
-    image = await iconCache.createScaledIcon(iconRow, 1.0);
-    image.getWidth().should.be.equal(iconImage.getWidth());
-    image.getHeight().should.be.equal(iconImage.getHeight());
-  }));
+      iconRow.setWidth(undefined);
+      image = await iconCache.createScaledIcon(iconRow, 1.0);
+      image.getWidth().should.be.equal(iconImage.getWidth());
+      image.getHeight().should.be.equal(iconImage.getHeight());
+    }),
+  );
 });

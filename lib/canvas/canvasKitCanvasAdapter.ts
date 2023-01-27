@@ -5,7 +5,7 @@ import http from 'http';
 import CanvasKitInit from '../../canvaskit/canvaskit.js';
 import { CanvasUtils } from './canvasUtils';
 import { GeoPackageImage } from '../image/geoPackageImage';
-import { EmulatedCanvas2D, EmulatedImageData, EncodedImageFormat, Image } from '../../@types/canvaskit';
+import { EmulatedCanvas2D, EmulatedImageData, EncodedImageFormat } from '../../@types/canvaskit';
 import { ImageType } from '../image/imageType';
 import { GeoPackageException } from '../geoPackageException';
 
@@ -17,7 +17,7 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
   private static initialized = false;
 
   // default wasm locator
-  static canvasKitWasmLocateFile: (filename: string) => string = filename => {
+  static canvasKitWasmLocateFile: (filename: string) => string = (filename) => {
     return path.join(__dirname, '..', '..', 'canvaskit', filename);
   };
 
@@ -32,13 +32,16 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
     CanvasKitCanvasAdapter.initialized = true;
   }
 
+  /**
+   * @inheritDoc
+   */
   initialize(): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
         CanvasKitInit({
           locateFile: CanvasKitCanvasAdapter.canvasKitWasmLocateFile,
         })
-          .then(CanvasKit => {
+          .then((CanvasKit) => {
             CanvasKitCanvasAdapter.CanvasKit = CanvasKit;
             CanvasKitCanvasAdapter.initialized = true;
             resolve();
@@ -60,10 +63,16 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
     });
   }
 
+  /**
+   * @inheritDoc
+   */
   isInitialized(): boolean {
     return CanvasKitCanvasAdapter.initialized;
   }
 
+  /**
+   * @inheritDoc
+   */
   create(width: number, height: number): EmulatedCanvas2D {
     return CanvasKitCanvasAdapter.CanvasKit.MakeCanvas(width, height);
   }
@@ -73,6 +82,7 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
    * @param imageData
    * @param contentType
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async createImage(imageData: Uint8Array | Buffer | string | Blob, contentType: string): Promise<GeoPackageImage> {
     let src = imageData;
     let image;
@@ -85,17 +95,17 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
           src = CanvasUtils.base64toUInt8Array(imageString.split(',')[1]);
         } else if (/^\s*https?:\/\//.test(imageString)) {
           src = await new Promise((resolve, reject) => {
-            http.get(imageString, res => {
+            http.get(imageString, (res) => {
               const data = [];
               if (res.statusCode === 200) {
                 res
-                  .on('data', function(chunk) {
+                  .on('data', function (chunk) {
                     data.push(chunk);
                   })
-                  .on('end', function() {
+                  .on('end', function () {
                     resolve(Buffer.concat(data).buffer as Buffer);
                   })
-                  .on('error', function(e) {
+                  .on('error', function (e) {
                     reject(e);
                   });
               } else {
@@ -132,10 +142,16 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
     return new GeoPackageImage(image, width, height);
   }
 
+  /**
+   * @inheritDoc
+   */
   createImageData(width, height): EmulatedImageData {
     return new CanvasKitCanvasAdapter.CanvasKit.ImageData(width, height);
   }
 
+  /**
+   * @inheritDoc
+   */
   disposeCanvas(canvas: EmulatedCanvas2D): void {
     if (canvas != null) {
       canvas.dispose();
@@ -143,18 +159,24 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
     }
   }
 
+  /**
+   * @inheritDoc
+   */
   measureText(context: any, fontFace: string, fontSize: number, text: string): number {
     const font = new CanvasKitCanvasAdapter.CanvasKit.Font(null, fontSize);
     const ids = font.getGlyphIDs(text);
     const paint = new CanvasKitCanvasAdapter.CanvasKit.Paint();
     paint.setStyle(CanvasKitCanvasAdapter.CanvasKit.PaintStyle.Fill);
-    const size = font.getGlyphWidths(ids, paint).reduce(function(a, b) {
+    const size = font.getGlyphWidths(ids, paint).reduce(function (a, b) {
       return a + b;
     }, 0);
     paint.delete();
     return size;
   }
 
+  /**
+   * @inheritDoc
+   */
   drawText(
     context: any,
     text: string,
@@ -172,16 +194,25 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
     context.restore();
   }
 
+  /**
+   * @inheritDoc
+   */
   toDataURL(canvas: any, format = 'image/png'): Promise<string> {
     return Promise.resolve(canvas.toDataURL(format));
   }
 
+  /**
+   * @inheritDoc
+   */
   async scaleImage(image: GeoPackageImage, scale: number): Promise<GeoPackageImage> {
     const scaledWidth = Math.round(scale * image.getWidth());
     const scaledHeight = Math.round(scale * image.getHeight());
     return this.scaleImageToDimensions(image, scaledWidth, scaledHeight);
   }
 
+  /**
+   * @inheritDoc
+   */
   async scaleImageToDimensions(
     image: GeoPackageImage,
     scaledWidth: number,
@@ -195,6 +226,9 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
     return result;
   }
 
+  /**
+   * @inheritDoc
+   */
   disposeImage(image: GeoPackageImage): void {
     if (image != null && image.getImage() && image.getImage().delete != null) {
       try {
@@ -241,7 +275,7 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
    * Gets the type for the image format
    * @param imageFormat
    */
-  getTypeForImageFormat (imageFormat: ImageType): EncodedImageFormat {
+  getTypeForImageFormat(imageFormat: ImageType): EncodedImageFormat {
     let type = CanvasKitCanvasAdapter.CanvasKit.ImageFormat.PNG;
     switch (imageFormat) {
       case ImageType.PNG:
@@ -270,7 +304,7 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
    * @param compressionQuality
    * @return Promise<Uint8Array>
    */
-  async toBytes(canvas: any, imageFormat: ImageType = ImageType.PNG, compressionQuality: number = 100): Promise<Uint8Array> {
+  async toBytes(canvas: any, imageFormat: ImageType = ImageType.PNG, compressionQuality = 100): Promise<Uint8Array> {
     const image = canvas.bf.makeImageSnapshot();
     return Promise.resolve(image.encodeToBytes(this.getTypeForImageFormat(imageFormat), compressionQuality));
   }

@@ -20,8 +20,9 @@ export abstract class UserPaginatedResults<
   TColumn extends UserColumn,
   TTable extends UserTable<TColumn>,
   TRow extends UserRow<TColumn, TTable>,
-  TResult extends UserResultSet<TColumn, TTable, TRow>
-> implements IterableIterator<TRow> {
+  TResult extends UserResultSet<TColumn, TTable, TRow>,
+> implements IterableIterator<TRow>
+{
   /**
    * DAO
    */

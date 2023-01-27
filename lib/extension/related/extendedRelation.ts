@@ -1,6 +1,3 @@
-/**
- * @module extension/relatedTables
- */
 import { RelationType } from './relationType';
 
 /**

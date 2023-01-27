@@ -62,7 +62,7 @@ export class SQLiteMaster {
    * @return columns
    */
   columns(): SQLiteMasterColumn[] {
-    return Object.keys(this._columns).map(key => SQLiteMasterColumn.fromName(key));
+    return Object.keys(this._columns).map((key) => SQLiteMasterColumn.fromName(key));
   }
 
   /**

@@ -41,7 +41,7 @@ export class AlterTable {
   }
 
   /**
-   * Create the rename table SQL
+   * Create the Rename table SQL
    * @param tableName table name
    * @param newTableName new table name
    * @return rename table SQL
@@ -121,7 +121,7 @@ export class AlterTable {
    */
   static dropColumnsForUserTable(db: GeoPackageConnection, table: UserTable<UserColumn>, columnNames: string[]): void {
     const newTable: UserTable<UserColumn> = table.copy();
-    columnNames.forEach(columnName => {
+    columnNames.forEach((columnName) => {
       newTable.dropColumnWithName(columnName);
     });
     // Build the table mapping
@@ -130,13 +130,13 @@ export class AlterTable {
       newTable.getTableName(),
       newTable.getUserColumns().getColumns(),
     );
-    columnNames.forEach(columnName => {
+    columnNames.forEach((columnName) => {
       tableMapping.addDroppedColumn(columnName);
     });
 
     AlterTable.alterTableWithTableMapping(db, newTable, tableMapping);
 
-    columnNames.forEach(columnName => {
+    columnNames.forEach((columnName) => {
       table.dropColumnWithName(columnName);
     });
   }
@@ -168,7 +168,6 @@ export class AlterTable {
    * @param db connection
    * @param table table
    * @param column column
-   * @param user column type
    */
   static alterColumnForTable(db: GeoPackageConnection, table: UserTable<UserColumn>, column: any): void {
     AlterTable.alterColumnsForTable(db, table, [column]);
@@ -183,13 +182,13 @@ export class AlterTable {
   static alterColumnsForTable(db: GeoPackageConnection, table: UserTable<UserColumn>, columns: UserColumn[]): void {
     const newTable: UserTable<UserColumn> = table.copy();
 
-    columns.forEach(column => {
+    columns.forEach((column) => {
       newTable.alterColumn(column);
     });
 
     AlterTable.alterTable(db, newTable);
 
-    columns.forEach(column => {
+    columns.forEach((column) => {
       table.alterColumn(column);
     });
   }
@@ -326,7 +325,7 @@ export class AlterTable {
       }
     });
 
-    // Build the create table sql
+    // Build the 'Create' table sql
     const sql = SQLUtils.createTableSQL(newTable);
     AlterTable.alterTableWithSQLAndTableMapping(db, sql, tableMapping);
   }
@@ -365,7 +364,6 @@ export class AlterTable {
     const enableForeignKeys = SQLUtils.setForeignKeys(db, false);
 
     // 2. Start a transaction
-    let successful = true;
     db.transaction(() => {
       try {
         // 9a. Query for views
@@ -475,9 +473,7 @@ export class AlterTable {
         if (enableForeignKeys) {
           AlterTable.foreignKeyCheck(db);
         }
-      } catch (e) {
-        successful = false;
-      }
+      } catch (e) {}
     });
 
     // 12. Re-enable foreign key constraints

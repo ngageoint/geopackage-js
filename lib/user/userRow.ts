@@ -1,8 +1,3 @@
-/**
- * UserRow module.
- * @module user/userRow
- */
-
 import { UserTable } from './userTable';
 import { GeoPackageDataType } from '../db/geoPackageDataType';
 import { DBValue } from '../db/dbValue';
@@ -64,8 +59,12 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
         const table: TTable = args[0] as TTable;
         this.table = table;
         this.columns = table.getUserColumns();
-        this.columnTypes = Array(this.columns.getColumns().length).fill(0).map((_, i) => i);
-        this.values = Array(this.columns.getColumns().length).fill(null).map((_, i) => i);
+        this.columnTypes = Array(this.columns.getColumns().length)
+          .fill(0)
+          .map((_, i) => i);
+        this.values = Array(this.columns.getColumns().length)
+          .fill(null)
+          .map((_, i) => i);
         const columns = table.getColumns();
         for (let i = 0; i < columns.length; i++) {
           const column = columns[i];
@@ -77,7 +76,9 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
         this.table = userRow.table;
         this.columns = userRow.columns;
         this.columnTypes = userRow.columnTypes;
-        this.values = Array(this.columns.getColumns().length).fill(null).map((_, i) => i);
+        this.values = Array(this.columns.getColumns().length)
+          .fill(null)
+          .map((_, i) => i);
         for (let i = 0; i < userRow.values.length; i++) {
           const value = userRow.values[i];
           if (value != null) {
@@ -134,6 +135,8 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
     switch (column.getDataType()) {
       case GeoPackageDataType.BLOB:
         if (value instanceof Buffer) {
+          copyValue = Buffer.from(value);
+        } else if (value instanceof Uint8Array) {
           copyValue = Buffer.from(value);
         } else {
           throw new GeoPackageException(
@@ -212,7 +215,7 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
    * @return {Object}            value
    */
   getValue(columnName: string): any {
-    const index = this.getColumnIndexWithColumnName(columnName)
+    const index = this.getColumnIndexWithColumnName(columnName);
     const value = this.values[index];
     if (value != null) {
       const dataType = this.getRowColumnTypeWithColumnName(columnName);

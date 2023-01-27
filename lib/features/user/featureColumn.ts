@@ -158,7 +158,15 @@ export class FeatureColumn extends UserColumn {
     max?: number,
     autoincrement?: boolean,
   ): FeatureColumn {
-    return FeatureColumn.createColumnWithIndex(FeatureColumn.NO_INDEX, name, type, notNull, defaultValue, max, autoincrement);
+    return FeatureColumn.createColumnWithIndex(
+      FeatureColumn.NO_INDEX,
+      name,
+      type,
+      notNull,
+      defaultValue,
+      max,
+      autoincrement,
+    );
   }
 
   /**

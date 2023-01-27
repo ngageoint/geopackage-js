@@ -197,9 +197,7 @@ export class AttributesTableMetadata extends UserTableMetadata<AttributesColumn>
 
     if (attributesColumns == null) {
       attributesColumns = [];
-      attributesColumns.push(
-        AttributesColumn.createPrimaryKeyColumn(this.getIdColumnName(), this.isAutoincrement()),
-      );
+      attributesColumns.push(AttributesColumn.createPrimaryKeyColumn(this.getIdColumnName(), this.isAutoincrement()));
       const additional = this.getAdditionalColumns();
       if (additional != null) {
         attributesColumns.push(...additional);

@@ -685,9 +685,7 @@ export class TileReprojection {
    */
   protected deleteTileMatrices(reproject: boolean, table: string): void {
     try {
-      this.getTileDao(reproject)
-        .getTileMatrixDao()
-        .deleteByTableName(table);
+      this.getTileDao(reproject).getTileMatrixDao().deleteByTableName(table);
     } catch (e) {
       throw new GeoPackageException(
         'Failed to delete tile matrices for tile table. GeoPackage: ' +
@@ -710,9 +708,7 @@ export class TileReprojection {
    */
   protected createTileMatrix(tileMatrix: TileMatrix): void {
     try {
-      this.getReprojectTileDao()
-        .getTileMatrixDao()
-        .createOrUpdate(tileMatrix);
+      this.getReprojectTileDao().getTileMatrixDao().createOrUpdate(tileMatrix);
     } catch (e) {
       throw new GeoPackageException(
         'Failed to create tile matrix. GeoPackage: ' +
@@ -749,12 +745,7 @@ export class TileReprojection {
     const zoomBounds = tileDao.getBoundingBoxAtZoomLevelWithProjection(zoom, reprojectTileDao.getProjection());
     const tileGrid = TileBoundingBoxUtils.getTileGrid(boundingBox, matrixWidth, matrixHeight, zoomBounds);
 
-    const tileCreator = new TileCreator(
-      tileDao,
-      tileWidth,
-      tileHeight,
-      ImageType.PNG,
-    );
+    const tileCreator = new TileCreator(tileDao, tileWidth, tileHeight, ImageType.PNG);
 
     tileCreator.setRequestProjection(reprojectTileDao.getProjection());
 

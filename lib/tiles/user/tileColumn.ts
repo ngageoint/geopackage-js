@@ -31,7 +31,7 @@ export class TileColumn extends UserColumn {
    * @param  {boolean} autoincrement Autoincrement
    */
   static createIdColumn(autoincrement: boolean = UserTableDefaults.DEFAULT_AUTOINCREMENT): TileColumn {
-    return TileColumn.createIdColumnWithIndex(TileColumn.NO_INDEX, autoincrement)
+    return TileColumn.createIdColumnWithIndex(TileColumn.NO_INDEX, autoincrement);
   }
 
   /**
@@ -39,7 +39,10 @@ export class TileColumn extends UserColumn {
    * @param  {number} index Index
    * @param  {boolean} autoincrement Autoincrement
    */
-  static createIdColumnWithIndex(index: number = TileColumn.NO_INDEX, autoincrement: boolean = UserTableDefaults.DEFAULT_AUTOINCREMENT): TileColumn {
+  static createIdColumnWithIndex(
+    index: number = TileColumn.NO_INDEX,
+    autoincrement: boolean = UserTableDefaults.DEFAULT_AUTOINCREMENT,
+  ): TileColumn {
     return new TileColumn(
       index,
       TileColumn.COLUMN_ID,

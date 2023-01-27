@@ -71,7 +71,7 @@ import { MediaDao } from './extension/related/media/mediaDao';
 import { MediaRow } from './extension/related/media/mediaRow';
 import { MediaTableMetadata } from './extension/related/media/mediaTableMetadata';
 import { UserCustomColumn } from './user/custom/userCustomColumn';
-import { GeometryType } from '@ngageoint/simple-features-js';
+import { Geometry, GeometryType } from '@ngageoint/simple-features-js';
 import { FeatureColumn } from './features/user/featureColumn';
 import { SimpleAttributesTableMetadata } from './extension/related/simple/simpleAttributesTableMetadata';
 import { SimpleAttributesTable } from './extension/related/simple/simpleAttributesTable';
@@ -418,7 +418,6 @@ export class GeoPackage {
     return this.getTileDao(table.getTableName());
   }
 
-
   /**
    * Get the tile dao from the table name
    * @param tableName
@@ -591,7 +590,7 @@ export class GeoPackage {
    * @since 3.3.0
    */
   public static foreignKeys(db: GeoPackageConnection): boolean {
-    const foreignKeys = db.querySingleResult("PRAGMA foreign_keys");
+    const foreignKeys = db.querySingleResult('PRAGMA foreign_keys');
     return foreignKeys != null && foreignKeys;
   }
 
@@ -618,7 +617,7 @@ export class GeoPackage {
    * @since 3.3.0
    */
   public static foreignKeysSQL(on: boolean): string {
-    return "PRAGMA foreign_keys = " + on;
+    return 'PRAGMA foreign_keys = ' + on;
   }
 
   /**
@@ -646,7 +645,7 @@ export class GeoPackage {
    * @since 3.3.0
    */
   public static foreignKeyCheckSQL(tableName): string {
-    return "PRAGMA foreign_key_check" + (tableName != null ? "(" + SQLUtils.quoteWrap(tableName) + ")" : "");
+    return 'PRAGMA foreign_key_check' + (tableName != null ? '(' + SQLUtils.quoteWrap(tableName) + ')' : '');
   }
 
   /**
@@ -656,7 +655,7 @@ export class GeoPackage {
    * @since 3.3.0
    */
   public static integrityCheckSQL(): string {
-    return "PRAGMA integrity_check";
+    return 'PRAGMA integrity_check';
   }
 
   /**
@@ -666,7 +665,7 @@ export class GeoPackage {
    * @since 3.3.0
    */
   public static quickCheckSQL(): string {
-    return "PRAGMA quick_check";
+    return 'PRAGMA quick_check';
   }
 
   /**
@@ -680,7 +679,7 @@ export class GeoPackage {
         resultSet = null;
       }
     } catch (e) {
-      throw new GeoPackageException("Foreign key check failed on database: " + this.getName());
+      throw new GeoPackageException('Foreign key check failed on database: ' + this.getName());
     }
     return resultSet;
   }
@@ -698,7 +697,7 @@ export class GeoPackage {
   public quickCheck(): ResultSet {
     return this.integrityCheckWithResultSet(this.query(SQLUtils.quickCheckSQL(), null));
   }
-  
+
   /**
    * Check the result set returned from the integrity check to see if things
    * are "ok"
@@ -710,13 +709,13 @@ export class GeoPackage {
     try {
       if (resultSet.next()) {
         const value = resultSet.getStringAtIndex(0);
-        if (value === "ok") {
+        if (value === 'ok') {
           resultSet.close();
           resultSet = null;
         }
       }
     } catch (e) {
-      throw new GeoPackageException("Integrity check failed on database: " + this.getName());
+      throw new GeoPackageException('Integrity check failed on database: ' + this.getName());
     }
     return resultSet;
   }
@@ -831,7 +830,6 @@ export class GeoPackage {
     const tables = this.getAttributesTables();
     return tables && tables.indexOf(attributeTableName) != -1;
   }
-
 
   /**
    * Gets the tables for the provided ContentsDataType
@@ -1165,10 +1163,7 @@ export class GeoPackage {
    * @param tableName
    * @param properties
    */
-  createFeatureTableWithProperties(
-    tableName: string,
-    properties: { name: string; dataType: string }[],
-  ): FeatureTable {
+  createFeatureTableWithProperties(tableName: string, properties: { name: string; dataType: string }[]): FeatureTable {
     const geometryColumn = new GeometryColumns();
     geometryColumn.setTableName(tableName);
     geometryColumn.setColumnName('geometry');
@@ -1181,7 +1176,9 @@ export class GeoPackage {
       const property = properties[i] as { name: string; dataType: string };
       columns.push(FeatureColumn.createColumn(property.name, GeoPackageDataType.fromName(property.dataType)));
     }
-    return this.createFeatureTableWithFeatureTableMetadata(FeatureTableMetadata.create(geometryColumn, columns, undefined, BoundingBox.worldWGS84()));
+    return this.createFeatureTableWithFeatureTableMetadata(
+      FeatureTableMetadata.create(geometryColumn, columns, undefined, BoundingBox.worldWGS84()),
+    );
   }
 
   /**
@@ -1326,7 +1323,7 @@ export class GeoPackage {
 
       // Create new matrix tile set
       const tileMatrixSet = new TileMatrixSet();
-      tileMatrixSet.setTableName(contents.getId())
+      tileMatrixSet.setTableName(contents.getId());
       tileMatrixSet.setSrsId(metadata.getTileSrsId());
       tileMatrixSet.setBoundingBox(metadata.getTileBoundingBox());
       this.getTileMatrixSetDao().create(tileMatrixSet);
@@ -1840,7 +1837,7 @@ export class GeoPackage {
       .getUserColumns()
       .getColumns()
       .forEach(
-        function(column: UserColumn): any {
+        function (column: UserColumn): any {
           const dataColumn = dcd.getDataColumns(tableDao.getTable().getTableName(), column.getName());
           info.columns.push({
             index: column.getIndex(),
@@ -2039,9 +2036,14 @@ export class GeoPackage {
    * @param force
    * @param progress
    */
-  public indexFeatureTable(table: string, featureIndexType: FeatureIndexType, force?: boolean, progress?: GeoPackageProgress): boolean {
+  public indexFeatureTable(
+    table: string,
+    featureIndexType: FeatureIndexType,
+    force?: boolean,
+    progress?: GeoPackageProgress,
+  ): boolean {
     const indexManager = new FeatureIndexManager(this, table);
-    let indexed = indexManager.isIndexedForType(featureIndexType);
+    const indexed = indexManager.isIndexedForType(featureIndexType);
     if (!indexed) {
       indexManager.setProgress(progress);
       indexManager.indexType(featureIndexType, force);
@@ -2120,7 +2122,9 @@ export class GeoPackage {
    * @param additionalColumns
    */
   createSimpleAttributesTable(simpleAttributesTableName: string, additionalColumns: UserCustomColumn[]): boolean {
-    return this.createSimpleAttributesWithMetadata(SimpleAttributesTableMetadata.create(simpleAttributesTableName, additionalColumns));
+    return this.createSimpleAttributesWithMetadata(
+      SimpleAttributesTableMetadata.create(simpleAttributesTableName, additionalColumns),
+    );
   }
 
   /**
@@ -2177,8 +2181,19 @@ export class GeoPackage {
    * @param simpleAttributesTableName
    * @param simpleAttributesRowId
    */
-  linkSimpleAttributes(baseTableName: string, baseId: number, simpleAttributesTableName: string, simpleAttributesRowId: number): number {
-    return this.linkRelatedRows(baseTableName, baseId, simpleAttributesTableName, simpleAttributesRowId, RelationType.SIMPLE_ATTRIBUTES);
+  linkSimpleAttributes(
+    baseTableName: string,
+    baseId: number,
+    simpleAttributesTableName: string,
+    simpleAttributesRowId: number,
+  ): number {
+    return this.linkRelatedRows(
+      baseTableName,
+      baseId,
+      simpleAttributesTableName,
+      simpleAttributesRowId,
+      RelationType.SIMPLE_ATTRIBUTES,
+    );
   }
 
   /**
@@ -2238,7 +2253,12 @@ export class GeoPackage {
     let mappingTableName: string;
     if (mappingTable instanceof UserMappingTable) {
       mappingTableName = mappingTable.getTableName();
-      rte.addRelationshipWithMappingTableAndRelationName(baseTableName, relatedTableName, mappingTable, relationType.getName())
+      rte.addRelationshipWithMappingTableAndRelationName(
+        baseTableName,
+        relatedTableName,
+        mappingTable,
+        relationType.getName(),
+      );
     } else {
       const extension = new ExtendedRelation();
       extension.setBaseTableName(baseTableName);
@@ -2272,7 +2292,6 @@ export class GeoPackage {
       for (const mappingRow of mappingRowMap.keys()) {
         const row = mappingRowMap.get(mappingRow);
         rows.push(row as MediaRow);
-
       }
     }
     return rows;
@@ -2291,7 +2310,6 @@ export class GeoPackage {
       for (const mappingRow of mappingRowMap.keys()) {
         const row = mappingRowMap.get(mappingRow);
         rows.push(row as SimpleAttributesRow);
-
       }
     }
     return rows;
@@ -2310,7 +2328,6 @@ export class GeoPackage {
       for (const mappingRow of mappingRowMap.keys()) {
         const row = mappingRowMap.get(mappingRow);
         rows.push(row as AttributesRow);
-
       }
     }
     return rows;
@@ -2329,7 +2346,6 @@ export class GeoPackage {
       for (const mappingRow of mappingRowMap.keys()) {
         const row = mappingRowMap.get(mappingRow);
         rows.push(row as FeatureRow);
-
       }
     }
     return rows;
@@ -2348,7 +2364,6 @@ export class GeoPackage {
       for (const mappingRow of mappingRowMap.keys()) {
         const row = mappingRowMap.get(mappingRow);
         rows.push(row as TileRow);
-
       }
     }
     return rows;
@@ -2367,15 +2382,21 @@ export class GeoPackage {
    * processed. The number of features added is sent as an argument to that function.
    * @return {Promise<number>} number of features inserted
    */
-  async addGeoJSONFeaturesToGeoPackage (features: Feature[], tableName: string, index = false, batchSize = 1000, progress?: GeoPackageProgress): Promise<number> {
+  async addGeoJSONFeaturesToGeoPackage(
+    features: Feature[],
+    tableName: string,
+    index = false,
+    batchSize = 1000,
+    progress?: GeoPackageProgress,
+  ): Promise<number> {
     let inserted = 0;
     const featureDao = this.getFeatureDao(tableName);
     const connectionSource = featureDao.getFeatureDb().getConnection().getConnectionSource();
     const srs = featureDao.getSrs();
-    let reprojectFunction = geometry => geometry;
+    let reprojectFunction = (geometry): Geometry => geometry;
     if (!srs.getProjection().equalsProjection(Projections.getWGS84Projection())) {
-      const geometryTransform = new GeometryTransform(Projections.getWGS84Projection(), srs.getProjection())
-      reprojectFunction = geometry => geometryTransform.transformGeometry(geometry);
+      const geometryTransform = new GeometryTransform(Projections.getWGS84Projection(), srs.getProjection());
+      reprojectFunction = (geometry): Geometry => geometryTransform.transformGeometry(geometry);
     }
     let geometryData;
     let featureRow = featureDao.newRow();
@@ -2385,7 +2406,7 @@ export class GeoPackage {
 
     const insertSql = SqliteQueryBuilder.buildInsert(SQLUtils.quoteWrap(featureDao.getTableName()), featureRow);
 
-    const stepFunction = async (start: number, end: number, resolve: Function) => {
+    const stepFunction = async (start: number, end: number, resolve: Function): Promise<void> => {
       // execute step if there are still features
       if (start < end) {
         connectionSource.transaction(() => {
@@ -2394,7 +2415,7 @@ export class GeoPackage {
 
           // determine if indexing is needed
           let tableIndex;
-          let featureIndexManager = new FeatureIndexManager(this, featureDao);
+          const featureIndexManager = new FeatureIndexManager(this, featureDao);
           let fti;
           if (index && featureIndexManager.isIndexedForType(FeatureIndexType.GEOPACKAGE)) {
             fti = new FeatureIndexManager(this, featureDao).getFeatureTableIndex();
@@ -2404,7 +2425,7 @@ export class GeoPackage {
           }
 
           for (let i = start; i < end; i++) {
-            let feature = features[i];
+            const feature = features[i];
             featureRow = featureDao.newRow();
             // convert GeoJSON to Simple Features
             let geometry = FeatureConverter.toSimpleFeaturesGeometry(feature);
@@ -2443,13 +2464,13 @@ export class GeoPackage {
         }
         setTimeout(() => {
           stepFunction(end, Math.min(end + batchSize, features.length), resolve);
-        })
+        });
       } else {
         resolve(inserted);
       }
-    }
+    };
 
-    return new Promise ((resolve) => {
+    return new Promise((resolve) => {
       setTimeout(() => {
         stepFunction(0, Math.min(batchSize, features.length), resolve);
       });
@@ -2462,7 +2483,11 @@ export class GeoPackage {
    * @param tableName
    * @param {FeatureIndexType} index
    */
-  addGeoJSONFeatureToGeoPackage(feature: Feature, tableName: string, index: FeatureIndexType = FeatureIndexType.GEOPACKAGE): number {
+  addGeoJSONFeatureToGeoPackage(
+    feature: Feature,
+    tableName: string,
+    index: FeatureIndexType = FeatureIndexType.GEOPACKAGE,
+  ): number {
     const featureDao = this.getFeatureDao(tableName);
     return this.addGeoJSONFeatureToGeoPackageWithFeatureDaoAndSrs(feature, featureDao, featureDao.getSrs(), index);
   }
@@ -2474,7 +2499,12 @@ export class GeoPackage {
    * @param srs
    * @param index
    */
-  addGeoJSONFeatureToGeoPackageWithFeatureDaoAndSrs(feature: Feature, featureDao: FeatureDao, srs: SpatialReferenceSystem, index: FeatureIndexType = FeatureIndexType.GEOPACKAGE): number {
+  addGeoJSONFeatureToGeoPackageWithFeatureDaoAndSrs(
+    feature: Feature,
+    featureDao: FeatureDao,
+    srs: SpatialReferenceSystem,
+    index: FeatureIndexType = FeatureIndexType.GEOPACKAGE,
+  ): number {
     const featureRow = featureDao.newRow();
     const geometryData = new GeoPackageGeometryData();
     geometryData.setSrsId(srs.getSrsId());
@@ -2482,7 +2512,9 @@ export class GeoPackage {
     let geometry = feature.geometry != null ? FeatureConverter.toSimpleFeaturesGeometry(feature) : null;
     // reproject to target projection
     if (!srs.getProjection().equalsProjection(Projections.getWGS84Projection())) {
-      geometry = new GeometryTransform(Projections.getWGS84Projection(), srs.getProjection()).transformGeometry(geometry);
+      geometry = new GeometryTransform(Projections.getWGS84Projection(), srs.getProjection()).transformGeometry(
+        geometry,
+      );
     }
     geometryData.setGeometry(geometry);
     featureRow.setGeometry(geometryData);
@@ -2507,7 +2539,10 @@ export class GeoPackage {
    * @param row
    * @private
    */
-  private getColumnAndValuesForRecord(columns: UserColumns<any>, row: Record<string, DBValue>): {columnTypes: number[], values: any[]} {
+  private getColumnAndValuesForRecord(
+    columns: UserColumns<any>,
+    row: Record<string, DBValue>,
+  ): { columnTypes: number[]; values: any[] } {
     const columnTypes = [];
     const values = [];
     try {
@@ -2521,8 +2556,8 @@ export class GeoPackage {
     }
     return {
       columnTypes,
-      values
-    }
+      values,
+    };
   }
 
   /**
@@ -2569,7 +2604,11 @@ export class GeoPackage {
    * @param baseId
    * @param typeFilter
    */
-  getRelatedRows(baseTableName: string, baseId: number, typeFilter?: RelationType[]): Map<ExtendedRelation, Map<UserMappingRow, UserRow<any, any>>>  {
+  getRelatedRows(
+    baseTableName: string,
+    baseId: number,
+    typeFilter?: RelationType[],
+  ): Map<ExtendedRelation, Map<UserMappingRow, UserRow<any, any>>> {
     return this.getRelatedTablesExtension().getRelatedRows(baseTableName, baseId, typeFilter);
   }
 
@@ -2577,9 +2616,13 @@ export class GeoPackage {
    * Adds a spatial reference system to the gpkg_spatial_ref_sys table to be used by feature and tile tables.
    * @param spatialReferenceSystem
    */
-  createSpatialReferenceSystem(spatialReferenceSystem: SpatialReferenceSystem) {
-    Projections.setProjection(spatialReferenceSystem.getOrganization().toUpperCase(), spatialReferenceSystem.getOrganizationCoordsysId(), spatialReferenceSystem.getDefinition());
-    this.getSpatialReferenceSystemDao().create(spatialReferenceSystem)
+  createSpatialReferenceSystem(spatialReferenceSystem: SpatialReferenceSystem): void {
+    Projections.setProjection(
+      spatialReferenceSystem.getOrganization().toUpperCase(),
+      spatialReferenceSystem.getOrganizationCoordsysId(),
+      spatialReferenceSystem.getDefinition(),
+    );
+    this.getSpatialReferenceSystemDao().create(spatialReferenceSystem);
   }
 
   /**
@@ -2694,11 +2737,15 @@ export class GeoPackage {
 
     if (contentsSrsId !== wgs84SrsId) {
       const from = contentsSrs.projection;
-      contentsBoundingBox = contentsBoundingBox.transform(new ProjectionTransform(from, Projections.getWGS84Projection()));
+      contentsBoundingBox = contentsBoundingBox.transform(
+        new ProjectionTransform(from, Projections.getWGS84Projection()),
+      );
     }
     if (tileMatrixSetSrsId !== wgs84SrsId) {
       const from = tileMatrixSrs.projection;
-      tileMatrixSetBoundingBox = tileMatrixSetBoundingBox.transform(new ProjectionTransform(from, Projections.getWGS84Projection()));
+      tileMatrixSetBoundingBox = tileMatrixSetBoundingBox.transform(
+        new ProjectionTransform(from, Projections.getWGS84Projection()),
+      );
     }
     const tileMatrixSet = this.createTileTableWithTableName(
       tableName,
@@ -2772,10 +2819,16 @@ export class GeoPackage {
     maxZoom: number,
     tileSize = TileUtils.TILE_PIXELS_DEFAULT,
   ): TileMatrixSet {
-    let webMercator = this.getSpatialReferenceSystemDao().getByOrganizationAndCoordSysId(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR);
+    let webMercator = this.getSpatialReferenceSystemDao().getByOrganizationAndCoordSysId(
+      ProjectionConstants.AUTHORITY_EPSG,
+      ProjectionConstants.EPSG_WEB_MERCATOR,
+    );
     if (!webMercator) {
       this.getSpatialReferenceSystemDao().createWebMercator();
-      webMercator = this.getSpatialReferenceSystemDao().getByOrganizationAndCoordSysId(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR);
+      webMercator = this.getSpatialReferenceSystemDao().getByOrganizationAndCoordSysId(
+        ProjectionConstants.AUTHORITY_EPSG,
+        ProjectionConstants.EPSG_WEB_MERCATOR,
+      );
     }
     const webMercatorSrsId = webMercator.getSrsId();
     const srsDao = this.getSpatialReferenceSystemDao();
@@ -2791,11 +2844,15 @@ export class GeoPackage {
 
     if (contentsSrsId !== webMercatorSrsId) {
       const from = contentsSrs.projection;
-      contentsBoundingBox = contentsBoundingBox.transform(new ProjectionTransform(from, Projections.getWebMercatorProjection()));
+      contentsBoundingBox = contentsBoundingBox.transform(
+        new ProjectionTransform(from, Projections.getWebMercatorProjection()),
+      );
     }
     if (tileMatrixSetSrsId !== webMercatorSrsId) {
       const from = tileMatrixSrs.projection;
-      tileMatrixSetBoundingBox = tileMatrixSetBoundingBox.transform(new ProjectionTransform(from, Projections.getWebMercatorProjection()));
+      tileMatrixSetBoundingBox = tileMatrixSetBoundingBox.transform(
+        new ProjectionTransform(from, Projections.getWebMercatorProjection()),
+      );
     }
     const tileMatrixSet = this.createTileTableWithTableName(
       tableName,
@@ -2824,17 +2881,23 @@ export class GeoPackage {
    * @param tileSize the width and height in pixels of the tile images; defaults to 256
    * @returns {Promise} a `Promise` that resolves with the created {@link TileMatrixSet} object, or rejects with an `Error`
    */
-  public  (
+  public(
     tableName: string,
     contentsBoundingBox: BoundingBox,
     tileMatrixSetBoundingBox: BoundingBox,
     zoomLevels: Set<number>,
     tileSize = TileUtils.TILE_PIXELS_DEFAULT,
   ): TileMatrixSet {
-    let webMercator = this.getSpatialReferenceSystemDao().getByOrganizationAndCoordSysId(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR);
+    let webMercator = this.getSpatialReferenceSystemDao().getByOrganizationAndCoordSysId(
+      ProjectionConstants.AUTHORITY_EPSG,
+      ProjectionConstants.EPSG_WEB_MERCATOR,
+    );
     if (!webMercator) {
       this.getSpatialReferenceSystemDao().createWebMercator();
-      webMercator = this.getSpatialReferenceSystemDao().getByOrganizationAndCoordSysId(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR);
+      webMercator = this.getSpatialReferenceSystemDao().getByOrganizationAndCoordSysId(
+        ProjectionConstants.AUTHORITY_EPSG,
+        ProjectionConstants.EPSG_WEB_MERCATOR,
+      );
     }
     const webMercatorSrsId = webMercator.getSrsId();
     const tileMatrixSet = this.createTileTableWithTableName(
@@ -2895,7 +2958,7 @@ export class GeoPackage {
   ): GeoPackage {
     tileSize = tileSize || TileUtils.TILE_PIXELS_DEFAULT;
     const tileMatrixDao = this.getTileMatrixDao();
-    zoomLevels.forEach(zoomLevel => {
+    zoomLevels.forEach((zoomLevel) => {
       this.createTileMatrixRow(epsg3857TileBoundingBox, tileMatrixSet, tileMatrixDao, zoomLevel, tileSize);
     });
     return this;
@@ -2922,8 +2985,10 @@ export class GeoPackage {
     const tileGrid = TileBoundingBoxUtils.getTileGridWGS84(epsg4326TileBoundingBox, zoomLevel);
     const matrixWidth = tileGrid.getWidth() + 1;
     const matrixHeight = tileGrid.getHeight() + 1;
-    const pixelXSize = (epsg4326TileBoundingBox.getMaxLongitude() - epsg4326TileBoundingBox.getMinLongitude()) / matrixWidth / tileSize;
-    const pixelYSize = (epsg4326TileBoundingBox.getMaxLatitude() - epsg4326TileBoundingBox.getMinLatitude()) / matrixHeight / tileSize;
+    const pixelXSize =
+      (epsg4326TileBoundingBox.getMaxLongitude() - epsg4326TileBoundingBox.getMinLongitude()) / matrixWidth / tileSize;
+    const pixelYSize =
+      (epsg4326TileBoundingBox.getMaxLatitude() - epsg4326TileBoundingBox.getMinLatitude()) / matrixHeight / tileSize;
     const tileMatrix = new TileMatrix();
     tileMatrix.setTableName(tileMatrixSet.getTableName());
     tileMatrix.setZoomLevel(zoomLevel);
@@ -2957,8 +3022,10 @@ export class GeoPackage {
     const tileGrid = TileBoundingBoxUtils.getTileGridWithBoundingBoxAndZoom(epsg3857TileBoundingBox, zoomLevel);
     const matrixWidth = tileGrid.getWidth() + 1;
     const matrixHeight = tileGrid.getHeight() + 1;
-    const pixelXSize = (epsg3857TileBoundingBox.getMaxLongitude() - epsg3857TileBoundingBox.getMinLongitude()) / matrixWidth / tileSize;
-    const pixelYSize = (epsg3857TileBoundingBox.getMaxLatitude() - epsg3857TileBoundingBox.getMinLatitude()) / matrixHeight / tileSize;
+    const pixelXSize =
+      (epsg3857TileBoundingBox.getMaxLongitude() - epsg3857TileBoundingBox.getMinLongitude()) / matrixWidth / tileSize;
+    const pixelYSize =
+      (epsg3857TileBoundingBox.getMaxLatitude() - epsg3857TileBoundingBox.getMinLatitude()) / matrixHeight / tileSize;
     const tileMatrix = new TileMatrix();
     tileMatrix.setTableName(tileMatrixSet.getTableName());
     tileMatrix.setZoomLevel(zoomLevel);
@@ -2978,7 +3045,13 @@ export class GeoPackage {
    * @param  {Number}   tileRow    row of this tile
    * @param  {Number}   tileColumn column of this tile
    */
-  addTile(tileStream: Uint8Array | Buffer, tableName: string, zoom: number, tileRow: number, tileColumn: number): number {
+  addTile(
+    tileStream: Uint8Array | Buffer,
+    tableName: string,
+    zoom: number,
+    tileRow: number,
+    tileColumn: number,
+  ): number {
     const tileDao = this.getTileDao(tableName);
     const newRow = tileDao.newRow();
     newRow.setZoomLevel(zoom);
@@ -3069,7 +3142,7 @@ export class GeoPackage {
     if (zoom < tileDao.getMinZoom() || zoom > tileDao.getMaxZoom()) {
       return;
     }
-    tiles.columns = tileDao.getTable().getUserColumns().getColumns()
+    tiles.columns = tileDao.getTable().getUserColumns().getColumns();
     tiles.srs = tileDao.getSrs();
     tiles.tiles = [];
     const tms = tileDao.getTileMatrixSet();
@@ -3077,14 +3150,24 @@ export class GeoPackage {
     if (!tm) {
       return tiles;
     }
-    let mapBoundingBox = new BoundingBox(Math.max(-ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH, west), south, Math.min(east, ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH), north);
+    let mapBoundingBox = new BoundingBox(
+      Math.max(-ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH, west),
+      south,
+      Math.min(east, ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH),
+      north,
+    );
     tiles.west = Math.max(-ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH, west).toFixed(2);
     tiles.east = Math.min(east, ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH).toFixed(2);
     tiles.south = south.toFixed(2);
     tiles.north = north.toFixed(2);
     tiles.zoom = zoom;
     mapBoundingBox = mapBoundingBox.projectBoundingBox(Projections.getWGS84Projection(), tileDao.getProjection());
-    const grid = TileBoundingBoxUtils.getTileGrid(tms.getBoundingBox(), tm.getMatrixWidth(), tm.getMatrixHeight(), mapBoundingBox);
+    const grid = TileBoundingBoxUtils.getTileGrid(
+      tms.getBoundingBox(),
+      tm.getMatrixWidth(),
+      tm.getMatrixHeight(),
+      mapBoundingBox,
+    );
     const iterator = tileDao.queryByTileGrid(grid, zoom);
     for (const row of iterator) {
       const tile = {} as {
@@ -3100,7 +3183,12 @@ export class GeoPackage {
       tile.tableName = table;
       tile.id = row.getId();
 
-      const tileBB = TileBoundingBoxUtils.getBoundingBoxWithTileMatrix(tms.getBoundingBox(), tm, row.getTileColumn(), row.getTileRow());
+      const tileBB = TileBoundingBoxUtils.getBoundingBoxWithTileMatrix(
+        tms.getBoundingBox(),
+        tm,
+        row.getTileColumn(),
+        row.getTileRow(),
+      );
       tile.minLongitude = tileBB.getMinLongitude();
       tile.maxLongitude = tileBB.getMaxLongitude();
       tile.minLatitude = tileBB.getMinLatitude();
@@ -3192,7 +3280,7 @@ export class GeoPackage {
     if (webZoom < tileDao.getMapMinZoom() || webZoom > tileDao.getMapMaxZoom()) {
       return;
     }
-    tiles.columns = tileDao.getTable().getUserColumns().getColumns()
+    tiles.columns = tileDao.getTable().getUserColumns().getColumns();
     tiles.srs = tileDao.getSrs();
     tiles.tiles = [];
 
@@ -3203,14 +3291,24 @@ export class GeoPackage {
       return tiles;
     }
 
-    let mapBoundingBox = new BoundingBox(Math.max(-ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH, west), Math.min(east, ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH), south, north);
+    let mapBoundingBox = new BoundingBox(
+      Math.max(-ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH, west),
+      Math.min(east, ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH),
+      south,
+      north,
+    );
     tiles.west = Math.max(-ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH, west).toFixed(2);
     tiles.east = Math.min(east, ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH).toFixed(2);
     tiles.south = south.toFixed(2);
     tiles.north = north.toFixed(2);
     tiles.zoom = zoom;
     mapBoundingBox = mapBoundingBox.projectBoundingBox(Projections.getWGS84Projection(), tileDao.getProjection());
-    const grid = TileBoundingBoxUtils.getTileGrid(tms.getBoundingBox(), tm.getMatrixWidth(), tm.getMatrixHeight(), mapBoundingBox);
+    const grid = TileBoundingBoxUtils.getTileGrid(
+      tms.getBoundingBox(),
+      tm.getMatrixWidth(),
+      tm.getMatrixHeight(),
+      mapBoundingBox,
+    );
     const iterator = tileDao.queryByTileGrid(grid, zoom);
     for (const row of iterator) {
       const tile = {} as {
@@ -3226,7 +3324,12 @@ export class GeoPackage {
       tile.tableName = table;
       tile.id = row.getId();
 
-      const tileBB = TileBoundingBoxUtils.getBoundingBoxWithTileMatrix(tms.getBoundingBox(), tm, row.getTileColumn(), row.getTileRow());
+      const tileBB = TileBoundingBoxUtils.getBoundingBoxWithTileMatrix(
+        tms.getBoundingBox(),
+        tm,
+        row.getTileColumn(),
+        row.getTileRow(),
+      );
       tile.minLongitude = tileBB.getMinLongitude();
       tile.maxLongitude = tileBB.getMaxLongitude();
       tile.minLatitude = tileBB.getMinLatitude();
@@ -3352,16 +3455,16 @@ export class GeoPackage {
    * @param dataColumnsDao
    * @private
    */
-  getColumnToDataColumnMap (featureDao: FeatureDao, dataColumnsDao: DataColumnsDao): Map<string, string> {
+  getColumnToDataColumnMap(featureDao: FeatureDao, dataColumnsDao: DataColumnsDao): Map<string, string> {
     const columnMap = new Map();
     if (dataColumnsDao.isTableExists()) {
       const dataColumns = dataColumnsDao.queryByTable(featureDao.getTableName());
-      featureDao.getColumnNames().forEach(columnName => {
-        const dataColumn = dataColumns.find(dc => dc.getColumnName() === columnName);
+      featureDao.getColumnNames().forEach((columnName) => {
+        const dataColumn = dataColumns.find((dc) => dc.getColumnName() === columnName);
         columnMap.set(columnName, dataColumn != null ? dataColumn.getName() : columnName);
-      })
+      });
     }
-    return columnMap
+    return columnMap;
   }
 
   /**
@@ -3375,12 +3478,12 @@ export class GeoPackage {
     const featureDao = this.getFeatureDao(table);
     featureRow = featureDao.queryForIdRow(featureId);
     if (featureRow == null) {
-      let resultSet = featureDao.queryForEq('_feature_id', featureId);
+      const resultSet = featureDao.queryForEq('_feature_id', featureId);
       resultSet.moveToNext();
       featureRow = resultSet.getRow();
       resultSet.close();
       if (featureRow == null) {
-        let resultSet = featureDao.queryForEq('_properties_id', featureId);
+        const resultSet = featureDao.queryForEq('_properties_id', featureId);
         resultSet.moveToNext();
         featureRow = resultSet.getRow();
         resultSet.close();
@@ -3400,17 +3503,21 @@ export class GeoPackage {
     const srs = featureDao.getSrs();
     let featureRow = featureDao.queryForIdRow(featureId);
     if (featureRow == null) {
-      let resultSet = featureDao.queryForEq('_feature_id', featureId);
+      const resultSet = featureDao.queryForEq('_feature_id', featureId);
       resultSet.moveToNext();
       featureRow = resultSet.getRow();
       if (featureRow == null) {
-        let resultSet = featureDao.queryForEq('_properties_id', featureId);
+        const resultSet = featureDao.queryForEq('_properties_id', featureId);
         resultSet.moveToNext();
         featureRow = resultSet.getRow();
       }
     }
     if (featureRow != null) {
-      feature = GeoPackage.parseFeatureRowIntoGeoJSON(featureRow, srs, this.getColumnToDataColumnMap(featureDao, this.getDataColumnsDao()));
+      feature = GeoPackage.parseFeatureRowIntoGeoJSON(
+        featureRow,
+        srs,
+        this.getColumnToDataColumnMap(featureDao, this.getDataColumnsDao()),
+      );
     }
     return feature;
   }
@@ -3419,7 +3526,7 @@ export class GeoPackage {
   static parseFeatureRowIntoGeoJSON(
     featureRow: FeatureRow,
     srs: SpatialReferenceSystem,
-    dataColumnsMap?: Map<string, string>
+    dataColumnsMap?: Map<string, string>,
   ): Feature {
     let geometryTransform = null;
     if (!srs.getProjection().equalsProjection(Projections.getWGS84Projection())) {
@@ -3435,12 +3542,7 @@ export class GeoPackage {
    * @param  {Number}   y       y tile number
    * @param  {Number}   z      z tile number
    */
-  public getGeoJSONFeaturesInTile(
-    table: string,
-    x: number,
-    y: number,
-    z: number,
-  ): GeoJSONResultSet {
+  public getGeoJSONFeaturesInTile(table: string, x: number, y: number, z: number): GeoJSONResultSet {
     const webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBox(x, y, z);
     const featureIndexManager = this.getFeatureIndexManager(table);
     const featureProjection = featureIndexManager.getFeatureDao().getSrs().getProjection();
@@ -3483,7 +3585,14 @@ export class GeoPackage {
    * @param  {Number}   width      width of the resulting tile
    * @param  {Number}   height     height of the resulting tile
    */
-  async xyzTile(table: string, x: number, y: number, z: number, width = TileUtils.TILE_PIXELS_DEFAULT, height = TileUtils.TILE_PIXELS_DEFAULT): Promise<GeoPackageTile> {
+  async xyzTile(
+    table: string,
+    x: number,
+    y: number,
+    z: number,
+    width = TileUtils.TILE_PIXELS_DEFAULT,
+    height = TileUtils.TILE_PIXELS_DEFAULT,
+  ): Promise<GeoPackageTile> {
     width = Number(width);
     height = Number(height);
     const tileDao = this.getTileDao(table);
@@ -3572,14 +3681,14 @@ export class GeoPackage {
    * Get the tile scaling extension for a given table
    * @param table
    */
-  public getTileScalingExtension(table: string) {
+  public getTileScalingExtension(table: string): TileTableScaling {
     return new TileTableScaling(this, table);
   }
 
   /**
    * Gets the related table extension
    */
-  public getRelatedTablesExtension() {
+  public getRelatedTablesExtension(): RelatedTablesExtension {
     if (this.relatedTablesExtension == null) {
       this.relatedTablesExtension = new RelatedTablesExtension(this);
     }

@@ -1,6 +1,3 @@
-/**
- * @module user/custom
- */
 import { UserCustomTable } from './userCustomTable';
 import { UserTableReader } from '../userTableReader';
 import { UserCustomColumn } from './userCustomColumn';

@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-// @ts-ignore
 import simplify from 'simplify-js';
 import { FeatureDao } from '../../features/user/featureDao';
 import { TileBoundingBoxUtils } from '../tileBoundingBoxUtils';
@@ -31,7 +29,7 @@ import {
   Polygon,
   PolyhedralSurface,
   TIN,
-  Triangle
+  Triangle,
 } from '@ngageoint/simple-features-js';
 import { GeoPackageException } from '../../geoPackageException';
 import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
@@ -41,13 +39,8 @@ import { FeatureResultSet } from '../../features/user/featureResultSet';
 import { GeoPackageImage } from '../../image/geoPackageImage';
 import { FeatureIndexResults } from '../../features/index/featureIndexResults';
 import { FeatureTileCanvas } from './featureTileCanvas';
-import { EmulatedCanvas2D } from '../../../@types/canvaskit';
+import { EmulatedCanvas2D, EmulatedCanvas2DContext } from '../../../@types/canvaskit';
 import type { GeoPackage } from '../../geoPackage';
-
-/**
- * FeatureTiles module.
- * @module tiles/features
- */
 
 /**
  *  Tiles drawn from or linked to features. Used to query features and optionally draw tiles
@@ -306,11 +299,11 @@ export class FeatureTiles {
       const styleRowIds: Set<number> = new Set<number>();
       const tableStyleIds = this.featureTableStyles.getAllTableStyleIds();
       if (tableStyleIds != null) {
-        tableStyleIds.forEach(id => styleRowIds.add(id));
+        tableStyleIds.forEach((id) => styleRowIds.add(id));
       }
       const styleIds = this.featureTableStyles.getAllStyleIds();
       if (styleIds != null) {
-        styleIds.forEach(id => styleRowIds.add(id));
+        styleIds.forEach((id) => styleRowIds.add(id));
       }
 
       const styleDao = this.featureTableStyles.getStyleDao();
@@ -327,11 +320,11 @@ export class FeatureTiles {
       const iconRowIds: Set<number> = new Set<number>();
       const tableIconIds = this.featureTableStyles.getAllTableIconIds();
       if (tableIconIds != null) {
-        tableIconIds.forEach(id => iconRowIds.add(id));
+        tableIconIds.forEach((id) => iconRowIds.add(id));
       }
       const iconIds = this.featureTableStyles.getAllIconIds();
       if (iconIds != null) {
-        iconIds.forEach(id => iconRowIds.add(id));
+        iconIds.forEach((id) => iconRowIds.add(id));
       }
 
       const iconDao = this.featureTableStyles.getIconDao();
@@ -745,10 +738,7 @@ export class FeatureTiles {
   getFeatureCount(x: number, y: number, z: number): number {
     let boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBox(x, y, z);
     boundingBox = this.expandBoundingBox(boundingBox);
-    return this.indexManager.countWithBoundingBoxAndProjection(
-      boundingBox,
-      FeatureTiles.WEB_MERCATOR_PROJECTION,
-    );
+    return this.indexManager.countWithBoundingBoxAndProjection(boundingBox, FeatureTiles.WEB_MERCATOR_PROJECTION);
   }
 
   /**
@@ -760,10 +750,7 @@ export class FeatureTiles {
   getFeatureCountWGS84(x: number, y: number, z: number): number {
     let boundingBox = TileBoundingBoxUtils.getWGS84BoundingBox(x, y, z);
     boundingBox = this.expandBoundingBoxWithProjection(boundingBox, FeatureTiles.WGS_84_PROJECTION);
-    return this.indexManager.countWithBoundingBoxAndProjection(
-      boundingBox,
-      FeatureTiles.WGS_84_PROJECTION,
-    );
+    return this.indexManager.countWithBoundingBoxAndProjection(boundingBox, FeatureTiles.WGS_84_PROJECTION);
   }
 
   /**
@@ -850,7 +837,7 @@ export class FeatureTiles {
           );
         }
       } finally {
-        resultSet.close()
+        resultSet.close();
       }
     }
     return image;
@@ -935,7 +922,13 @@ export class FeatureTiles {
           );
         } else if (this.maxFeaturesTileDraw != null) {
           // Draw the max features tile
-          image = await this.maxFeaturesTileDraw.drawTile(this.tileWidth, this.tileHeight, tileCount, resultSet, canvas);
+          image = await this.maxFeaturesTileDraw.drawTile(
+            this.tileWidth,
+            this.tileHeight,
+            tileCount,
+            resultSet,
+            canvas,
+          );
         }
       } finally {
         resultSet.close();
@@ -1232,17 +1225,17 @@ export class FeatureTiles {
    */
   public expandBoundingBoxWithProjection(boundingBox: BoundingBox, projection: Projection): BoundingBox {
     let expandedBoundingBox = boundingBox.copy();
-    const toWebMercator = GeometryTransform.create(projection, ProjectionConstants.EPSG_WEB_MERCATOR);
+    let toWebMercator;
     if (!projection.equalsProjection(FeatureTiles.WEB_MERCATOR_PROJECTION)) {
+      toWebMercator = GeometryTransform.create(projection, Projections.getWebMercatorProjection());
       expandedBoundingBox = expandedBoundingBox.transform(toWebMercator);
     }
     expandedBoundingBox = this.expandBoundingBox(expandedBoundingBox);
 
-    if (!projection.equalsProjection(FeatureTiles.WEB_MERCATOR_PROJECTION)) {
+    if (toWebMercator != null) {
       const fromWebMercator = toWebMercator.getInverseTransformation();
       expandedBoundingBox = expandedBoundingBox.transform(fromWebMercator);
     }
-
 
     return expandedBoundingBox;
   }
@@ -1264,10 +1257,10 @@ export class FeatureTiles {
   getTransformFunction(projection: Projection): Function {
     if (this.projection.equalsProjection(projection)) {
       // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-      return coordinate => coordinate;
+      return (coordinate) => coordinate;
     } else if (Projections.isWebMercator(projection) && Projections.isWGS84(this.projection)) {
       // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-      return coordinate => {
+      return (coordinate) => {
         return GeometryTransform.create(this.projection, projection).transform(
           Math.max(
             -ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH,
@@ -1318,9 +1311,7 @@ export class FeatureTiles {
         const iconX = Math.round(x - anchorU * width);
         const iconY = Math.round(y - anchorV * height);
         const iconCanvas = canvas.getIconCanvas();
-        const iconCanvasContext = iconCanvas.getContext('2d');
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore
+        const iconCanvasContext: any = iconCanvas.getContext('2d');
         iconCanvasContext.drawImage(icon.getImage(), iconX, iconY, width, height);
         drawn = true;
       }
@@ -1331,9 +1322,7 @@ export class FeatureTiles {
         const iconX = Math.round(x - this.scale * this.pointIcon.getXOffset());
         const iconY = Math.round(y - this.scale * this.pointIcon.getYOffset());
         const iconCanvas = canvas.getIconCanvas();
-        const iconCanvasContext = iconCanvas.getContext('2d');
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore
+        const iconCanvasContext: any = iconCanvas.getContext('2d');
         iconCanvasContext.drawImage(this.pointIcon.getIcon().getImage(), iconX, iconY, width, height);
         drawn = true;
       }
@@ -1350,7 +1339,7 @@ export class FeatureTiles {
       }
       if (x >= 0 - radius && x <= this.tileWidth + radius && y >= 0 - radius && y <= this.tileHeight + radius) {
         const pointCanvas = canvas.getPointCanvas();
-        const pointCanvasContext = pointCanvas.getContext('2d');
+        const pointCanvasContext: any = pointCanvas.getContext('2d');
         pointCanvasContext.save();
         const pointPaint = this.getPointPaint(featureStyle);
         const circleX = Math.round(x);
@@ -1378,7 +1367,8 @@ export class FeatureTiles {
   protected simplifyPoints(simplifyTolerance: number, points: Point[]): Point[] {
     let simplifiedPoints;
     if (this.simplifyGeometries) {
-      const requiresTransformation = this.projection != null && Projections.getUnits(this.projection.toString()) !== 'meters';
+      const requiresTransformation =
+        this.projection != null && Projections.getUnits(this.projection.toString()) !== 'meters';
       // Reproject to web mercator if not in meters
       if (requiresTransformation) {
         const toWebMercator = GeometryTransform.create(this.projection, FeatureTiles.WEB_MERCATOR_PROJECTION);
@@ -1386,7 +1376,7 @@ export class FeatureTiles {
       }
 
       // Simplify the points
-      simplifiedPoints = simplify(points, simplifyTolerance, false).map(point => new Point(point.x, point.y));
+      simplifiedPoints = simplify(points, simplifyTolerance, false).map((point) => new Point(point.x, point.y));
 
       // Reproject back to the original projection
       if (requiresTransformation) {
@@ -1488,7 +1478,7 @@ export class FeatureTiles {
       return;
     }
 
-    const coordinates = circularString.points.map(point => {
+    const coordinates = circularString.points.map((point) => {
       const transformedCoordinate = transform.transformPoint(point);
       return new Point(
         TileBoundingBoxUtils.getXPixel(this.tileWidth, boundingBox, transformedCoordinate[0]),
@@ -1611,7 +1601,7 @@ export class FeatureTiles {
     let drawn = true;
     try {
       const lineCanvas = canvas.getLineCanvas();
-      const context = lineCanvas.getContext('2d');
+      const context: any = lineCanvas.getContext('2d');
       context.save();
       context.beginPath();
       const paint = this.getLinePaint(featureStyle);
@@ -1648,7 +1638,7 @@ export class FeatureTiles {
     let drawn = true;
     try {
       const lineCanvas = canvas.getLineCanvas();
-      const context = lineCanvas.getContext('2d');
+      const context: any = lineCanvas.getContext('2d');
       context.save();
       context.beginPath();
       const paint = this.getLinePaint(featureStyle);
@@ -1702,7 +1692,7 @@ export class FeatureTiles {
     featureStyle: FeatureStyle,
   ): boolean {
     const polyCanvas = canvas.getPolygonCanvas();
-    const context = polyCanvas.getContext('2d');
+    const context: any = polyCanvas.getContext('2d');
     // get paint
     context.save();
     context.beginPath();
@@ -1873,6 +1863,8 @@ export class FeatureTiles {
     maxLatitude = Math.max(maxLatitude, boundingBox.getMaxLatitude());
 
     // Bound with the web mercator limits
-    return TileBoundingBoxUtils.boundWebMercatorBoundingBox(new BoundingBox(minLongitude, minLatitude, maxLongitude, maxLatitude));
+    return TileBoundingBoxUtils.boundWebMercatorBoundingBox(
+      new BoundingBox(minLongitude, minLatitude, maxLongitude, maxLatitude),
+    );
   }
 }

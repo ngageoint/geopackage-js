@@ -1,6 +1,3 @@
-/**
- * @module attributes/attributesTable
- */
 import { UserTable } from '../user/userTable';
 import { Contents } from '../contents/contents';
 import { AttributesColumn } from './attributesColumn';

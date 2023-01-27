@@ -1,6 +1,3 @@
-/**
- * @module user/userColumn
- */
 import { GeoPackageDataType } from '../db/geoPackageDataType';
 import { Constraint } from '../db/table/constraint';
 import { RawConstraint } from '../db/table/rawConstraint';
@@ -15,15 +12,7 @@ import { ConstraintParser } from '../db/table/constraintParser';
 
 /**
  * A `UserColumn` is meta-data about a single column from a {@link UserTable}.
- *
  * @class
- * @param {Number} index column index
- * @param {string} name column name
- * @param {GPKGDataType} dataType data type of the column
- * @param {?Number} max max value
- * @param {Boolean} notNull not null
- * @param {?Object} defaultValue default value or null
- * @param {Boolean} primaryKey `true` if this column is part of the table's primary key
  */
 export abstract class UserColumn implements Comparable<UserColumn> {
   /**

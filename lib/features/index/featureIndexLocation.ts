@@ -47,13 +47,13 @@ export class FeatureIndexLocation implements IterableIterator<FeatureIndexType> 
     return type;
   }
 
-  public next(): { value: FeatureIndexType, done: boolean } {
+  public next(): { value: FeatureIndexType; done: boolean } {
     const currentType = this.type;
     this.type = this.getNextSupportedFeatureIndexType();
 
     return {
       value: currentType,
-      done: currentType == null
+      done: currentType == null,
     };
   }
 }

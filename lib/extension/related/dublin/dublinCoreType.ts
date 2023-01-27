@@ -1,8 +1,4 @@
 /**
- * @module  extension/relatedTables
- */
-
-/**
  * Dublin Core Metadata Initiative term types
  * @class
  */
@@ -58,7 +54,14 @@ export class DublinCoreType {
    * Returns a list of all dublin core types
    */
   public static getTypes(): DublinCoreType[] {
-    return [DublinCoreType.DATE, DublinCoreType.DESCRIPTION, DublinCoreType.FORMAT, DublinCoreType.IDENTIFIER, DublinCoreType.SOURCE, DublinCoreType.TITLE];
+    return [
+      DublinCoreType.DATE,
+      DublinCoreType.DESCRIPTION,
+      DublinCoreType.FORMAT,
+      DublinCoreType.IDENTIFIER,
+      DublinCoreType.SOURCE,
+      DublinCoreType.TITLE,
+    ];
   }
 
   /**

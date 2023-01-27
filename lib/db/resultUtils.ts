@@ -73,7 +73,11 @@ export class ResultUtils {
    * @param limit  result row limit
    * @return single column results
    */
-  public static buildSingleColumnResultsWithColumnIndex(result: ResultSetResult, columnIndex = 0, limit?: number): any[] {
+  public static buildSingleColumnResultsWithColumnIndex(
+    result: ResultSetResult,
+    columnIndex = 0,
+    limit?: number,
+  ): any[] {
     const results = [];
     while (result.moveToNext()) {
       const value = result.getValueWithIndex(columnIndex);
@@ -109,5 +113,4 @@ export class ResultUtils {
     }
     return results;
   }
-
 }

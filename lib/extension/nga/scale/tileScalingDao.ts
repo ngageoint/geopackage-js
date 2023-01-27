@@ -27,8 +27,8 @@ export class TileScalingDao extends GeoPackageDao<TileScaling, string> {
   }
 
   /**
-   * Create a {module:extension/nga/scale.TileScaling} object
-   * @return {module:extension/nga/scale.TileScaling}
+   * Create a TileScaling object
+   * @return {TileScaling}
    */
   createObject(results?: Record<string, DBValue>): TileScaling {
     const c = new TileScaling();
@@ -44,7 +44,7 @@ export class TileScalingDao extends GeoPackageDao<TileScaling, string> {
   /**
    * Query by table name
    * @param  {string} tableName name of the table
-   * @return {module:extension/nga/scale.TileScaling}
+   * @return {TileScaling}
    */
   queryForTableName(tableName: string): TileScaling {
     const tileScaling = this.queryForAll(

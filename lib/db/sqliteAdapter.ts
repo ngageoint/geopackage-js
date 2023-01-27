@@ -19,15 +19,15 @@ export class SqliteAdapter implements DBAdapter {
    * Returns a Promise which, when resolved, returns a DBAdapter which has connected to the GeoPackage database file
    */
   async initialize(): Promise<this> {
-    // @ts-ignore
     try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const Database = require('better-sqlite3');
       if (this.filePath && typeof this.filePath === 'string') {
         if (this.filePath.indexOf('http') === 0) {
           const url: string = this.filePath as string;
           return new Promise((resolve, reject) => {
             http
-              .get(url, response => {
+              .get(url, (response) => {
                 if (response.statusCode !== 200) {
                   reject(new Error('Unable to reach url: ' + this.filePath));
                 }
@@ -46,7 +46,7 @@ export class SqliteAdapter implements DBAdapter {
                   }
                 });
               })
-              .on('error', e => {
+              .on('error', (e) => {
                 reject(e);
               });
           });
@@ -134,7 +134,7 @@ export class SqliteAdapter implements DBAdapter {
    * Returns a Buffer containing the contents of the database as a file
    */
   async export(): Promise<Uint8Array> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       return fs.readFile(this.filePath as string, (err, data) => {
         resolve(data);
       });
@@ -173,7 +173,7 @@ export class SqliteAdapter implements DBAdapter {
    */
   isTableExists(tableName: string): boolean {
     let statement = this.db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=:name");
-    const result = statement.get({ name: tableName })
+    const result = statement.get({ name: tableName });
     statement = null;
     return !!result;
   }
@@ -239,7 +239,7 @@ export class SqliteAdapter implements DBAdapter {
    * Prepares a SQL statement
    * @param sql
    */
-  prepareStatement (sql: string): any {
+  prepareStatement(sql: string): any {
     return this.db.prepare(sql);
   }
   /**
@@ -248,14 +248,15 @@ export class SqliteAdapter implements DBAdapter {
    * @param  {Object|Array} [params] bind parameters
    * @return {Number} last inserted row id
    */
-  bindAndInsert (statement: any, params?: [] | Record<string, DBValue>): number {
+  bindAndInsert(statement: any, params?: [] | Record<string, DBValue>): number {
     return statement.run(params).lastInsertRowid;
   }
   /**
    * Closes a prepared statement
    * @param statement
    */
-  closeStatement (statement: any) {
+  closeStatement(statement: any): void {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     statement = null;
   }
   /**
@@ -324,17 +325,13 @@ export class SqliteAdapter implements DBAdapter {
     } else {
       iterator = statement.iterate();
     }
-    const close = () => {
-      try {
-        if (iterator != null) {
-          iterator.return();
-          iterator = null;
-        }
-        statement = null;
-      } catch (e) {
-        console.error(e);
+    const close = (): void => {
+      if (iterator != null) {
+        iterator.return();
+        iterator = null;
       }
-    }
+      statement = null;
+    };
     return new ResultSet(iterator, { close }, this);
   }
 

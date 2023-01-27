@@ -56,7 +56,8 @@ export class GeoPackageManager {
    */
   static async create(gppath?: string): Promise<GeoPackage> {
     let geoPackage: GeoPackage;
-    const valid = typeof gppath !== 'string' ||
+    const valid =
+      typeof gppath !== 'string' ||
       (typeof gppath === 'string' && !GeoPackageValidate.validateGeoPackageExtension(gppath));
     if (!valid) {
       throw new GeoPackageException('Invalid GeoPackage');

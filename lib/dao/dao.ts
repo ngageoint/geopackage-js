@@ -4,7 +4,6 @@ import { DBValue } from '../db/dbValue';
 import { SQLUtils } from '../db/sqlUtils';
 import type { GeoPackage } from '../geoPackage';
 import type { GeoPackageConnection } from '../db/geoPackageConnection';
-import { GeometryIndex } from '../extension/nga/index/geometryIndex';
 
 /**
  * Return class for the {@link Dao#createOrUpdate(Object)} method.
@@ -83,12 +82,11 @@ export abstract class Dao<T, ID> {
     return this.db.isTableExists(this.gpkgTableName);
   }
 
-
   /**
    * Checks if the ID exists
    * @param id
    */
-  idExists(id: ID) {
+  idExists(id: ID): boolean {
     return this.queryForIdWithKey(id) != null;
   }
 
@@ -120,7 +118,7 @@ export abstract class Dao<T, ID> {
    * @param value
    */
   queryForEq(field: string, value: any): T[] {
-    return this.queryForAllEq(field, value).map(result => this.createObject(result));
+    return this.queryForAllEq(field, value).map((result) => this.createObject(result));
   }
 
   queryForSameId(object: T): T {
@@ -159,7 +157,7 @@ export abstract class Dao<T, ID> {
    * @param params
    */
   queryRaw(sql: string, params?: [] | Record<string, any>): Record<string, DBValue> {
-    return this.db.get(sql, params)
+    return this.db.get(sql, params);
   }
 
   /**
@@ -168,7 +166,7 @@ export abstract class Dao<T, ID> {
    * @param params
    */
   queryAllRaw(sql: string, params?: [] | Record<string, any>): Record<string, DBValue>[] {
-    return this.db.all(sql, params)
+    return this.db.all(sql, params);
   }
 
   /**
@@ -177,7 +175,7 @@ export abstract class Dao<T, ID> {
    * @param params
    */
   queryEachRaw(sql: string, params?: [] | Record<string, any>): IterableIterator<any> {
-    return this.db.each(sql, params)
+    return this.db.each(sql, params);
   }
 
   /**
@@ -199,7 +197,7 @@ export abstract class Dao<T, ID> {
    */
   queryForAllAndCreateObjects(where?: string, whereArgs?: DBValue[]): T[] {
     const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), undefined, where);
-    return this.db.all(query, whereArgs).map(result => this.createObject(result));
+    return this.db.all(query, whereArgs).map((result) => this.createObject(result));
   }
 
   /**
@@ -375,23 +373,23 @@ export abstract class Dao<T, ID> {
    * @param iterator
    * @private
    */
-  public createTypedIterator(iterator: IterableIterator<Record<string, DBValue>>) {
-    const self = this;
+  public createTypedIterator(iterator: IterableIterator<Record<string, DBValue>>): IterableIterator<T> {
+    const createObject = this.createObject;
     return {
       [Symbol.iterator](): IterableIterator<T> {
         return this;
       },
-      next(): { value: T, done: boolean } {
+      next(): { value: T; done: boolean } {
         let tObj = null;
         const result = iterator.next();
         if (result.value != null) {
-          tObj = self.createObject(result.value);
+          tObj = createObject(result.value);
         }
         return {
           value: tObj,
-          done: result.done
+          done: result.done,
         };
-      }
+      },
     };
   }
 
@@ -545,7 +543,6 @@ export abstract class Dao<T, ID> {
   _buildWhereArgsWithColumnValues(values: FieldValues): DBValue[] {
     const args = [];
     for (let i = 0; i < values.columns.length; i++) {
-      const column = values.columns[i];
       const value = values.values[i];
       if (value !== undefined && value !== null) {
         args.push(value);
@@ -757,9 +754,7 @@ export abstract class Dao<T, ID> {
    * @param  {Object} object object with updated values
    * @return {number} number of objects updated
    */
-  update(
-    object: T,
-  ): {
+  update(object: T): {
     changes: number;
     lastInsertRowid: number;
   } {
@@ -815,7 +810,7 @@ export abstract class Dao<T, ID> {
    * @param {string} newName
    */
   rename(newName: string): void {
-    this.db.run('ALTER TABLE ' + SQLUtils.quoteWrap(this.gpkgTableName) + " RENAME TO " + SQLUtils.quoteWrap(newName));
+    this.db.run('ALTER TABLE ' + SQLUtils.quoteWrap(this.gpkgTableName) + ' RENAME TO ' + SQLUtils.quoteWrap(newName));
     this.gpkgTableName = newName;
   }
 }

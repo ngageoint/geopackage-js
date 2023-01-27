@@ -4,7 +4,6 @@ import { DBValue } from '../db/dbValue';
 import { GeoPackageDao } from '../db/geoPackageDao';
 import { ExtensionsKey } from './extensionsKey';
 import type { GeoPackage } from '../geoPackage';
-import { ExtensionScopeType } from './extensionScopeType';
 
 /**
  * Extension Data Access Object

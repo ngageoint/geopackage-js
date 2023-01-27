@@ -5,23 +5,21 @@ import { GeoPackageImage } from '../../../image/geoPackageImage';
 import { GeoPackageException } from '../../../geoPackageException';
 
 /**
- * @memberOf module:extension/nga/style
- * @class IconCache
- */
-/**
- * Constructor, created with cache size of {@link #IconCache.DEFAULT_CACHE_SIZE}
- * @constructor
+ * IconCache for caching icons used by library
  */
 export class IconCache {
   public static DEFAULT_CACHE_SIZE = 100;
   iconCache: { [key: number]: GeoPackageImage } = {};
   accessHistory: number[] = [];
-
+  /**
+   * Constructor, created with cache size of {@link #IconCache.DEFAULT_CACHE_SIZE}
+   * @constructor
+   */
   constructor(public cacheSize = IconCache.DEFAULT_CACHE_SIZE) {}
 
   /**
    * Get the cached image for the icon row or null if not cached
-   * @param {module:extension/nga/style.IconRow} iconRow icon row
+   * @param {IconRow} iconRow icon row
    * @return {GeoPackageImage} icon image or null
    */
   getIconForIconRow(iconRow: IconRow): GeoPackageImage {
@@ -45,7 +43,7 @@ export class IconCache {
   }
   /**
    * Cache the icon image for the icon row
-   * @param {module:extension/nga/style.IconRow} iconRow icon row
+   * @param {IconRow} iconRow icon row
    * @param {GeoPackageImage} image icon image
    * @return {GeoPackageImage} previous cached icon image or null
    */
@@ -82,7 +80,7 @@ export class IconCache {
   }
   /**
    * Remove the cached image for the icon row, if using CanvasKitCanvasAdapter, dispose of returned image to free up memory using Canvas.dispose(icon.image)
-   * @param {module:extension/nga/style.IconRow} iconRow icon row
+   * @param {IconRow} iconRow icon row
    * @return {GeoPackageImage} removed icon image or null
    */
   removeIconForIconRow(iconRow: IconRow): GeoPackageImage {
@@ -108,7 +106,7 @@ export class IconCache {
    * Clear the cache
    */
   clear(): void {
-    Object.keys(this.iconCache).forEach(key => {
+    Object.keys(this.iconCache).forEach((key) => {
       const icon = this.iconCache[key];
       Canvas.disposeImage(icon);
     });
@@ -134,7 +132,7 @@ export class IconCache {
   }
   /**
    * Create or retrieve from cache an icon image for the icon row
-   * @param {module:extension/nga/style.IconRow} icon icon row
+   * @param {IconRow} icon icon row
    * @return {Promise<GeoPackageImage>} icon image
    */
   async createIcon(icon: IconRow): Promise<GeoPackageImage> {
@@ -142,7 +140,7 @@ export class IconCache {
   }
   /**
    * Create or retrieve from cache an icon image for the icon row
-   * @param {module:extension/nga/style.IconRow} icon icon row
+   * @param {IconRow} icon icon row
    * @param {Number} scale scale factor
    * @return {Promise<GeoPackageImage>} icon image
    */
@@ -151,7 +149,7 @@ export class IconCache {
   }
   /**
    * Create an icon image for the icon row without caching
-   * @param {module:extension/nga/style.IconRow} icon icon row
+   * @param {IconRow} icon icon row
    * @return {Promise<GeoPackageImage>} icon image
    */
   async createIconNoCache(icon: IconRow): Promise<GeoPackageImage> {
@@ -168,8 +166,8 @@ export class IconCache {
   }
   /**
    * Create or retrieve from cache an icon image for the icon row
-   * @param {module:extension/nga/style.IconRow} icon icon row
-   * @param {module:extension/nga/style.IconCache} iconCache icon cache
+   * @param {IconRow} icon icon row
+   * @param {IconCache} iconCache icon cache
    * @return {Promise<GeoPackageImage>} icon image
    */
   async createAndCacheIcon(icon: IconRow, iconCache: IconCache): Promise<GeoPackageImage> {
@@ -177,9 +175,9 @@ export class IconCache {
   }
   /**
    * Create or retrieve from cache an icon image for the icon row
-   * @param {module:extension/nga/style.IconRow} icon icon row
+   * @param {IconRow} icon icon row
    * @param {Number} scale scale factor
-   * @param {module:extension/nga/style.IconCache} iconCache icon cache
+   * @param {IconCache} iconCache icon cache
    * @return {Promise<GeoPackageImage>} icon image
    */
   async createAndCacheScaledIcon(icon: IconRow, scale: number, iconCache: IconCache): Promise<GeoPackageImage> {
@@ -195,7 +193,9 @@ export class IconCache {
         try {
           iconImage = await ImageUtils.getImage(icon.getData());
         } catch (e) {
-          throw new GeoPackageException('Failed to get the Icon Row image. Id: ' + iconId + ', Name: ' + icon.getName());
+          throw new GeoPackageException(
+            'Failed to get the Icon Row image. Id: ' + iconId + ', Name: ' + icon.getName(),
+          );
         }
 
         const dataWidth = iconImage.width;

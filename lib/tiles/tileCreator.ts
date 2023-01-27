@@ -14,7 +14,6 @@ import { ImageUtils } from '../image/imageUtils';
 import { GeoPackageImage } from '../image/geoPackageImage';
 import { TileScalingType } from '../extension/nga/scale/tileScalingType';
 import { ImageType } from '../image/imageType';
-import { CanvasUtils } from '../canvas/canvasUtils';
 
 /**
  * Tile Creator, creates a tile from a tile matrix to the desired projection
@@ -83,12 +82,7 @@ export class TileCreator {
    * @param height request height
    * @param imageFormat image format
    */
-  public constructor(
-    tileDao: TileDao,
-    width: number,
-    height: number,
-    imageFormat: string,
-  ) {
+  public constructor(tileDao: TileDao, width: number, height: number, imageFormat: string) {
     this.tileDao = tileDao;
     this.width = width;
     this.height = height;
@@ -107,7 +101,8 @@ export class TileCreator {
 
     // Check if the projections are the same or have the same units
     this.sameProjection = this.requestProjection.equalsProjection(this.tilesProjection);
-    this.sameUnit = Projections.getUnits(this.requestProjection.toString()) === Projections.getUnits(this.tilesProjection.toString());
+    this.sameUnit =
+      Projections.getUnits(this.requestProjection.toString()) === Projections.getUnits(this.tilesProjection.toString());
 
     if (imageFormat == null && !this.sameProjection) {
       throw new GeoPackageException(
@@ -123,7 +118,8 @@ export class TileCreator {
   public setRequestProjection(requestProjection: Projection): void {
     this.requestProjection = requestProjection;
     this.sameProjection = requestProjection.equalsProjection(this.tilesProjection);
-    this.sameUnit = Projections.getUnits(requestProjection.toString()) === Projections.getUnits(this.tilesProjection.toString());
+    this.sameUnit =
+      Projections.getUnits(requestProjection.toString()) === Projections.getUnits(this.tilesProjection.toString());
   }
 
   /**
@@ -139,12 +135,7 @@ export class TileCreator {
     width?: number,
     height?: number,
   ): TileCreator {
-    return new TileCreator(
-      tileDao,
-      width,
-      height,
-      imageFormat,
-    );
+    return new TileCreator(tileDao, width, height, imageFormat);
   }
 
   /**
@@ -266,7 +257,7 @@ export class TileCreator {
       if (tileResults != null) {
         hasTile = tileResults.getCount() > 0;
       }
-      tileResults.close()
+      tileResults.close();
     }
 
     return hasTile;
@@ -333,10 +324,9 @@ export class TileCreator {
           let tileWidth = requestedTileWidth;
           let tileHeight = requestedTileHeight;
           if (!this.sameUnit) {
-            tileWidth = Math.round((tilesBoundingBox.getLongitudeRange()) / tileMatrix.getPixelXSize());
-            tileHeight = Math.round((tilesBoundingBox.getLatitudeRange()) / tileMatrix.getPixelYSize());
+            tileWidth = Math.round(tilesBoundingBox.getLongitudeRange() / tileMatrix.getPixelXSize());
+            tileHeight = Math.round(tilesBoundingBox.getLatitudeRange() / tileMatrix.getPixelYSize());
           }
-
 
           // Draw the resulting bitmap with the matching tiles
           let geoPackageTile = await this.drawTile(tileMatrix, tileResults, tilesBoundingBox, tileWidth, tileHeight);
@@ -347,7 +337,14 @@ export class TileCreator {
           if (geoPackageTile != null) {
             // Project the tile if needed
             if (!this.sameProjection && geoPackageTile.getData() != null) {
-              geoPackageTile = await this.reprojectTile(geoPackageTile, requestedTileWidth, requestedTileHeight, requestBoundingBox, transformRequestToTiles, tilesBoundingBox);
+              geoPackageTile = await this.reprojectTile(
+                geoPackageTile,
+                requestedTileWidth,
+                requestedTileHeight,
+                requestBoundingBox,
+                transformRequestToTiles,
+                tilesBoundingBox,
+              );
             }
             tile = geoPackageTile;
           }
@@ -450,7 +447,6 @@ export class TileCreator {
     tileWidth: number,
     tileHeight: number,
   ): Promise<GeoPackageTile> {
-    let dataUrl = null;
     // Draw the resulting bitmap with the matching tiles
     let geoPackageTile: GeoPackageTile = null;
     let canvas: HTMLCanvasElement = null;
@@ -467,7 +463,12 @@ export class TileCreator {
 
       if (tileDataImage != null) {
         // Get the bounding box of the tile
-        const tileBoundingBox = TileBoundingBoxUtils.getBoundingBoxWithTileMatrix(this.tileSetBoundingBox, tileMatrix, tileRow.getTileColumn(), tileRow.getTileRow());
+        const tileBoundingBox = TileBoundingBoxUtils.getBoundingBoxWithTileMatrix(
+          this.tileSetBoundingBox,
+          tileMatrix,
+          tileRow.getTileColumn(),
+          tileRow.getTileRow(),
+        );
 
         // Get the bounding box where the requested image and
         // tile overlap
@@ -475,7 +476,12 @@ export class TileCreator {
         // If the tile overlaps with the requested box
         if (overlap != null) {
           // Get the rectangle of the tile image to draw
-          const src = TileBoundingBoxUtils.getRectangle(tileMatrix.getTileWidth(), tileMatrix.getTileHeight(), tileBoundingBox, overlap);
+          const src = TileBoundingBoxUtils.getRectangle(
+            tileMatrix.getTileWidth(),
+            tileMatrix.getTileHeight(),
+            tileBoundingBox,
+            overlap,
+          );
           // Get the rectangle of where to draw the tile in the resulting image
           const dest = TileBoundingBoxUtils.getRectangle(tileWidth, tileHeight, requestBoundingBox, overlap);
           if (src.isValid() && dest.isValid()) {
@@ -487,10 +493,22 @@ export class TileCreator {
               }
               // Draw the tile to the image
               const image = tileDataImage.getImage();
-              context.drawImage(image, src.getLeft(), src.getTop(), src.getRight() - src.getLeft(), src.getBottom() - src.getTop(), dest.getLeft(), dest.getTop(), dest.getRight() - dest.getLeft(), dest.getBottom() - dest.getTop());
+              context.drawImage(
+                image,
+                src.getLeft(),
+                src.getTop(),
+                src.getRight() - src.getLeft(),
+                src.getBottom() - src.getTop(),
+                dest.getLeft(),
+                dest.getTop(),
+                dest.getRight() - dest.getLeft(),
+                dest.getBottom() - dest.getTop(),
+              );
             } else {
               if (geoPackageTile != null || !src.equals(dest)) {
-                throw new GeoPackageException('Raw image only supported when the images are aligned with the tile format requiring no combining and cropping');
+                throw new GeoPackageException(
+                  'Raw image only supported when the images are aligned with the tile format requiring no combining and cropping',
+                );
               }
               geoPackageTile = new GeoPackageTile(tileWidth, tileHeight, tileRow.getTileData());
             }
@@ -505,10 +523,13 @@ export class TileCreator {
       geoPackageTile = new GeoPackageTile(tileWidth, tileHeight, data);
     }
 
-
     // Check if the entire image is transparent
     if (geoPackageTile != null && geoPackageTile.getData() != null) {
-      const isFullyTransparent = await ImageUtils.isFullyTransparent(geoPackageTile.getData(), geoPackageTile.getWidth(), geoPackageTile.getHeight());
+      const isFullyTransparent = await ImageUtils.isFullyTransparent(
+        geoPackageTile.getData(),
+        geoPackageTile.getWidth(),
+        geoPackageTile.getHeight(),
+      );
       if (isFullyTransparent) {
         geoPackageTile = null;
       }
@@ -539,8 +560,8 @@ export class TileCreator {
     transformRequestToTiles: ProjectionTransform,
     tilesBoundingBox: BoundingBox,
   ): Promise<GeoPackageTile> {
-    const requestedWidthUnitsPerPixel = (requestBoundingBox.getLongitudeRange()) / requestedTileWidth;
-    const requestedHeightUnitsPerPixel = (requestBoundingBox.getLatitudeRange()) / requestedTileHeight;
+    const requestedWidthUnitsPerPixel = requestBoundingBox.getLongitudeRange() / requestedTileWidth;
+    const requestedHeightUnitsPerPixel = requestBoundingBox.getLatitudeRange() / requestedTileHeight;
 
     const tilesDistanceWidth = tilesBoundingBox.getLongitudeRange();
     const tilesDistanceHeight = tilesBoundingBox.getLatitudeRange();
@@ -548,7 +569,7 @@ export class TileCreator {
     const width = tile.getWidth();
     const height = tile.getHeight();
     const image = await tile.getGeoPackageImage();
-    const pixels = image.getImageData().data
+    const pixels = image.getImageData().data;
     const imageFormat = image.getFormat();
     Canvas.disposeImage(image);
 
@@ -564,8 +585,12 @@ export class TileCreator {
         const toCoord = transformRequestToTiles.transform(longitude, latitude);
         const projectedLongitude = toCoord[0];
         const projectedLatitude = toCoord[1];
-        let xPixel = Math.round((projectedLongitude - tilesBoundingBox.getMinLongitude()) / tilesDistanceWidth * width);
-        let yPixel = Math.round((tilesBoundingBox.getMaxLatitude() - projectedLatitude) / tilesDistanceHeight * height);
+        let xPixel = Math.round(
+          ((projectedLongitude - tilesBoundingBox.getMinLongitude()) / tilesDistanceWidth) * width,
+        );
+        let yPixel = Math.round(
+          ((tilesBoundingBox.getMaxLatitude() - projectedLatitude) / tilesDistanceHeight) * height,
+        );
         xPixel = Math.max(0, xPixel);
         xPixel = Math.min(width - 1, xPixel);
         yPixel = Math.max(0, yPixel);

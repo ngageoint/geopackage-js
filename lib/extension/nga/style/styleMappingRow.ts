@@ -1,11 +1,5 @@
-/**
- * @memberOf module:extension/nga/style
- * @class StyleMappingRow
- */
-
 import { UserMappingRow } from '../../related/userMappingRow';
 import { UserColumn } from '../../../user/userColumn';
-import { StyleTable } from './styleTable';
 import { StyleMappingTable } from './styleMappingTable';
 
 /**

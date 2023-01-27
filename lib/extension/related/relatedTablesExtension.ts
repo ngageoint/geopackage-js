@@ -220,7 +220,9 @@ export class RelatedTablesExtension extends BaseExtension {
     let result;
     try {
       if (this.extendedRelationsDao.isTableExists()) {
-        result = this.extendedRelationsDao.queryForAll().map(result => this.extendedRelationsDao.createObject(result));
+        result = this.extendedRelationsDao
+          .queryForAll()
+          .map((result) => this.extendedRelationsDao.createObject(result));
       } else {
         result = [];
       }
@@ -239,7 +241,8 @@ export class RelatedTablesExtension extends BaseExtension {
       extendedRelation.getBaseTableName(),
       extendedRelation.getRelatedTableName(),
       UserMappingTable.create(extendedRelation.getMappingTableName()),
-      extendedRelation.getRelationName());
+      extendedRelation.getRelationName(),
+    );
   }
 
   /**
@@ -264,7 +267,7 @@ export class RelatedTablesExtension extends BaseExtension {
     userMappingTable?: UserMappingTable,
     relatedTable?: UserRelatedTable,
   ): ExtendedRelation {
-    let extendedRelation = new ExtendedRelation();
+    const extendedRelation = new ExtendedRelation();
     if (relationType != null) {
       extendedRelation.setRelationName(relationType.getName());
     } else {
@@ -293,12 +296,14 @@ export class RelatedTablesExtension extends BaseExtension {
         extendedRelation.getBaseTableName(),
         extendedRelation.getRelatedTableName(),
         extendedRelation.getRelationName(),
-      )
+      );
     } catch (e) {
       return null;
     }
     this.createUserMappingTableWithMappingTable(userMappingTable);
-    const mappingTableRelations = this.getExtendedRelationsDao().queryByMappingTableName(extendedRelation.getMappingTableName());
+    const mappingTableRelations = this.getExtendedRelationsDao().queryByMappingTableName(
+      extendedRelation.getMappingTableName(),
+    );
     if (mappingTableRelations.length) {
       return mappingTableRelations[0];
     }
@@ -461,7 +466,14 @@ export class RelatedTablesExtension extends BaseExtension {
     extendedRelation.setMappingTableName(userMappingTable.getTableName());
     extendedRelation.setRelationName(relationName);
     try {
-      const relations = this.extendedRelationsDao.getRelations(baseTableName, this.getPrimaryKeyColumnName(baseTableName), relatedTableName, this.getPrimaryKeyColumnName(relatedTableName), relationName, userMappingTable.getTableName());
+      const relations = this.extendedRelationsDao.getRelations(
+        baseTableName,
+        this.getPrimaryKeyColumnName(baseTableName),
+        relatedTableName,
+        this.getPrimaryKeyColumnName(relatedTableName),
+        relationName,
+        userMappingTable.getTableName(),
+      );
       if (relations.length > 0) {
         extendedRelation = relations[0];
       } else {
@@ -469,7 +481,9 @@ export class RelatedTablesExtension extends BaseExtension {
         extendedRelation.setId(id);
       }
     } catch (e) {
-      throw new GeoPackageException("Failed to add relationship '" + relationName + "' between " + baseTableName + ' and ' + relatedTableName,);
+      throw new GeoPackageException(
+        "Failed to add relationship '" + relationName + "' between " + baseTableName + ' and ' + relatedTableName,
+      );
     }
     return extendedRelation;
   }
@@ -980,7 +994,6 @@ export class RelatedTablesExtension extends BaseExtension {
     return created;
   }
 
-
   /**
    * Get a related media table DAO
    * @param mediaTable media table
@@ -1015,7 +1028,9 @@ export class RelatedTablesExtension extends BaseExtension {
    * @param simpleAttributesTable simple attributes table
    * @return simple attributes DAO
    */
-  public getSimpleAttributesDaoWithSimpleAttributesTable(simpleAttributesTable: SimpleAttributesTable): SimpleAttributesDao {
+  public getSimpleAttributesDaoWithSimpleAttributesTable(
+    simpleAttributesTable: SimpleAttributesTable,
+  ): SimpleAttributesDao {
     return this.getSimpleAttributesDao(simpleAttributesTable.getTableName());
   }
 
@@ -1499,7 +1514,11 @@ export class RelatedTablesExtension extends BaseExtension {
    * @param typeFilter
    * @return map of extended relation to a map of user mapping row to user row
    */
-  public getRelatedRows(baseTableName: string, baseId: number, typeFilter?: RelationType[]): Map<ExtendedRelation, Map<UserMappingRow, UserRow<any, any>>> {
+  public getRelatedRows(
+    baseTableName: string,
+    baseId: number,
+    typeFilter?: RelationType[],
+  ): Map<ExtendedRelation, Map<UserMappingRow, UserRow<any, any>>> {
     const relationshipMap = new Map<ExtendedRelation, Map<UserMappingRow, UserRow<any, any>>>();
     const relationships = this.getBaseTableRelations(baseTableName);
     for (let i = 0; i < relationships.length; i++) {
@@ -1524,21 +1543,20 @@ export class RelatedTablesExtension extends BaseExtension {
             userDao = this.geoPackage.getSimpleAttributesDao(relation.getRelatedTableName());
             break;
           default:
-            throw new GeoPackageException('Relationship Unknown')
+            throw new GeoPackageException('Relationship Unknown');
         }
 
         const userMappingDao = this.getUserMappingDao(relation.getMappingTableName());
         const mappingResultSet = userMappingDao.queryByBaseId(baseId);
         while (mappingResultSet.moveToNext()) {
           const userMappingRow = userMappingDao.getRowWithUserCustomRow(mappingResultSet.getRow());
-          relationMap.set(userMappingRow, userDao.queryForIdRow(userMappingRow.getRelatedId()))
+          relationMap.set(userMappingRow, userDao.queryForIdRow(userMappingRow.getRelatedId()));
         }
         relationshipMap.set(relation, relationMap);
       }
     }
     return relationshipMap;
   }
-
 
   /**
    * Get the related id mappings for the base id
@@ -1590,7 +1608,6 @@ export class RelatedTablesExtension extends BaseExtension {
    * @return IDs representing the matching base IDs
    */
   public getMappingsForRelated(tableName: string, relatedId: number): number[] {
-
     const baseIds = [];
 
     const userMappingDao = this.getMappingDao(tableName);
@@ -1804,7 +1821,10 @@ export class RelatedTablesExtension extends BaseExtension {
    * @param relatedId related id
    * @return rows deleted
    */
-  public deleteMappingsToRelatedWithExtendedRelations(extendedRelations: ExtendedRelation[], relatedId: number): number {
+  public deleteMappingsToRelatedWithExtendedRelations(
+    extendedRelations: ExtendedRelation[],
+    relatedId: number,
+  ): number {
     let count = 0;
     if (extendedRelations != null) {
       for (const extendedRelation of extendedRelations) {
@@ -1831,7 +1851,10 @@ export class RelatedTablesExtension extends BaseExtension {
    * @return mappings count
    */
   public countMappings(table: string, id: number): number {
-    return this.countMappingsToBaseWithExtendedRelations(this.getBaseTableRelations(table), id) + this.countMappingsToRelatedWithExtendedRelations(this.getRelatedTableRelations(table), id);
+    return (
+      this.countMappingsToBaseWithExtendedRelations(this.getBaseTableRelations(table), id) +
+      this.countMappingsToRelatedWithExtendedRelations(this.getRelatedTableRelations(table), id)
+    );
   }
 
   /**
@@ -1841,7 +1864,10 @@ export class RelatedTablesExtension extends BaseExtension {
    * @return true if mapping exists
    */
   public hasMappingForBaseOrRelatedId(table: string, id: number): boolean {
-    return this.hasMappingToBaseWithExtendedRelations(this.getBaseTableRelations(table), id) || this.hasMappingToRelatedWithExtendedRelations(this.getRelatedTableRelations(table), id);
+    return (
+      this.hasMappingToBaseWithExtendedRelations(this.getBaseTableRelations(table), id) ||
+      this.hasMappingToRelatedWithExtendedRelations(this.getRelatedTableRelations(table), id)
+    );
   }
 
   /**

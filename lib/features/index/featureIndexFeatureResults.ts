@@ -51,7 +51,7 @@ export class FeatureIndexFeatureResults implements FeatureIndexResults {
   /**
    * {@inheritDoc}
    */
-  public next(): { value: FeatureRow, done: boolean } {
+  public next(): { value: FeatureRow; done: boolean } {
     return this.resultSet.next();
   }
 

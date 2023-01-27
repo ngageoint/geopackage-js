@@ -1,7 +1,3 @@
-/**
- * @module tiles/matrixset
- * @see module:dao/dao
- */
 import { BoundingBox } from '../../boundingBox';
 import { Contents } from '../../contents/contents';
 import { SpatialReferenceSystemConstants } from '../../srs/spatialReferenceSystemConstants';

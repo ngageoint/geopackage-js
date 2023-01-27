@@ -1,7 +1,3 @@
-/**
- * Dublin Core Metadata Initiative
- * @module extension/relatedTables
- */
 import { UserRow } from '../../../user/userRow';
 import { UserTable } from '../../../user/userTable';
 import { DublinCoreType } from './dublinCoreType';

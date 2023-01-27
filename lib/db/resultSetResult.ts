@@ -36,12 +36,12 @@ export class ResultSetResult implements Result {
    * @param columnName
    * @param dataType
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public getValue(columnName: string, dataType?: GeoPackageDataType): any {
     let value;
     try {
       value = this.resultSet.getValue(columnName);
     } catch (e) {
-      console.error(e)
       throw new GeoPackageException('Failed to get value for column name: ' + columnName);
     }
     return value;
