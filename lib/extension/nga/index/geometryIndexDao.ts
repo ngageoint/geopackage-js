@@ -76,28 +76,28 @@ export class GeometryIndexDao extends GeoPackageDao<GeometryIndex, GeometryIndex
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public extractId(data: GeometryIndex): GeometryIndexKey {
     return data.getId();
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public idExists(id: GeometryIndexKey): boolean {
     return this.queryForIdWithKey(id) != null;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public queryForSameId(data: GeometryIndex): GeometryIndex {
     return this.queryForIdWithKey(data.getId());
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public updateId(data: GeometryIndex, newId: GeometryIndexKey): number {
     let count = 0;
@@ -110,7 +110,7 @@ export class GeometryIndexDao extends GeoPackageDao<GeometryIndex, GeometryIndex
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public deleteByIdWithKey(id: GeometryIndexKey): number {
     let count = 0;

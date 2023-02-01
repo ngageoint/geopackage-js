@@ -28,14 +28,14 @@ export class DataColumnsDao extends GeoPackageDao<DataColumns, TableColumnKey> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public extractId(data: DataColumns): TableColumnKey {
     return data.getId();
   }
 
   /**
-   * Creates a new {DataColumns} object
+   * Creates a new DataColumns object
    * @return {DataColumns}
    */
   createObject(results?: Record<string, DBValue>): DataColumns {
@@ -120,7 +120,7 @@ export class DataColumnsDao extends GeoPackageDao<DataColumns, TableColumnKey> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public updateId(data: DataColumns, newId: TableColumnKey): number {
     let count = 0;

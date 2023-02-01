@@ -18,14 +18,14 @@ export class SimpleAttributesDao extends UserCustomDao {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getTable(): SimpleAttributesTable {
     return super.getTable() as SimpleAttributesTable;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public newRow(): SimpleAttributesRow {
     return new SimpleAttributesRow(this.getTable());

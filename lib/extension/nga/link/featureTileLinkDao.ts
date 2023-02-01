@@ -37,7 +37,7 @@ export class FeatureTileLinkDao extends GeoPackageDao<FeatureTileLink, FeatureTi
   }
 
   /**
-   * Create a {ContentsId} object
+   * Create a feature tile link object
    * @return {FeatureTileLink}
    */
   createObject(results?: Record<string, DBValue>): FeatureTileLink {
@@ -50,7 +50,7 @@ export class FeatureTileLinkDao extends GeoPackageDao<FeatureTileLink, FeatureTi
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public queryForFeatureTileLinkKey(key: FeatureTileLinkKey): FeatureTileLink {
     let featureTileLink = null;
@@ -79,28 +79,28 @@ export class FeatureTileLinkDao extends GeoPackageDao<FeatureTileLink, FeatureTi
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public extractId(data: FeatureTileLink): FeatureTileLinkKey {
     return data.getId();
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public idExists(id: FeatureTileLinkKey): boolean {
     return this.queryForFeatureTileLinkKey(id) != null;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public queryForSameId(data: FeatureTileLink): FeatureTileLink {
     return this.queryForFeatureTileLinkKey(data.getId());
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public updateId(data: FeatureTileLink, newId: FeatureTileLinkKey): number {
     let count = 0;
@@ -113,7 +113,7 @@ export class FeatureTileLinkDao extends GeoPackageDao<FeatureTileLink, FeatureTi
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public deleteByFeatureTileLink(data: FeatureTileLink): number {
     let where = '';
@@ -125,7 +125,7 @@ export class FeatureTileLinkDao extends GeoPackageDao<FeatureTileLink, FeatureTi
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public deleteByFeatureTileLinkKey(id: FeatureTileLinkKey): number {
     let count = 0;
@@ -139,7 +139,7 @@ export class FeatureTileLinkDao extends GeoPackageDao<FeatureTileLink, FeatureTi
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public deleteByFeatureTileLinkKeys(idCollection: FeatureTileLinkKey[]): number {
     let count = 0;

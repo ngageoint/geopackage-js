@@ -111,7 +111,7 @@ export class UserCustomDao extends UserDao<UserCustomColumn, UserCustomTable, Us
   }
 
   /**
-   * {inheritDoc}
+   * @inheritDoc
    * @param projection
    * @protected
    */

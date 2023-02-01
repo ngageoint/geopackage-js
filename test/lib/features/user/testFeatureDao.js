@@ -300,7 +300,7 @@ describe('FeatureDao tests', function () {
         //      |/        |
         //      /_________|
         //     /
-        geoPackage.createFeatureTableWithFeatureTableMetadata(FeatureTableMetadata.create(geometryColumns, columns));
+        geoPackage.createFeatureTableWithMetadata(FeatureTableMetadata.create(geometryColumns, columns));
         var featureDao = geoPackage.getFeatureDao('QueryTest');
         queryTestFeatureDao = featureDao;
         createRow(box1, 'box1', featureDao);

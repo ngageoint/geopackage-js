@@ -629,7 +629,7 @@ export class TileReprojection {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   protected getOptimizeZoom(): number {
     const tileDao = this.getTileDao();
@@ -637,7 +637,7 @@ export class TileReprojection {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   protected createReprojectTileDao(table: string): TileDao {
     return this.getGeoPackage().getTileDao(table);
@@ -660,28 +660,28 @@ export class TileReprojection {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   protected getTileMatrixSet(reproject: boolean): TileMatrixSet {
     return this.getTileDao(reproject).getTileMatrixSet();
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   protected getTileMatrices(reproject: boolean): TileMatrix[] {
     return this.getTileDao(reproject).getTileMatrices();
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   protected getTileMatrix(reproject: boolean, zoom: number): TileMatrix {
     return this.getTileDao(reproject).getTileMatrix(zoom);
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   protected deleteTileMatrices(reproject: boolean, table: string): void {
     try {
@@ -697,14 +697,14 @@ export class TileReprojection {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   protected getMapZoom(reproject: boolean, tileMatrix: TileMatrix): number {
     return this.getTileDao(reproject).getMapZoomWithTileMatrix(tileMatrix);
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   protected createTileMatrix(tileMatrix: TileMatrix): void {
     try {
@@ -720,7 +720,7 @@ export class TileReprojection {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   protected async _reproject(
     zoom: number,

@@ -93,7 +93,7 @@ export class ContentsIdExtension extends BaseExtension {
   }
   /**
    * Get the ContentsId object
-   * @param contents {Contents}
+   * @param {Contents} contents
    * @returns {ContentsId}
    */
   getWithContents(contents: Contents): ContentsId {
@@ -116,9 +116,9 @@ export class ContentsIdExtension extends BaseExtension {
     return contentsId;
   }
   /**
-   * Get the ContentsId id
-   * @param contents {Contents}
-   * @returns {Number}
+   * Get the contents id
+   * @param {Contents} contents
+   * @returns {number} id
    */
   getId(contents: Contents): number {
     let contentsId = null;
@@ -144,15 +144,15 @@ export class ContentsIdExtension extends BaseExtension {
   }
   /**
    * Creates contentsId for contents
-   * @param contents {Contents}
-   * @returns {ContentsId}
+   * @param {Contents} contents
+   * @returns {ContentsId} contents id
    */
   create(contents: Contents): ContentsId {
     return this.createWithTableName(contents.getTableName());
   }
   /**
    * Creates contentsId for contents
-   * @param tableName
+   * @param {string} tableName
    * @returns {ContentsId}
    */
   createWithTableName(tableName: string): ContentsId {
@@ -177,7 +177,7 @@ export class ContentsIdExtension extends BaseExtension {
 
   /**
    * Creates contentsId for contents
-   * @param contents {Contents}
+   * @param {Contents} contents
    * @returns number
    */
   createId(contents: Contents): number {
@@ -189,7 +189,7 @@ export class ContentsIdExtension extends BaseExtension {
   }
   /**
    * Creates contentsId for contents
-   * @param tableName {string}
+   * @param {string} tableName
    * @returns number
    */
   createIdWithTableName(tableName: string): number {
@@ -238,7 +238,7 @@ export class ContentsIdExtension extends BaseExtension {
   }
   /**
    * Deletes contentsId for contents
-   * @param contents {Contents}
+   * @param {Contents} contents
    */
   deleteId(contents: Contents): number {
     let deleted = 0;
@@ -249,7 +249,7 @@ export class ContentsIdExtension extends BaseExtension {
   }
   /**
    * Deletes contentId for table name
-   * @param tableName {string}
+   * @param {string} tableName
    */
   deleteIdByTableName(tableName: string): number {
     return this.contentsIdDao.deleteByTableName(tableName);

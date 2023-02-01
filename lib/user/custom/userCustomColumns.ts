@@ -105,7 +105,7 @@ export class UserCustomColumns extends UserColumns<UserCustomColumn> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   updateColumns(): void {
     super.updateColumns();

@@ -15,14 +15,14 @@ export class IconDao extends MediaDao {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getTable(): IconTable {
     return super.getTable() as IconTable;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public newRow(): IconRow {
     return new IconRow(this.getTable());

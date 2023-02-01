@@ -122,10 +122,7 @@ describe('RTree tests', function () {
             }
             let transform = new ProjectionTransform(projection, queryProjection);
             let projectedBoundingBox = boundingBox.transform(transform);
-            let projectedBboxCount = tableDao.countWithBoundingBoxAndProjection(
-              projectedBoundingBox,
-              queryProjection,
-            );
+            let projectedBboxCount = tableDao.countWithBoundingBoxAndProjection(projectedBoundingBox, queryProjection);
             assert.isTrue(projectedBboxCount >= expectedCount);
             results = tableDao.queryWithBoundingBoxAndProjection(projectedBoundingBox, queryProjection);
             projectedBboxCount.should.be.equal(results.getCount());

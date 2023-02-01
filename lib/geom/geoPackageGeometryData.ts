@@ -1555,13 +1555,9 @@ export class GeoPackageGeometryData {
 
   /**
    * Get the envelope flag indicator
-   * <p>
    * 1 for xy, 2 for xyz, 3 for xym, 4 for xyzm (null would be 0)
-   *
-   * @param envelope
-   *            geometry envelope
-   *
-   * @return indicator
+   * @param {GeometryEnvelope} envelope geometry envelope
+   * @return {number} indicator
    */
   public static getIndicator(envelope: GeometryEnvelope): number {
     let indicator = 1;

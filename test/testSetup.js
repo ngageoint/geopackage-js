@@ -388,7 +388,7 @@ module.exports.buildFeatureTable = function (
 
   const boundingBox = new BoundingBox(-180, -90, 180, 90);
 
-  return geoPackage.createFeatureTableWithFeatureTableMetadata(
+  return geoPackage.createFeatureTableWithMetadata(
     FeatureTableMetadata.create(geometryColumns, additionalColumns, 'id', boundingBox),
   );
 };

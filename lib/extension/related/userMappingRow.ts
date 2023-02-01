@@ -47,7 +47,7 @@ export class UserMappingRow extends UserCustomRow {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getTable(): UserMappingTable {
     return super.getTable() as UserMappingTable;

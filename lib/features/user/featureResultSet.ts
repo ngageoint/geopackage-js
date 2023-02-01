@@ -32,16 +32,14 @@ export class FeatureResultSet extends UserResultSet<FeatureColumn, FeatureTable,
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getRowWithColumnTypesAndValues(columnTypes: number[], values: DBValue[]): FeatureRow {
     return new FeatureRow(this.getTable(), this.getColumns(), columnTypes, values);
   }
 
   /**
-   * {@inheritDoc}
-   * <p>
-   * Handles geometries
+   * Gets the value for a given column
    */
   public getValueForColumn(column: FeatureColumn): DBValue {
     let value;
@@ -54,7 +52,7 @@ export class FeatureResultSet extends UserResultSet<FeatureColumn, FeatureTable,
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getColumns(): FeatureColumns {
     return super.getColumns() as FeatureColumns;

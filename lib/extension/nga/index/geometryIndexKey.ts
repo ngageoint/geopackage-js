@@ -64,14 +64,14 @@ export class GeometryIndexKey {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public toString(): string {
     return this.tableName + ':' + this.geomId;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public equals(obj: GeometryIndexKey): boolean {
     return obj != null && obj.getTableName() === this.getTableName() && obj.getGeomId() === this.getGeomId();

@@ -122,9 +122,7 @@ describe('GeoPackage Feature table create tests', function () {
     columns.push(FeatureColumn.createColumn('test_blob.test', GeoPackageDataType.BLOB, false, null));
     columns.push(FeatureColumn.createColumn('test_integer.test', GeoPackageDataType.INTEGER, false, null));
 
-    var result = geoPackage.createFeatureTableWithFeatureTableMetadata(
-      FeatureTableMetadata.create(geometryColumns, columns),
-    );
+    var result = geoPackage.createFeatureTableWithMetadata(FeatureTableMetadata.create(geometryColumns, columns));
     should.exist(result);
     Verification.verifyGeometryColumns(geoPackage).should.be.equal(true);
     Verification.verifyTableExists(geoPackage, tableName).should.be.equal(true);
@@ -225,7 +223,7 @@ describe('GeoPackage Feature table create tests', function () {
     dc.setMimeType('text/html');
     dc.setConstraintName('test constraint');
 
-    geoPackage.createFeatureTableWithFeatureTableMetadata(
+    geoPackage.createFeatureTableWithMetadata(
       FeatureTableMetadata.create(geometryColumns, columns, undefined, boundingBox),
     );
     const schemaExtension = new SchemaExtension(geoPackage);
@@ -379,7 +377,7 @@ describe('GeoPackage Feature table create tests', function () {
       columns.push(FeatureColumn.createColumn('test space', GeoPackageDataType.TEXT, false, ''));
       columns.push(FeatureColumn.createColumn('test-dash', GeoPackageDataType.TEXT, false, ''));
 
-      geoPackage.createFeatureTableWithFeatureTableMetadata(FeatureTableMetadata.create(geometryColumns, columns));
+      geoPackage.createFeatureTableWithMetadata(FeatureTableMetadata.create(geometryColumns, columns));
       var verified =
         Verification.verifyGeometryColumns(geoPackage) &&
         Verification.verifyTableExists(geoPackage, tableName) &&

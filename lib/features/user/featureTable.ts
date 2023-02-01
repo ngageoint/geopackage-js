@@ -70,21 +70,21 @@ export class FeatureTable extends UserTable<FeatureColumn> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getDataType(): string {
     return this.getDataTypeOrDefault(ContentsDataType.nameFromType(ContentsDataType.FEATURES));
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getUserColumns(): FeatureColumns {
     return super.getUserColumns() as FeatureColumns;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public createUserColumns(columns: FeatureColumn[]): FeatureColumns {
     return new FeatureColumns(this.getTableName(), this.getGeometryColumnName(), columns, true);
@@ -123,7 +123,7 @@ export class FeatureTable extends UserTable<FeatureColumn> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   validateContents(contents: Contents): void {
     // Verify the Contents have a features data type

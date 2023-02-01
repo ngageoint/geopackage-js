@@ -45,7 +45,7 @@ export class FeatureRow extends UserRow<FeatureColumn, FeatureTable> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getColumns(): FeatureColumns {
     return super.getColumns() as FeatureColumns;
@@ -77,8 +77,6 @@ export class FeatureRow extends UserRow<FeatureColumn, FeatureTable> {
   }
 
   /**
-   * {@inheritDoc}
-   * <p>
    * Handles geometry columns
    */
   protected copyValue(column: FeatureColumn, value: any): any {
@@ -100,8 +98,6 @@ export class FeatureRow extends UserRow<FeatureColumn, FeatureTable> {
   }
 
   /**
-   * {@inheritDoc}
-   * <p>
    * Handles geometry columns
    */
   protected columnToContentValue(contentValues: ContentValues, column: FeatureColumn, value: any): void {

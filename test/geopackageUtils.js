@@ -310,7 +310,7 @@ GeoPackageUtils.createFeatureTableAndAddFeatures = function (geoPackage, tableNa
     FeatureColumn.createColumnWithIndex(columnNumber++, 'datetime', GeoPackageDataType.DATETIME, false, null),
   );
 
-  geoPackage.createFeatureTableWithFeatureTableMetadata(
+  geoPackage.createFeatureTableWithMetadata(
     FeatureTableMetadata.create(geometryColumns, columns, undefined, boundingBox),
   );
   const featureDao = geoPackage.getFeatureDao(tableName);

@@ -18,10 +18,7 @@ export abstract class GeoPackageDao<T, ID> extends Dao<T, ID> {
   }
 
   /**
-   * {@inheritDoc}
-   * <p>
    * Check if the DAO is backed by a table or a view
-   *
    * @return true if a table or view exists
    */
   public isTableExists(): boolean {
@@ -30,7 +27,6 @@ export abstract class GeoPackageDao<T, ID> extends Dao<T, ID> {
 
   /**
    * Check if the DAO is backed by a table or a view
-   *
    * @return true if a table or view exists
    */
   public isTableOrView(): boolean {

@@ -44,7 +44,7 @@ export class TileRow extends UserRow<TileColumn, TileTable> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getColumns(): TileColumns {
     return super.getColumns() as TileColumns;

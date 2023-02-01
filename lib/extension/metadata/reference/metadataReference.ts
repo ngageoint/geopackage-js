@@ -2,7 +2,7 @@ import { Metadata } from '../metadata';
 import { DBValue } from '../../../db/dbValue';
 import { ReferenceScopeType } from './referenceScopeType';
 
-type MetadataReferenceKeys =
+export type MetadataReferenceColumnKey =
   | 'reference_scope'
   | 'table_name'
   | 'column_name'
@@ -103,7 +103,7 @@ export class MetadataReference {
   /**
    * @param {string} columnName
    */
-  toDatabaseValue(columnName: MetadataReferenceKeys): DBValue {
+  toDatabaseValue(columnName: MetadataReferenceColumnKey): DBValue {
     if (columnName === 'timestamp') {
       return this.timestamp.toISOString();
     }

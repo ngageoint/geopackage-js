@@ -161,14 +161,14 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getBoundingBox(): BoundingBox {
     return this.tileMatrixSet.getBoundingBox();
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getBoundingBoxWithProjection(projection: Projection): BoundingBox {
     return this.geoPackage.getTileMatrixSetDao().getBoundingBoxWithProjection(this.tileMatrixSet, projection);
@@ -251,7 +251,7 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public newRow(): TileRow {
     return new TileRow(this.getTable());

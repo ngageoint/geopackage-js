@@ -199,7 +199,7 @@ export class Pagination {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public toString(): string {
     const sql = [' '];

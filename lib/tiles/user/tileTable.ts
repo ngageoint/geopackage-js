@@ -55,28 +55,28 @@ export class TileTable extends UserTable<TileColumn> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   copy(): TileTable {
     return new TileTable(this.getTableName(), this.columns.getColumns());
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   getDataType(): string {
     return ContentsDataType.nameFromType(ContentsDataType.TILES);
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   getUserColumns(): TileColumns {
     return super.getUserColumns() as TileColumns;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   createUserColumns(columns: TileColumn[]): TileColumns {
     return new TileColumns(this.getTableName(), columns, true);
@@ -163,7 +163,7 @@ export class TileTable extends UserTable<TileColumn> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   validateContents(contents: Contents): void {
     // Verify the Contents have a tiles data type

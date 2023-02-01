@@ -12,8 +12,6 @@ import type { GeoPackage } from '../../../geoPackage';
 /**
  * Abstract Feature Tile Table linker, used to link feature and tile tables
  * together when the tiles represent the feature data
- * <p>
- * <a href="http://ngageoint.github.io/GeoPackage/docs/extensions/feature-tile-link.html">http://ngageoint.github.io/GeoPackage/docs/extensions/feature-tile-link.html</a>
  */
 export class FeatureTileTableLinker extends BaseExtension {
   /**

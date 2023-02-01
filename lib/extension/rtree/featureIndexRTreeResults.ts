@@ -29,14 +29,14 @@ export class FeatureIndexRTreeResults implements FeatureIndexResults {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   [Symbol.iterator](): IterableIterator<FeatureRow> {
     return this;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public next(): { value: FeatureRow; done: boolean } {
     const { value, done } = this.resultSet.next();
@@ -49,7 +49,7 @@ export class FeatureIndexRTreeResults implements FeatureIndexResults {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public ids(): IterableIterator<number> {
     const dao = this.dao;
@@ -68,7 +68,7 @@ export class FeatureIndexRTreeResults implements FeatureIndexResults {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   public close(): void {}

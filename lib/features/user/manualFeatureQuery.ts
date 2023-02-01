@@ -1847,7 +1847,6 @@ export class ManualFeatureQuery {
   /**
    * Manually query for rows within the geometry envelope, starting at the
    * offset and returning no more than the limit
-   * <p>
    * WARNING: This method must iterate from the 0 offset each time, is
    * extremely inefficient, and not recommended for use
    * @param envelope geometry envelope
@@ -1882,7 +1881,6 @@ export class ManualFeatureQuery {
   /**
    * Manually query for rows within the geometry envelope, starting at the
    * offset and returning no more than the limit
-   * <p>
    * WARNING: This method must iterate from the 0 offset each time, is
    * extremely inefficient, and not recommended for use
    * @param distinct distinct rows
@@ -1920,7 +1918,6 @@ export class ManualFeatureQuery {
   /**
    * Manually query for rows within the geometry envelope, starting at the
    * offset and returning no more than the limit
-   * <p>
    * WARNING: This method must iterate from the 0 offset each time, is
    * extremely inefficient, and not recommended for use
    * @param columns columns
@@ -1958,7 +1955,6 @@ export class ManualFeatureQuery {
   /**
    * Manually query for rows within the geometry envelope, starting at the
    * offset and returning no more than the limit
-   * <p>
    * WARNING: This method must iterate from the 0 offset each time, is
    * extremely inefficient, and not recommended for use
    * @param distinct distinct rows
@@ -1999,7 +1995,6 @@ export class ManualFeatureQuery {
   /**
    * Manually query for rows within the bounds, starting at the offset and
    * returning no more than the limit
-   * <p>
    * WARNING: This method must iterate from the 0 offset each time, is
    * extremely inefficient, and not recommended for use
    * @param minX min x
@@ -2042,7 +2037,6 @@ export class ManualFeatureQuery {
   /**
    * Manually query for rows within the bounds, starting at the offset and
    * returning no more than the limit
-   * <p>
    * WARNING: This method must iterate from the 0 offset each time, is
    * extremely inefficient, and not recommended for use
    * @param distinct distinct rows
@@ -2087,7 +2081,6 @@ export class ManualFeatureQuery {
   /**
    * Manually query for rows within the bounds, starting at the offset and
    * returning no more than the limit
-   * <p>
    * WARNING: This method must iterate from the 0 offset each time, is
    * extremely inefficient, and not recommended for use
    * @param columns columns
@@ -2132,7 +2125,6 @@ export class ManualFeatureQuery {
   /**
    * Manually query for rows within the bounds, starting at the offset and
    * returning no more than the limit
-   * <p>
    * WARNING: This method must iterate from the 0 offset each time, is
    * extremely inefficient, and not recommended for use
    * @param distinct distinct rows

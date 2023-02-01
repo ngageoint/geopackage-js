@@ -32,14 +32,14 @@ export class ZoomLevelProgress extends Progress implements GeoPackageZoomLevelPr
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public setZoomLevelMax(zoomLevel: number, max: number): void {
     this.zoomLevelMax.set(zoomLevel, max);
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   protected logProgress(): void {
     const zoomCount = this.getZoomLevelProgress(this.currentZoom);
@@ -67,7 +67,7 @@ export class ZoomLevelProgress extends Progress implements GeoPackageZoomLevelPr
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public addZoomLevelProgress(zoomLevel: number, progress: number): void {
     let zoomProgress = this.getZoomLevelProgress(zoomLevel);

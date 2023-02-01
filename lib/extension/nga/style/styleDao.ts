@@ -18,7 +18,7 @@ export class StyleDao extends AttributesDao {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public newRow(): StyleRow {
     return new StyleRow(this.getTable());

@@ -27,7 +27,7 @@ export class StyleMappingDao extends UserMappingDao {
   }
 
   /**
-   * Create a new {UserCustomTable}
+   * Create a new user custom table
    * @param  {UserCustomDao} userCustomDao
    * @return {UserCustomTable} userCustomTable user custom table
    */

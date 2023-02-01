@@ -2,7 +2,6 @@ import { default as testSetup } from '../../../../testSetup';
 import { GeometryType } from '@ngageoint/simple-features-js';
 import { FeatureColumn } from '../../../../../lib/features/user/featureColumn';
 import { GeoPackageDataType } from '../../../../../lib/db/geoPackageDataType';
-import exp from "constants";
 
 var FeatureTableStyles = require('../../../../../lib/extension/nga/style/featureTableStyles').FeatureTableStyles,
   IconCache = require('../../../../../lib/extension/nga/style/iconCache').IconCache,

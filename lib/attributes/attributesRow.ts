@@ -2,6 +2,7 @@ import { AttributesTable } from './attributesTable';
 import { UserRow } from '../user/userRow';
 import { AttributesColumns } from './attributesColumns';
 import { AttributesColumn } from './attributesColumn';
+import { DBValue } from '../db/dbValue';
 
 /**
  * Attribute Row containing the values from a single result set row
@@ -14,7 +15,7 @@ export class AttributesRow extends UserRow<AttributesColumn, AttributesTable> {
    * @param columnTypes column types
    * @param values values
    */
-  public constructor(table: AttributesTable, columns: AttributesColumns, columnTypes: number[], values: any[]);
+  public constructor(table: AttributesTable, columns: AttributesColumns, columnTypes: number[], values: DBValue[]);
 
   /**
    * Constructor to create an empty row
@@ -41,7 +42,7 @@ export class AttributesRow extends UserRow<AttributesColumn, AttributesTable> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getColumns(): AttributesColumns {
     return super.getColumns() as AttributesColumns;

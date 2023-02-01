@@ -27,35 +27,35 @@ export class WebMercatorOptimize extends TileReprojectionOptimize {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getProjection(): Projection {
     return Projections.getWebMercatorProjection();
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getTileGrid(): TileGrid {
     return new TileGrid(0, 0, 0, 0);
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getBoundingBox(): BoundingBox {
     return BoundingBox.worldWebMercator();
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getTileGridFromBoundingBox(boundingBox: BoundingBox, zoom: number): TileGrid {
     return TileBoundingBoxUtils.getTileGridFromBoundingBox(boundingBox, zoom);
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getBoundingBoxFromTileGrid(tileGrid: TileGrid, zoom: number): BoundingBox {
     return TileBoundingBoxUtils.getWebMercatorBoundingBoxWithTileGrid(tileGrid, zoom);

@@ -41,14 +41,14 @@ export class FeatureIndexGeoPackageResults implements FeatureIndexResults {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   [Symbol.iterator](): IterableIterator<FeatureRow> {
     return this;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public next(): { value: FeatureRow; done: boolean } {
     const { value, done } = this.geometryIndices.next();
@@ -56,14 +56,14 @@ export class FeatureIndexGeoPackageResults implements FeatureIndexResults {
     return { value: featureRow, done };
   }
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public count(): number {
     return this._count;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public ids(): IterableIterator<number> {
     return {

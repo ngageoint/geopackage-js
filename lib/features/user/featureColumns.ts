@@ -27,7 +27,7 @@ export class FeatureColumns extends UserColumns<FeatureColumn> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   updateColumns(): void {
     super.updateColumns();

@@ -53,14 +53,14 @@ export class FeaturePaginatedResults extends UserPaginatedResults<
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getDao(): FeatureDao {
     return super.getDao() as FeatureDao;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getResults(): FeatureResultSet {
     return super.getResults() as FeatureResultSet;

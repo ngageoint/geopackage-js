@@ -98,7 +98,7 @@ export class ImageRectangle {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public equals(obj: ImageRectangle): boolean {
     return (

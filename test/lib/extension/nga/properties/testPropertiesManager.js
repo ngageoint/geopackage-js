@@ -4,7 +4,6 @@ const path = require('path');
 const testSetup = require('../../../../testSetup').default;
 const PropertiesExtension =
   require('../../../../../lib/extension/nga/properties/propertiesExtension').PropertiesExtension;
-const GeoPackageManager = require('../../../../../lib/geoPackageManager').GeoPackageManager;
 const PropertiesManager = require('../../../../../lib/extension/nga/properties/propertiesManager').PropertiesManager;
 const PropertyNames = require('../../../../../lib/extension/nga/properties/propertyNames').PropertyNames;
 

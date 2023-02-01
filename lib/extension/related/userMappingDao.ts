@@ -20,14 +20,14 @@ export class UserMappingDao extends UserCustomDao {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getTable(): UserMappingTable {
     return super.getTable() as UserMappingTable;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public newRow(): UserMappingRow {
     return new UserMappingRow(this.getTable());

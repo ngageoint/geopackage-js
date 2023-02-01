@@ -33,8 +33,6 @@ export class AttributesDao extends UserDao<AttributesColumn, AttributesTable, At
   }
 
   /**
-   * {@inheritDoc}
-   * <p>
    * Not supported for Attributes
    */
   public getBoundingBox(): BoundingBox {

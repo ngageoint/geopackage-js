@@ -105,14 +105,14 @@ export class MediaTableMetadata extends UserTableMetadata<UserCustomColumn> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getDefaultDataType(): string {
     return null;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public buildColumns(): UserCustomColumn[] {
     let simpleAttributeColumns = this.getColumns();

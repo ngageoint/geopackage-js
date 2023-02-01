@@ -19,14 +19,14 @@ export class MediaDao extends UserCustomDao {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getTable(): MediaTable {
     return super.getTable() as MediaTable;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public newRow(): MediaRow {
     return new MediaRow(this.getTable());

@@ -8,9 +8,6 @@ import { ExtensionScopeType } from './extensionScopeType';
 
 /**
  * Geometry Extensions utility methods and constants
- * <p>
- * <a href=
- * "https://www.geopackage.org/spec/#extension_geometry_types">https://www.geopackage.org/spec/#extension_geometry_types</a>
  */
 export class GeometryExtensions extends BaseExtension {
   /**

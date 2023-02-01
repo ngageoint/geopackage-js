@@ -124,14 +124,14 @@ export class TileTableMetadata extends UserTableMetadata<TileColumn> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getDefaultDataType(): string {
     return TileTableMetadata.DEFAULT_DATA_TYPE;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public buildColumns(): TileColumn[] {
     let tileColumns = this.getColumns();

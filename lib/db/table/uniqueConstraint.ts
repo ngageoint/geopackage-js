@@ -22,7 +22,7 @@ export class UniqueConstraint extends Constraint {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   buildSql(): string {
     let sql = '';
@@ -41,7 +41,7 @@ export class UniqueConstraint extends Constraint {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public copy(): UniqueConstraint {
     return new UniqueConstraint(this.name, ...this.columns);

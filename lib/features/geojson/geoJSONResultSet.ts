@@ -8,7 +8,9 @@ import { Projections } from '@ngageoint/projections-js';
 import { GeoJSONUtils } from './geoJSONUtils';
 
 /**
- * GeoJSON Results is a wrapper for FeatureIndexResults and handles the conversion to GeoJSON
+ * GeoJSON Results is a wrapper for FeatureIndexResults and handles the
+ * conversion to GeoJSON
+ * @class
  */
 export class GeoJSONResultSet implements IterableIterator<Feature> {
   /**

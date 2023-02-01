@@ -3,7 +3,7 @@ import { UserTable } from './userTable';
 import { UserColumn } from './userColumn';
 import { GeoPackageConnection } from '../db/geoPackageConnection';
 import { UserConnection } from './userConnection';
-import { Projection, ProjectionConstants, Projections, ProjectionTransform } from '@ngageoint/projections-js';
+import { Projection, Projections, ProjectionTransform } from '@ngageoint/projections-js';
 import { BoundingBox } from '../boundingBox';
 import { Contents } from '../contents/contents';
 import { GeoPackageException } from '../geoPackageException';
@@ -1839,7 +1839,7 @@ export abstract class UserDao<
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public insert(row: TRow): number {
     const id = this.insertWithContentValues(row.toContentValues(false));

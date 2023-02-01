@@ -48,7 +48,7 @@ export class ResultSetResult implements Result {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getValueWithIndex(columnIdx: number): any {
     let value;
@@ -75,7 +75,7 @@ export class ResultSetResult implements Result {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getColumnCount(): number {
     let count = 0;
@@ -88,7 +88,7 @@ export class ResultSetResult implements Result {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getColumnNames(): string[] {
     let columnNames = [];
@@ -101,7 +101,7 @@ export class ResultSetResult implements Result {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getString(columnName: string): string {
     let value;
@@ -114,7 +114,7 @@ export class ResultSetResult implements Result {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getNumber(columnName: string): number {
     let value;
@@ -127,7 +127,7 @@ export class ResultSetResult implements Result {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getBuffer(columnName: string): Buffer {
     let value;
@@ -140,7 +140,7 @@ export class ResultSetResult implements Result {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public wasNull(): boolean {
     try {
@@ -151,7 +151,7 @@ export class ResultSetResult implements Result {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public close(): void {
     try {

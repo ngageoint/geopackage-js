@@ -862,9 +862,7 @@ export abstract class UserColumn implements Comparable<UserColumn> {
   }
 
   /**
-   * {@inheritDoc}
-   * <p>
-   * Sort by index
+   * Comparison function that sorts user columns by index
    */
   public compareTo(another: UserColumn): number {
     return this.index - another.index;

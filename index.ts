@@ -10,6 +10,7 @@ import { GeoPackageValidate } from './lib/validate/geoPackageValidate';
 
 // user
 import { ColumnValue } from './lib/user/columnValue';
+import { ContentValues } from './lib/user/contentValues';
 import { UserColumn } from './lib/user/userColumn';
 import { UserColumns } from './lib/user/userColumns';
 import { UserConnection } from './lib/user/userConnection';
@@ -134,6 +135,9 @@ import { FeatureIndexResults } from './lib/features/index/featureIndexResults';
 import { FeatureIndexType } from './lib/features/index/featureIndexType';
 import { MultipleFeatureIndexResults } from './lib/features/index/multipleFeatureIndexResults';
 
+// features/geojson
+import { GeoJSONResultSet } from './lib/features/geojson/geoJSONResultSet';
+
 // features/columns
 import { GeometryColumns } from './lib/features/columns/geometryColumns';
 import { GeometryColumnsDao } from './lib/features/columns/geometryColumnsDao';
@@ -144,6 +148,7 @@ import { CrsWktExtension } from './lib/extension/crsWktExtension';
 import { ExtensionManagement } from './lib/extension/extensionManagement';
 import { ExtensionManager } from './lib/extension/extensionManager';
 import { Extensions } from './lib/extension/extensions';
+import { ExtensionsKey } from './lib/extension/extensionsKey';
 import { ExtensionScopeType } from './lib/extension/extensionScopeType';
 import { ExtensionsDao } from './lib/extension/extensionsDao';
 import { GeometryExtensions } from './lib/extension/geometryExtensions';
@@ -255,7 +260,8 @@ import { MetadataExtension } from './lib/extension/metadata/metadataExtension';
 import { MetadataScopeType } from './lib/extension/metadata/metadataScopeType';
 
 // extension/metadata/reference
-import { MetadataReference } from './lib/extension/metadata/reference/metadataReference';
+import { MetadataReference, MetadataReferenceColumnKey } from './lib/extension/metadata/reference/metadataReference';
+import { MetadataReferenceKey } from './lib/extension/metadata/reference/metadataReferenceKey';
 import { MetadataReferenceDao } from './lib/extension/metadata/reference/metadataReferenceDao';
 import { ReferenceScopeType } from './lib/extension/metadata/reference/referenceScopeType';
 
@@ -263,11 +269,12 @@ import { ReferenceScopeType } from './lib/extension/metadata/reference/reference
 import { AlterTable } from './lib/db/alterTable';
 import { DateConverter } from './lib/db/dateConverter';
 import { Db } from './lib/db/db';
+import { DBValue } from './lib/db/dbValue';
 import { DBAdapter } from './lib/db/dbAdapter';
 import { GeoPackageConnection } from './lib/db/geoPackageConnection';
 import { GeoPackageDao } from './lib/db/geoPackageDao';
 import { GeoPackageDataType } from './lib/db/geoPackageDataType';
-import { GeoPackageTableCreator } from './lib/db/geoPackageTableCreator';
+import { GeoPackageTableCreator, SqlScripts } from './lib/db/geoPackageTableCreator';
 import { MappedColumn } from './lib/db/mappedColumn';
 import { Pagination } from './lib/db/pagination';
 import { Result } from './lib/db/result';
@@ -303,7 +310,7 @@ import { SQLiteMasterType } from './lib/db/master/sqliteMasterType';
 
 // dao
 import { FieldValues } from './lib/dao/fieldValues';
-import { Dao } from './lib/dao/dao';
+import { Dao, CreateOrUpdateStatus } from './lib/dao/dao';
 
 // context
 import { Context } from './lib/context/context';
@@ -349,6 +356,7 @@ export {
   GeoPackageValidationError,
   GeoPackageValidate,
   ColumnValue,
+  ContentValues,
   UserColumn,
   UserColumns,
   UserConnection,
@@ -443,6 +451,7 @@ export {
   FeatureIndexResults,
   FeatureIndexType,
   MultipleFeatureIndexResults,
+  GeoJSONResultSet,
   GeometryColumns,
   GeometryColumnsDao,
   BaseExtension,
@@ -450,6 +459,7 @@ export {
   ExtensionManagement,
   ExtensionManager,
   Extensions,
+  ExtensionsKey,
   ExtensionScopeType,
   ExtensionsDao,
   GeometryExtensions,
@@ -528,16 +538,20 @@ export {
   MetadataExtension,
   MetadataScopeType,
   MetadataReference,
+  MetadataReferenceKey,
+  MetadataReferenceColumnKey,
   MetadataReferenceDao,
   ReferenceScopeType,
   AlterTable,
   DateConverter,
   Db,
+  DBValue,
   DBAdapter,
   GeoPackageConnection,
   GeoPackageDao,
   GeoPackageDataType,
   GeoPackageTableCreator,
+  SqlScripts,
   MappedColumn,
   Pagination,
   Result,
@@ -568,6 +582,7 @@ export {
   SQLiteMasterType,
   FieldValues,
   Dao,
+  CreateOrUpdateStatus,
   Context,
   Contents,
   ContentsDao,

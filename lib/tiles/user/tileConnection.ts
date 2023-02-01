@@ -19,7 +19,7 @@ export class TileConnection extends UserConnection<TileColumn, TileTable, TileRo
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public createResult(columns: string[], resultSet: ResultSet, sql: string, selectionArgs: any[]): TileResultSet {
     return new TileResultSet(this.getTable(), columns, resultSet, sql, selectionArgs);

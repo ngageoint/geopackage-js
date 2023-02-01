@@ -28,28 +28,28 @@ export class FeatureIndexFeatureResults implements FeatureIndexResults {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public count(): number {
     return this.resultSet.getCount();
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public ids(): IterableIterator<number> {
     return this.resultSet.ids();
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   [Symbol.iterator](): IterableIterator<FeatureRow> {
     return this;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public next(): { value: FeatureRow; done: boolean } {
     return this.resultSet.next();

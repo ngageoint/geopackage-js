@@ -55,14 +55,14 @@ export class MetadataReferenceKey {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public toString(): string {
     return this.columnFileId + '-' + this.columnParentId;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public equals(obj: MetadataReferenceKey): boolean {
     return obj.getColumnFileId() === this.getColumnFileId() && obj.getColumnParentId() === this.getColumnParentId();

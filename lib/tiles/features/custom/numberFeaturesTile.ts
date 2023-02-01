@@ -270,7 +270,7 @@ export class NumberFeaturesTile implements CustomFeaturesTile {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public async drawTile(
     tileWidth: number,
@@ -285,7 +285,7 @@ export class NumberFeaturesTile implements CustomFeaturesTile {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public async drawUnindexedTile(
     tileWidth: number,

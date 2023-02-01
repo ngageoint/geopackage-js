@@ -27,7 +27,7 @@ export class ContentsIdDao extends GeoPackageDao<ContentsId, number> {
   }
 
   /**
-   * Create a {ContentsId} object
+   * Create a contents id object
    * @return {ContentsId}
    */
   createObject(results?: Record<string, DBValue>): ContentsId {
@@ -41,7 +41,8 @@ export class ContentsIdDao extends GeoPackageDao<ContentsId, number> {
 
   /**
    * Get the contents for the contents id table
-   * @param contentsId
+   * @param {ContentsId} contentsId
+   * @return {Contents} contents
    */
   public getContents(contentsId: ContentsId): Contents {
     return this.geoPackage.getContentsDao().queryForIdWithKey(contentsId.getTableName());
@@ -49,7 +50,7 @@ export class ContentsIdDao extends GeoPackageDao<ContentsId, number> {
 
   /**
    * Create the necessary tables for this dao
-   * @return {Promise}
+   * @return {boolean}
    */
   createTable(): boolean {
     return this.geoPackage.getTableCreator().createContentsId();

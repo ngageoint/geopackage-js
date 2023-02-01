@@ -47,7 +47,7 @@ export class SimpleAttributesRow extends UserCustomRow {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getTable(): SimpleAttributesTable {
     return super.getTable() as SimpleAttributesTable;

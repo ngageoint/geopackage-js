@@ -50,21 +50,21 @@ export class TileMatrixDao extends GeoPackageDao<TileMatrix, TileMatrixKey> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public extractId(data: TileMatrix): TileMatrixKey {
     return data.getId();
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public idExists(id: TileMatrixKey): boolean {
     return this.queryForIdWithKey(id) != null;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public queryForSameId(data: TileMatrix): TileMatrix {
     return this.queryForIdWithKey(data.getId());
@@ -93,7 +93,7 @@ export class TileMatrixDao extends GeoPackageDao<TileMatrix, TileMatrixKey> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public updateId(data: TileMatrix, newId: TileMatrixKey): number {
     let count = 0;
@@ -106,7 +106,7 @@ export class TileMatrixDao extends GeoPackageDao<TileMatrix, TileMatrixKey> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public delete(data: TileMatrix): number {
     const columnValues = new FieldValues();
@@ -118,7 +118,7 @@ export class TileMatrixDao extends GeoPackageDao<TileMatrix, TileMatrixKey> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public deleteByIdWithKey(id: TileMatrixKey): number {
     let count = 0;
@@ -132,7 +132,7 @@ export class TileMatrixDao extends GeoPackageDao<TileMatrix, TileMatrixKey> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public deleteIds(idCollection: TileMatrixKey[]): number {
     let count = 0;

@@ -49,7 +49,7 @@ export class MediaRow extends UserCustomRow {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getTable(): MediaTable {
     return super.getTable() as MediaTable;

@@ -24,7 +24,7 @@ export class AttributesConnection extends UserConnection<
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   protected createResult(
     columns: string[],

@@ -73,14 +73,14 @@ export class Progress implements GeoPackageProgress {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public setMax(max: number): void {
     this.max = max;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public addProgress(progress: number): void {
     this.progress += progress;
@@ -111,14 +111,14 @@ export class Progress implements GeoPackageProgress {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public isActive(): boolean {
     return this.active;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public cleanupOnCancel(): boolean {
     return false;

@@ -176,7 +176,7 @@ export abstract class UserPaginatedResults<
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public ids(): IterableIterator<number> {
     const idNext = this.idNext;

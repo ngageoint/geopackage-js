@@ -52,14 +52,14 @@ export class FeatureTableReader extends UserTableReader<FeatureColumn, FeatureTa
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public createTable(tableName: string, columnList: FeatureColumn[]): FeatureTable {
     return new FeatureTable(tableName, this.columnName, columnList);
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public createColumn(tableColumn: TableColumn): FeatureColumn {
     return FeatureColumn.createColumnWithTableColumn(tableColumn);

@@ -30,7 +30,7 @@ describe('ContentsIdExtension Tests', function () {
     geometryColumn.setSrsId(4326);
     geometryColumn.setZ(0);
     geometryColumn.setM(0);
-    geoPackage.createFeatureTableWithFeatureTableMetadata(FeatureTableMetadata.create(geometryColumn));
+    geoPackage.createFeatureTableWithMetadata(FeatureTableMetadata.create(geometryColumn));
 
     // enable the contents_id extension
     contentsIdExtension = new ContentsIdExtension(geoPackage);

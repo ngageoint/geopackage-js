@@ -71,7 +71,10 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
   }
 
   /**
-   * @inheritDoc
+   * Create a canvas with dimensions set to the provided width and height
+   * @param {number} width
+   * @param {number} height
+   * @return {EmulatedCanvas2D} canvas
    */
   create(width: number, height: number): EmulatedCanvas2D {
     return CanvasKitCanvasAdapter.CanvasKit.MakeCanvas(width, height);

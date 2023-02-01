@@ -324,7 +324,7 @@ export class RTreeIndexExtension extends BaseExtension {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public createMinXFunction(): void {
     this.createFunction(
@@ -340,7 +340,7 @@ export class RTreeIndexExtension extends BaseExtension {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public createMaxXFunction(): void {
     this.createFunction(
@@ -356,7 +356,7 @@ export class RTreeIndexExtension extends BaseExtension {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public createMinYFunction(): void {
     this.createFunction(
@@ -372,7 +372,7 @@ export class RTreeIndexExtension extends BaseExtension {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public createMaxYFunction(): void {
     this.createFunction(
@@ -388,7 +388,7 @@ export class RTreeIndexExtension extends BaseExtension {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public createIsEmptyFunction(): void {
     this.createFunction(
@@ -487,10 +487,8 @@ export class RTreeIndexExtension extends BaseExtension {
   /**
    * Create update 1 trigger
    *
-   * <pre>
    * Conditions: Update of geometry column to non-empty geometry No row ID change
    * Actions   : Update record in rtree
-   * </pre>
    *
    * @param tableName table name
    * @param geometryColumnName geometry column name
@@ -504,10 +502,8 @@ export class RTreeIndexExtension extends BaseExtension {
   /**
    * Create update 2 trigger
    *
-   * <pre>
    * Conditions: Update of geometry column to empty geometry No row ID change
    * Actions   : Remove record from rtree
-   * </pre>
    *
    * @param tableName table name
    * @param geometryColumnName geometry column name
@@ -521,11 +517,9 @@ export class RTreeIndexExtension extends BaseExtension {
   /**
    * Create update 3 trigger
    *
-   * <pre>
    * Conditions: Update of any column Row ID change Non-empty geometry
-   * Actions   : Remove record from rtree for old {@literal <i>}
-   *             Insert record into rtree for new {@literal <i>}
-   * </pre>
+   * Actions   : Remove record from rtree for old
+   *             Insert record into rtree for new
    *
    * @param tableName table name
    * @param geometryColumnName geometry column name
@@ -539,10 +533,8 @@ export class RTreeIndexExtension extends BaseExtension {
   /**
    * Create update 4 trigger
    *
-   * <pre>
    * Conditions: Update of any column Row ID change Empty geometry
-   * Actions   : Remove record from rtree for old and new {@literal <i>}
-   * </pre>
+   * Actions   : Remove record from rtree for old and new
    *
    * @param tableName table name
    * @param geometryColumnName geometry column name
@@ -556,10 +548,8 @@ export class RTreeIndexExtension extends BaseExtension {
   /**
    * Create delete trigger
    *
-   * <pre>
    * Conditions: Row deleted
-   * Actions   : Remove record from rtree for old {@literal <i>}
-   * </pre>
+   * Actions   : Remove record from rtree for old
    *
    * @param tableName table name
    * @param geometryColumnName geometry column name

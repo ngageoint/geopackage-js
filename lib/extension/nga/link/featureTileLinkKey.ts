@@ -59,14 +59,14 @@ export class FeatureTileLinkKey {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public toString(): string {
     return this.featureTableName + '-' + this.tileTableName;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public equals(obj: FeatureTileLinkKey): boolean {
     return (

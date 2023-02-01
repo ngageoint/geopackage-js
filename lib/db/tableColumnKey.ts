@@ -42,14 +42,14 @@ export class TableColumnKey {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public toString(): string {
     return this.tableName + ':' + this.columnName;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public equals(obj: TableColumnKey): boolean {
     return obj != null && obj.getTableName() === this.getTableName() && obj.getColumnName() === this.getColumnName();

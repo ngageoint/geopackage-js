@@ -29,35 +29,35 @@ export class PlatteCarreOptimize extends TileReprojectionOptimize {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getProjection(): Projection {
     return Projections.getWGS84Projection();
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getTileGrid(): TileGrid {
     return new TileGrid(0, 0, 1, 0);
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getBoundingBox(): BoundingBox {
     return BoundingBox.worldWGS84();
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getTileGridFromBoundingBox(boundingBox: BoundingBox, zoom: number): TileGrid {
     return TileBoundingBoxUtils.getTileGridWGS84(boundingBox, zoom);
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getBoundingBoxFromTileGrid(tileGrid: TileGrid, zoom: number): BoundingBox {
     return TileBoundingBoxUtils.getBoundingBoxWGS84(tileGrid, zoom);

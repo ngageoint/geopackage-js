@@ -19,7 +19,7 @@ export class FeatureConnection extends UserConnection<FeatureColumn, FeatureTabl
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public createResult(columns: string[], resultSet: ResultSet, sql: string, selectionArgs: string[]): FeatureResultSet {
     return new FeatureResultSet(this.getTable(), columns, resultSet, sql, selectionArgs);

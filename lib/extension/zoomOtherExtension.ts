@@ -7,9 +7,6 @@ import type { GeoPackage } from '../geoPackage';
 
 /**
  * Zoom Other Intervals extension
- * <p>
- * <a href=
- * "https://www.geopackage.org/spec/#extension_zoom_other_intervals">https://www.geopackage.org/spec/#extension_zoom_other_intervals</a>
  */
 export class ZoomOtherExtension extends BaseExtension {
   /**

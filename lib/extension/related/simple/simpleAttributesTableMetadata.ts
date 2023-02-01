@@ -116,14 +116,14 @@ export class SimpleAttributesTableMetadata extends UserTableMetadata<UserCustomC
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getDefaultDataType(): string {
     return null;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public buildColumns(): UserCustomColumn[] {
     let simpleAttributeColumns = this.getColumns();

@@ -43,14 +43,14 @@ export class ExtensionManager extends ExtensionManagement {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getAuthor(): string {
     return GeoPackageConstants.EXTENSION_AUTHOR;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public deleteTableExtensions(table: string): void {
     // Handle deleting any extensions with extra tables here
@@ -69,7 +69,7 @@ export class ExtensionManager extends ExtensionManagement {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public deleteExtensions(): void {
     // Handle deleting any extensions with extra tables here
@@ -89,7 +89,7 @@ export class ExtensionManager extends ExtensionManagement {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public copyTableExtensions(table: string, newTable: string): void {
     try {

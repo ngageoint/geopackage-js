@@ -6,7 +6,7 @@ import { SQLUtils } from './sqlUtils';
 import type { GeoPackage } from '../geoPackage';
 import { GeoPackageException } from '../geoPackageException';
 
-type SqlScripts =
+export type SqlScripts =
   | 'spatial_reference_system'
   | 'contents'
   | 'geometry_columns'

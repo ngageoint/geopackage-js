@@ -190,7 +190,7 @@ export class AttributesTableMetadata extends UserTableMetadata<AttributesColumn>
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public buildColumns(): AttributesColumn[] {
     let attributesColumns = this.getColumns();

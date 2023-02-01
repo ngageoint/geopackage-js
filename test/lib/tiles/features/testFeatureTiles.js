@@ -92,9 +92,7 @@ describe('GeoPackage FeatureTiles tests', function () {
       //      |/        |
       //      /_________|
       //     /
-      await geoPackage.createFeatureTableWithFeatureTableMetadata(
-        FeatureTableMetadata.create(geometryColumns, columns),
-      );
+      await geoPackage.createFeatureTableWithMetadata(FeatureTableMetadata.create(geometryColumns, columns));
       featureDao = geoPackage.getFeatureDao('QueryTest');
       createRow(box, 'box', featureDao);
       createRow(line, 'line', featureDao);

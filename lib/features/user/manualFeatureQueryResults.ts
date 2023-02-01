@@ -80,20 +80,20 @@ export class ManualFeatureQueryResults implements FeatureIndexResults {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public count(): number {
     return this.featureIds.length;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   public close(): void {}
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public ids(): IterableIterator<number> {
     return this.featureIds[Symbol.iterator]();

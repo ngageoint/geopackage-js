@@ -122,11 +122,8 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
 
   /**
    * Copy the value of the data type
-   *
-   * @param column
-   *            table column
-   * @param value
-   *            value
+   * @param column table column
+   * @param value value
    * @return copy value
    */
   protected copyValue(column: TColumn, value: any): any {
@@ -437,8 +434,8 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
 
   /**
    * Convert the row to content values
-   * @param includeNulls include null values (default is true)
-   * @return content values
+   * @param {boolean} includeNulls include null values (default is true)
+   * @return {ContentValues} content values
    */
   public toContentValues(includeNulls = true): ContentValues {
     const contentValues = new ContentValues();

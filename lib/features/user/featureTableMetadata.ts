@@ -172,14 +172,14 @@ export class FeatureTableMetadata extends UserTableMetadata<FeatureColumn> {
     }
   }
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getDefaultDataType(): string {
     return FeatureTableMetadata.DEFAULT_DATA_TYPE;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public buildColumns(): FeatureColumn[] {
     let featureColumns = this.getColumns();
@@ -196,7 +196,7 @@ export class FeatureTableMetadata extends UserTableMetadata<FeatureColumn> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getTableName(): string {
     let tableName = null;

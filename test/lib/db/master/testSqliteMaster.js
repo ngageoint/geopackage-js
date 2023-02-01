@@ -27,9 +27,7 @@ describe('SQLiteMaster tests', function () {
     geometryColumns.setZ(0);
     geometryColumns.setM(0);
     geometryColumns.setSrsId(4326);
-    geoPackage.createFeatureTableWithFeatureTableMetadata(
-      FeatureTableMetadata.create(geometryColumns, additionalColumns),
-    );
+    geoPackage.createFeatureTableWithMetadata(FeatureTableMetadata.create(geometryColumns, additionalColumns));
   });
 
   afterEach(async function () {

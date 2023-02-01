@@ -31,14 +31,14 @@ export class AttributesResultSet extends UserResultSet<AttributesColumn, Attribu
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getRowWithColumnTypesAndValues(columnTypes: number[], values: DBValue[]): AttributesRow {
     return new AttributesRow(this.getTable(), this.getColumns(), columnTypes, values);
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getColumns(): AttributesColumns {
     return super.getColumns() as AttributesColumns;

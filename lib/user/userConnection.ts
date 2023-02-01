@@ -179,7 +179,7 @@ export abstract class UserConnection<
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public querySQL(
     distinct: boolean,

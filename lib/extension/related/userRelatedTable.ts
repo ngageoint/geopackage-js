@@ -118,7 +118,7 @@ export class UserRelatedTable extends UserCustomTable {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   protected validateContents(contents: Contents): void {
     // Verify the Contents have a relation name data type

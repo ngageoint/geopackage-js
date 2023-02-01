@@ -72,7 +72,7 @@ export class ContentValues {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public toString(): string {
     const sb = [];

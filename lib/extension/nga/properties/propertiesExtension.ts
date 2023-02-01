@@ -17,10 +17,6 @@ import { AttributesResultSet } from '../../../attributes/attributesResultSet';
 /**
  * GeoPackage properties core extension for defining GeoPackage specific
  * properties, attributes, and metadata
- * <p>
- * <a href=
- * "http://ngageoint.github.io/GeoPackage/docs/extensions/properties.html">http://ngageoint.github.io/GeoPackage/docs/extensions/properties.html</a>
- *
  */
 export class PropertiesExtension extends BaseExtension {
   /**
@@ -74,7 +70,7 @@ export class PropertiesExtension extends BaseExtension {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
 
   public getGeoPackage(): GeoPackage {
@@ -135,7 +131,7 @@ export class PropertiesExtension extends BaseExtension {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   protected newRow(): AttributesRow {
     return this.getDao().newRow();

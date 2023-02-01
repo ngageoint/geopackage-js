@@ -35,7 +35,7 @@ export class NGAExtensions extends ExtensionManagement {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getAuthor(): string {
     return NGAExtensionsConstants.EXTENSION_AUTHOR;

@@ -79,7 +79,7 @@ describe('GeoPackage Extensions tests', function () {
     geometryColumns.setM(0);
     geometryColumns.setSrsId(4326);
 
-    geoPackage.createFeatureTableWithFeatureTableMetadata(FeatureTableMetadata.create(geometryColumns, columns));
+    geoPackage.createFeatureTableWithMetadata(FeatureTableMetadata.create(geometryColumns, columns));
 
     const featureDao = geoPackage.getFeatureDao(tableName);
 

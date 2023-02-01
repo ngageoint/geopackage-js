@@ -570,14 +570,14 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the size of the database
    */
   public size(): number {
     return this.database.size();
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the readable size of the database
    */
   public readableSize(): string {
     return this.database.readableSize();
@@ -721,7 +721,7 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Close the GeoPackage connection
    */
   public close(): void {
     this.database.close();
@@ -742,28 +742,32 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Get the GeoPackage name
+   * @return {string} name
    */
   public getName(): string {
     return this.name;
   }
 
   /**
-   * {@inheritDoc}
+   * Get the GeoPackage path
+   * @return {string} path
    */
   public getPath(): string {
     return this.path;
   }
 
   /**
-   * {@inheritDoc}
+   * Get the SQLite database
+   * @return {GeoPackageConnection} connection
    */
   public getDatabase(): GeoPackageConnection {
     return this.database;
   }
 
   /**
-   * {@inheritDoc}
+   * Get the Table Creator
+   * @return {GeoPackageTableCreator} tableCreator
    */
   public getTableCreator(): GeoPackageTableCreator {
     return this.tableCreator;
@@ -832,8 +836,9 @@ export class GeoPackage {
   }
 
   /**
-   * Gets the tables for the provided ContentsDataType
-   * @param type, if not provided, tables for every type will be returned
+   * Get the tables for the contents data type
+   * @param {ContentsDataType} type
+   * @return {string[]} tables
    */
   public getTables(type?: ContentsDataType): string[] {
     let tableNames;
@@ -846,7 +851,9 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Get the tables for the contents data types
+   * @param {ContentsDataType[]} types
+   * @return {string[]} tables
    */
   public getTablesForTypes(types: ContentsDataType[]): string[] {
     let tableNames;
@@ -859,7 +866,9 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Get the contents for the data type
+   * @param {ContentsDataType} type
+   * @return {Contents[]} contents
    */
   public getTypeContents(type: ContentsDataType): Contents[] {
     let contents;
@@ -872,7 +881,9 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Get the contents for the data types
+   * @param {ContentsDataType[]} types
+   * @return {Contents[]} contents
    */
   public getTypeContentsWithTypes(types: ContentsDataType[]): Contents[] {
     let contents;
@@ -885,7 +896,9 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Get the contents for the data type
+   * @param {string} type
+   * @return {Contents[]} contents
    */
   public getTypeContentsWithString(type: string): Contents[] {
     let contents;
@@ -898,49 +911,67 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Check if the table is a feature table
+   * @param {string} table
+   * @return {boolean} result
    */
   public isFeatureTable(table: string): boolean {
     return this.isTableType(table, ContentsDataType.FEATURES);
   }
 
   /**
-   * {@inheritDoc}
+   * Check if the table is a tile table
+   * @param {string} table
+   * @return {boolean} result
    */
   public isTileTable(table: string): boolean {
     return this.isTableType(table, ContentsDataType.TILES);
   }
 
   /**
-   * {@inheritDoc}
+   * Check if the table is an attribute table
+   * @param {string} table
+   * @return {boolean} result
    */
   public isAttributeTable(table: string): boolean {
     return this.isTableType(table, ContentsDataType.ATTRIBUTES);
   }
 
   /**
-   * {@inheritDoc}
+   * Check if the table is the provided type
+   * @param {string} table
+   * @param {ContentsDataType} type
+   * @return {boolean} result
    */
   public isTableType(table: string, type: ContentsDataType): boolean {
     return this.isTableTypeWithTypes(table, [type]);
   }
 
   /**
-   * {@inheritDoc}
+   * Check if the table is one of the provided types
+   * @param {string} table
+   * @param {ContentsDataType[]} types
+   * @return {boolean} result
    */
   public isTableTypeWithTypes(table: string, types: ContentsDataType[]): boolean {
     return types.indexOf(this.getTableDataType(table)) !== -1;
   }
 
   /**
-   * {@inheritDoc}
+   * Check if the table is one of the provided types
+   * @param {string} table
+   * @param {string} type
+   * @return {boolean} result
    */
   public isTableTypeWithStringType(table: string, type: string): boolean {
     return this.isTableTypeWithStringTypes(table, [type]);
   }
 
   /**
-   * {@inheritDoc}
+   * Check if the table is one of the provided types
+   * @param {string} table
+   * @param {string[]} types
+   * @return {boolean} result
    */
   public isTableTypeWithStringTypes(table: string, types: string[]): boolean {
     let isType = types.indexOf(this.getTableType(table)) !== -1;
@@ -954,35 +985,45 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Check if the table exists as a user contents table
+   * @param {string} table
+   * @return {boolean} result
    */
   public isContentsTable(table: string): boolean {
     return this.getTableContents(table) != null;
   }
 
   /**
-   * {@inheritDoc}
+   * Check if the table exists
+   * @param {string} table
+   * @return {boolean} result
    */
   public isTable(table: string): boolean {
     return this.database.tableExists(table);
   }
 
   /**
-   * {@inheritDoc}
+   * Check if the view exists
+   * @param {string} view
+   * @return {boolean} result
    */
   public isView(view: string): boolean {
     return this.database.viewExists(view);
   }
 
   /**
-   * {@inheritDoc}
+   * Check if the table or view
+   * @param {string} name
+   * @return {boolean} result
    */
   public isTableOrView(name: string): boolean {
     return this.database.tableOrViewExists(name);
   }
 
   /**
-   * {@inheritDoc}
+   * Get the contents of the user table
+   * @param {string} table
+   * @return {Contents} contents
    */
   public getTableContents(table: string): Contents {
     const contentDao = this.getContentsDao();
@@ -996,7 +1037,9 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Get the contents data type of the user table
+   * @param {string} table
+   * @return {string} contents data type
    */
   public getTableType(table: string): string {
     let tableType = null;
@@ -1008,7 +1051,9 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Get the contents data type of the user table
+   * @param {string }table table name
+   * @return {ContentsDataType} table type or null if not an enumerated type
    */
   public getTableDataType(table: string): ContentsDataType {
     let tableType = null;
@@ -1020,14 +1065,20 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Get the bounding box for all table contents in the provided projection
+   * @param {Projection} projection desired bounding box projection
+   * @return {BoundingBox} bounding box
    */
   public getContentsBoundingBox(projection: Projection): BoundingBox {
     return this.getContentsDao().getBoundingBoxInProjection(projection);
   }
 
   /**
-   * {@inheritDoc}
+   * Get the bounding box from the contents for the table in the provided
+   * projection
+   * @param {string} table
+   * @param {Projection} projection
+   * @return {BoundingBox} bounding box
    */
   public getContentsBoundingBoxWithProjection(table: string, projection: Projection = null): BoundingBox {
     const contentsDao = this.getContentsDao();
@@ -1035,7 +1086,12 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Get the bounding box from the contents for the table in the provided
+   * projection
+   * @param {string} table
+   * @param {Projection} projection
+   * @param {boolean} manual query flag, true to determine missing bounds manually
+   * @return {BoundingBox} bounding box
    */
   public getBoundingBox(table: string, projection: Projection = null, manual = false): BoundingBox {
     const tableBoundingBox = this.getTableBoundingBox(table, projection, manual);
@@ -1058,7 +1114,14 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Get the bounding box for all tables in the provided projection, using
+   * only table metadata
+   *
+   * @param {string} table
+   * @param {Projection} projection desired bounding box projection
+   * @param {boolean} manual query flag, true to determine missing bounds manually
+   *
+   * @return {BoundingBox} bounding box
    */
   public getTableBoundingBox(table: string, projection: Projection = null, manual = false): BoundingBox {
     let boundingBox = null;
@@ -1085,7 +1148,9 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Get the projection of the table contents
+   * @param {string} table
+   * @return {Projection} projection
    */
   public getContentsProjection(table: string): Projection {
     const contents = this.getTableContents(table);
@@ -1096,7 +1161,9 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Get the projection of the table
+   * @param {string} table
+   * @return {Projection} projection
    */
   public getProjection(table: string): Projection {
     let projection: Projection = null;
@@ -1134,7 +1201,8 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Create the Geometry Columns table if it does not already exist
+   * @return {boolean} true if created
    */
   public createGeometryColumnsTable(): boolean {
     this.verifyWritable();
@@ -1152,7 +1220,12 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Create a new feature table
+   * WARNING: only creates the feature table, call
+   * {@link #createFeatureTableWithMetadata}) instead to create both
+   * the table and required GeoPackage metadata
+   *
+   * @param {FeatureTable} table  feature table
    */
   public createFeatureTable(table: FeatureTable): void {
     this.createUserTable(table);
@@ -1160,8 +1233,9 @@ export class GeoPackage {
 
   /**
    * Creates a FeatureTable with properties provided
-   * @param tableName
-   * @param properties
+   * @param {string} tableName
+   * @param {{name: string; dataType: string }[]} properties
+   * @return {FeatureTable} feature table
    */
   createFeatureTableWithProperties(tableName: string, properties: { name: string; dataType: string }[]): FeatureTable {
     const geometryColumn = new GeometryColumns();
@@ -1176,15 +1250,17 @@ export class GeoPackage {
       const property = properties[i] as { name: string; dataType: string };
       columns.push(FeatureColumn.createColumn(property.name, GeoPackageDataType.fromName(property.dataType)));
     }
-    return this.createFeatureTableWithFeatureTableMetadata(
+    return this.createFeatureTableWithMetadata(
       FeatureTableMetadata.create(geometryColumn, columns, undefined, BoundingBox.worldWGS84()),
     );
   }
 
   /**
-   * {@inheritDoc}
+   * Creates a FeatureTable with FeatureTableMetadata
+   * @param {FeatureTableMetadata} metadata
+   * @return {FeatureTable} feature table
    */
-  public createFeatureTableWithFeatureTableMetadata(metadata: FeatureTableMetadata): FeatureTable {
+  public createFeatureTableWithMetadata(metadata: FeatureTableMetadata): FeatureTable {
     const geometryColumns = metadata.getGeometryColumns();
     if (geometryColumns == null) {
       throw new GeoPackageException('Geometry Columns are required to create a feature table');
@@ -1229,7 +1305,8 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Get a Tile Matrix Set DAO
+   * @return {TileMatrixSetDao} Tile Matrix Set DAO
    */
   public getTileMatrixSetDao(): TileMatrixSetDao {
     if (this.tileMatrixSetDao == null) {
@@ -1239,7 +1316,8 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Create the Tile Matrix Set table if it does not already exist
+   * @return {boolean} true if created
    */
   public createTileMatrixSetTable(): boolean {
     this.verifyWritable();
@@ -1257,7 +1335,8 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Get a Tile Matrix DAO
+   * @return {TileMatrixDao} Tile Matrix DAO
    */
   public getTileMatrixDao(): TileMatrixDao {
     if (this.tileMatrixDao == null) {
@@ -1267,7 +1346,8 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Create the Tile Matrix table if it does not already exist
+   * @return {boolean} true if created
    */
   public createTileMatrixTable(): boolean {
     this.verifyWritable();
@@ -1285,14 +1365,21 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Create a new tile table
+   * WARNING: only creates the tile table, call
+   * {@link #createTileTableWithMetadata}) instead to create both the
+   * table and required GeoPackage metadata
+   * @param {TileTable} table tile table
    */
   public createTileTable(table: TileTable): void {
     this.createUserTable(table);
   }
 
   /**
-   * {@inheritDoc}
+   * Create a new tile table with GeoPackage metadata including: tile matrix
+   * set table and row, tile matrix table, user tile table, and contents row.
+   * @param {TileTableMetadata} metadata tile table metadata
+   * @return {TileTable} tile table
    */
   public createTileTableWithMetadata(metadata: TileTableMetadata): TileTable {
     // Create the Tile Matrix Set and Tile Matrix tables
@@ -1356,7 +1443,6 @@ export class GeoPackage {
 
   /**
    * Create a new attributes table
-   * <p>
    * WARNING: only creates the attributes table, call
    * {@link #createAttributesTable(AttributesTableMetadata)}) instead to
    * create both the table and required GeoPackage metadata
@@ -1405,7 +1491,8 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Create the Extensions table if it does not already exist
+   * @return true if created
    */
   public createExtensionsTable(): boolean {
     this.verifyWritable();
@@ -1423,7 +1510,9 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Delete the user table (a feature or tile table) and all GeoPackage
+   * metadata
+   * @param {string} table table name
    */
   public deleteTable(table: string): void {
     this.verifyWritable();
@@ -1433,7 +1522,9 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Attempt to delete the user table (a feature or tile table) and all
+   * GeoPackage metadata quietly
+   * @param {string} tableName table name
    */
   public deleteTableQuietly(tableName: string): void {
     this.verifyWritable();
@@ -1446,28 +1537,34 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * If foreign keys is disabled and there are no foreign key violations,
+   * enables foreign key checks, else logs violations
+   * @return {boolean} true if enabled or already enabled, false if foreign key
+   * violations and not enabled
    */
   public enableForeignKeys(): boolean {
     return this.database.setForeignKeys(true);
   }
 
   /**
-   * {@inheritDoc}
+   * Query for the foreign keys value
+   * @return {boolean} true if enabled, false if disabled
    */
   public foreignKeys(): boolean {
     return this.database.foreignKeys();
   }
 
   /**
-   * {@inheritDoc}
+   * Change the foreign keys state
+   * @param {boolean} on true to turn on, false to turn off
+   * @return {boolean} previous foreign keys value
    */
   public setForeignKeys(on: boolean): boolean {
     return this.database.setForeignKeys(on);
   }
 
   /**
-   * {@inheritDoc}
+   * Verify the GeoPackage is writable and throw an exception if it is not
    */
   public verifyWritable(): void {
     if (!this.writable) {
@@ -1478,21 +1575,28 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Drop the table if it exists. Drops the table with the table name, not
+   * limited to GeoPackage specific tables.
+   *
+   * @param {string} table table name
    */
   public dropTable(table: string): void {
     this.tableCreator.dropTable(table);
   }
 
   /**
-   * {@inheritDoc}
+   * Drop the view if it exists. Drops the view with the view name, not
+   * limited to GeoPackage specific tables.
+   * @param {string} view view name
    */
   public dropView(view: string): void {
     this.tableCreator.dropView(view);
   }
 
   /**
-   * {@inheritDoc}
+   * Rename the table
+   * @param {string} tableName table name
+   * @param {string} newTableName new table name
    */
   public renameTable(tableName: string, newTableName: string): void {
     if (this.getTableDataType(tableName) != null) {
@@ -1504,14 +1608,19 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Copy the table with transferred contents but no extensions
+   * @param tableName table name
+   * @param newTableName new table name
    */
   public copyTableNoExtensions(tableName: string, newTableName: string): void {
     this.copyTable(tableName, newTableName, true, false);
   }
 
   /**
-   * {@inheritDoc}
+   * Copy the table with transferred contents and extensions
+   * @param tableName table name
+   * @param newTableName new table name
+   * @since 3.3.0
    */
   public copyTableAsEmpty(tableName: string, newTableName: string): void {
     this.copyTable(tableName, newTableName, false, false);
@@ -1680,14 +1789,15 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Rebuild the GeoPackage, repacking it into a minimal amount of disk space
    */
   public vacuum(): void {
     SQLUtils.vacuum(this.database);
   }
 
   /**
-   * {@inheritDoc}
+   * Create a new user table
+   * @param {UserTable<UserColumn>} table user table
    */
   public createUserTable(table: UserTable<UserColumn>): void {
     this.verifyWritable();
@@ -1696,7 +1806,7 @@ export class GeoPackage {
 
   /**
    * Get table info using TileDao or FeatureDao
-   * @param tableDao
+   * @param {TileDao | FeatureDao} tableDao
    */
   getInfoForTable(tableDao: TileDao | FeatureDao): any {
     const info = {
@@ -2542,7 +2652,7 @@ export class GeoPackage {
   private getColumnAndValuesForRecord(
     columns: UserColumns<any>,
     row: Record<string, DBValue>,
-  ): { columnTypes: number[]; values: any[] } {
+  ): { columnTypes: number[]; values: DBValue[] } {
     const columnTypes = [];
     const values = [];
     try {

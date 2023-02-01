@@ -40,7 +40,7 @@ export class UserCustomResultSet extends UserResultSet<UserCustomColumn, UserCus
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getColumns(): UserCustomColumns {
     return super.getColumns() as UserCustomColumns;

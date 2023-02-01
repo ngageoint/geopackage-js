@@ -482,9 +482,7 @@ describe('GeoPackageManager tests', function () {
       columns.push(FeatureColumn.createColumn('test_blob.test', GeoPackageDataType.BLOB, false, null));
       columns.push(FeatureColumn.createColumn('test_integer.test', GeoPackageDataType.INTEGER, false, null));
 
-      let featureDao = geoPackage.createFeatureTableWithFeatureTableMetadata(
-        FeatureTableMetadata.create(geometryColumns, columns),
-      );
+      let featureDao = geoPackage.createFeatureTableWithMetadata(FeatureTableMetadata.create(geometryColumns, columns));
       should.exist(featureDao);
       const exists = geoPackage.hasFeatureTable(tableName);
       exists.should.be.equal(true);
@@ -554,9 +552,7 @@ describe('GeoPackageManager tests', function () {
       columns.push(FeatureColumn.createColumn('test_blob.test', GeoPackageDataType.BLOB, false, null));
       columns.push(FeatureColumn.createColumn('test_integer.test', GeoPackageDataType.INTEGER, false, null));
 
-      let featureDao = geoPackage.createFeatureTableWithFeatureTableMetadata(
-        FeatureTableMetadata.create(geometryColumns, columns),
-      );
+      let featureDao = geoPackage.createFeatureTableWithMetadata(FeatureTableMetadata.create(geometryColumns, columns));
       should.exist(featureDao);
       const exists = geoPackage.hasFeatureTable(tableName);
       exists.should.be.equal(true);

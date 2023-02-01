@@ -47,9 +47,7 @@ describe('AlterTable tests', function () {
     geometryColumns.setM(0);
     geometryColumns.setSrsId(4326);
 
-    geoPackage.createFeatureTableWithFeatureTableMetadata(
-      FeatureTableMetadata.create(geometryColumns, additionalColumns),
-    );
+    geoPackage.createFeatureTableWithMetadata(FeatureTableMetadata.create(geometryColumns, additionalColumns));
 
     const featureDao = geoPackage.getFeatureDao(tableName);
 

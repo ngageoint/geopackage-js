@@ -29,7 +29,7 @@ export class ExtendedRelationsDao extends GeoPackageDao<ExtendedRelation, number
   }
 
   /**
-   * Create a {ExtendedRelation} object
+   * Create an extended relations object
    * @return {ExtendedRelation}
    */
   createObject(result?: Record<string, DBValue>): ExtendedRelation {

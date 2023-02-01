@@ -45,7 +45,7 @@ export class StyleRow extends AttributesRow {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getTable(): StyleTable {
     return super.getTable() as StyleTable;

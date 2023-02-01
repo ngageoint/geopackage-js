@@ -31,7 +31,7 @@ module.exports = {
         test: /\.tsx?$/,
         use: 'ts-loader',
         exclude: [/node_modules/],
-      }
+      },
     ],
   },
   resolve: {
@@ -41,11 +41,26 @@ module.exports = {
     },
     alias: {
       '@ngageoint/projections-js': path.join(__dirname, './node_modules/@ngageoint/projections-js/dist/index.js'),
-      '@ngageoint/simple-features-js': path.join(__dirname, '/node_modules/@ngageoint/simple-features-js/dist/index.js'),
-      '@ngageoint/simple-features-proj-js': path.join(__dirname, '/node_modules/@ngageoint/simple-features-proj-js/dist/index.js'),
-      '@ngageoint/simple-features-wkb-js': path.join(__dirname, '/node_modules/@ngageoint/simple-features-wkb-js/dist/index.js'),
-      '@ngageoint/simple-features-wkt-js': path.join(__dirname, '/node_modules/@ngageoint/simple-features-wkt-js/dist/index.js'),
-      '@ngageoint/simple-features-geojson-js': path.join(__dirname, '/node_modules/@ngageoint/simple-features-geojson-js/dist/index.js'),
+      '@ngageoint/simple-features-js': path.join(
+        __dirname,
+        '/node_modules/@ngageoint/simple-features-js/dist/index.js',
+      ),
+      '@ngageoint/simple-features-proj-js': path.join(
+        __dirname,
+        '/node_modules/@ngageoint/simple-features-proj-js/dist/index.js',
+      ),
+      '@ngageoint/simple-features-wkb-js': path.join(
+        __dirname,
+        '/node_modules/@ngageoint/simple-features-wkb-js/dist/index.js',
+      ),
+      '@ngageoint/simple-features-wkt-js': path.join(
+        __dirname,
+        '/node_modules/@ngageoint/simple-features-wkt-js/dist/index.js',
+      ),
+      '@ngageoint/simple-features-geojson-js': path.join(
+        __dirname,
+        '/node_modules/@ngageoint/simple-features-geojson-js/dist/index.js',
+      ),
     },
   },
   output: {

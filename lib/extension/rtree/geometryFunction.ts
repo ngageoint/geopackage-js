@@ -33,7 +33,7 @@ export class GeometryFunction {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getFunction(): Function {
     return (buffer: Buffer | Uint8Array): any => {

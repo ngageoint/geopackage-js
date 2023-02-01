@@ -36,14 +36,14 @@ export class GeometryIndexTableCreator extends GeoPackageTableCreator {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getAuthor(): string {
     return FeatureTableIndexConstants.EXTENSION_AUTHOR;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getName(): string {
     return FeatureTableIndexConstants.EXTENSION_NAME_NO_AUTHOR;

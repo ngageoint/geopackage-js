@@ -39,7 +39,7 @@ export class TileResultSet extends UserResultSet<TileColumn, TileTable, TileRow>
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getColumns(): TileColumns {
     return super.getColumns() as TileColumns;

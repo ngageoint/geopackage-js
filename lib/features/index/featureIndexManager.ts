@@ -2620,9 +2620,10 @@ export class FeatureIndexManager {
 
   /**
    * Query for GeoJSON Results
-   * @param boundingBox
-   * @param where
-   * @param whereArgs
+   * @param {BoundingBox} boundingBox
+   * @param {string} where
+   * @param {any[]} whereArgs
+   * @return {GeoJSONResultSet} result set
    */
   public queryForGeoJSONFeatures(boundingBox?: BoundingBox, where?: string, whereArgs?: any[]): GeoJSONResultSet {
     const featureIndexResultSet: FeatureIndexResults =

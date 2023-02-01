@@ -82,35 +82,43 @@ export abstract class UserResultSet<
   }
 
   /**
-   * {@inheritDoc}
+   * Get the row with provided column types and values
+   * @return a user row
    */
   public getRowWithColumnTypesAndValues(columnTypes: number[], values: any[]): TRow {
     return new UserRow<TColumn, TTable>(this.getTable(), this.getColumns(), columnTypes, values) as TRow;
   }
 
   /**
-   * {@inheritDoc}
+   * Gets the value for a given column
+   * @param column
+   * @return {any}
    */
   public getValueForColumn(column: TColumn): any {
     return this.getValue(column.getName());
   }
 
   /**
-   * {@inheritDoc}
+   * Gets the value for a given index
+   * @param index
+   * @return {any}
    */
   public getValueForIndex(index: number): any {
     return this.getValue(this.columns.getColumnForIndex(index).getName());
   }
 
   /**
-   * {@inheritDoc}
+   * Get the value for a given column name
+   * @param {string} columnName
+   * @return {any}
    */
   public getValueForColumnName(columnName: string): any {
     return this.getValue(columnName);
   }
 
   /**
-   * {@inheritDoc}
+   * Get the id
+   * @return {number} the id
    */
   public getId(): number {
     let id = -1;
@@ -150,28 +158,32 @@ export abstract class UserResultSet<
   }
 
   /**
-   * {@inheritDoc}
+   * Get the table
+   * @return table
    */
   public getTable(): TTable {
     return this.table;
   }
 
   /**
-   * {@inheritDoc}
+   * Get the table name
+   * @return {string} table name
    */
   public getTableName(): string {
     return this.table.getTableName();
   }
 
   /**
-   * {@inheritDoc}
+   * Get the columns
+   * @return columns
    */
   public getColumns(): UserColumns<TColumn> {
     return this.columns;
   }
 
   /**
-   * {@inheritDoc}
+   * Get the row
+   * @return row
    */
   public getRow(): TRow {
     let row: TRow;
@@ -196,7 +208,8 @@ export abstract class UserResultSet<
   }
 
   /**
-   * {@inheritDoc}
+   * Get a count of the records in this result set
+   * @return {number} count
    */
   public getCount(): number {
     if (this.count == null) {
@@ -228,14 +241,16 @@ export abstract class UserResultSet<
   }
 
   /**
-   * {@inheritDoc}
+   * Get the sql
+   * @return {string} sql
    */
   public getSql(): string {
     return this.sql;
   }
 
   /**
-   * {@inheritDoc}
+   * Get the sql arguments
+   * @return {any[]} args
    */
   public getSelectionArgs(): any[] {
     return this.selectionArgs;
@@ -260,7 +275,7 @@ export abstract class UserResultSet<
   }
 
   /**
-   * {@inheritDoc}
+   * Get an iterator for id values
    */
   public ids(): IterableIterator<number> {
     const idNext = this.idNext;

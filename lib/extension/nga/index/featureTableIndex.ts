@@ -887,7 +887,7 @@ export class FeatureTableIndex extends BaseExtension {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getProjection(): Projection {
     return this.featureDao.getProjection();

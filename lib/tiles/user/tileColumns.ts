@@ -63,7 +63,7 @@ export class TileColumns extends UserColumns<TileColumn> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   copy(): TileColumns {
     const tileColumns = new TileColumns(this.getTableName(), this.getColumns(), this.isCustom());
@@ -75,7 +75,7 @@ export class TileColumns extends UserColumns<TileColumn> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   updateColumns(): void {
     super.updateColumns();

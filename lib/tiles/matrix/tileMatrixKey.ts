@@ -42,14 +42,14 @@ export class TileMatrixKey {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public toString(): string {
     return this.tableName + ':' + this.zoomLevel;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public equals(obj: TileMatrixKey): boolean {
     return this.getTableName() === obj.getTableName() && this.getZoomLevel() === obj.getZoomLevel();

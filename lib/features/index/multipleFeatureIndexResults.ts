@@ -48,14 +48,14 @@ export class MultipleFeatureIndexResults implements FeatureIndexResults {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public count(): number {
     return this._count;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public ids(): IterableIterator<number> {
     return {
@@ -80,14 +80,14 @@ export class MultipleFeatureIndexResults implements FeatureIndexResults {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   [Symbol.iterator](): IterableIterator<FeatureRow> {
     return this;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public next(): { value: FeatureRow; done: boolean } {
     if (this.currentResultSet == null && this.resultSetIdx + 1 < this.results.length) {

@@ -238,8 +238,6 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
   }
 
   /**
-   * {@inheritDoc}
-   * <p>
    * Verify optional tables have been created
    */
   public createOrUpdate(contents: Contents): CreateOrUpdateStatus {

@@ -53,14 +53,14 @@ export class FeatureDao extends UserDao<FeatureColumn, FeatureTable, FeatureRow,
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getBoundingBox(): BoundingBox {
     return this.getBoundingBoxWithProjection(this.projection);
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public getBoundingBoxWithProjection(projection: Projection): BoundingBox {
     const contents = this.geoPackage.getContentsDao().getContentsWithGeometryColumns(this.geometryColumns);
@@ -68,7 +68,7 @@ export class FeatureDao extends UserDao<FeatureColumn, FeatureTable, FeatureRow,
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public newRow(): FeatureRow {
     return new FeatureRow(this.getTable());

@@ -66,14 +66,14 @@ export class DataColumnConstraintsKey {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public toString(): string {
     return this.constraint_name + ':' + this.constraint_type + ':' + this.value;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public equals(obj: DataColumnConstraintsKey): boolean {
     return (
