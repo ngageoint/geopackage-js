@@ -3,9 +3,8 @@ import { UserTable } from './userTable';
 import { UserColumn } from './userColumn';
 import { GeoPackageConnection } from '../db/geoPackageConnection';
 import { UserConnection } from './userConnection';
-import { Projection, ProjectionConstants, Projections } from '@ngageoint/projections-js';
+import { Projection, ProjectionConstants, Projections, ProjectionTransform } from '@ngageoint/projections-js';
 import { BoundingBox } from '../boundingBox';
-import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
 import { Contents } from '../contents/contents';
 import { GeoPackageException } from '../geoPackageException';
 import { TileBoundingBoxUtils } from '../tiles/tileBoundingBoxUtils';
@@ -106,8 +105,14 @@ export abstract class UserDao<
    * @return projected bounding box
    */
   public projectBoundingBox(boundingBox: BoundingBox, projection: Projection): BoundingBox {
-    const projectionTransform = GeometryTransform.create(projection, this.getProjection());
-    return boundingBox.transform(projectionTransform);
+    let projectedBoundingBox;
+    if (!projection.equalsProjection(this.getProjection())) {
+      const projectionTransform = new ProjectionTransform(projection, this.getProjection());
+      projectedBoundingBox = boundingBox.transform(projectionTransform);
+    } else {
+      projectedBoundingBox = boundingBox.copy();
+    }
+    return projectedBoundingBox;
   }
 
   /**
@@ -1387,7 +1392,7 @@ export abstract class UserDao<
       if (Projections.getUnits(projection.toString()) === 'degrees') {
         boundingBox = BoundingBox.boundDegreesBoundingBoxWithWebMercatorLimits(boundingBox);
       }
-      const webMercatorTransform = GeometryTransform.create(projection, ProjectionConstants.EPSG_WEB_MERCATOR);
+      const webMercatorTransform = new ProjectionTransform(projection, Projections.getWebMercatorProjection());
       const webMercatorBoundingBox = boundingBox.transform(webMercatorTransform);
       zoomLevel = TileBoundingBoxUtils.getZoomLevel(webMercatorBoundingBox);
     }

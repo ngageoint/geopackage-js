@@ -420,9 +420,9 @@ describe('GeoPackage Feature table create tests', function () {
       fr.getValue('test_real').should.be.equal(3.0);
       fr.getValue('test_boolean').should.be.equal(true);
       fr.getValue('test_integer').should.be.equal(5);
-      fr.getValue('test_blob').toString().should.be.equal('test');
       fr.getValue('test_text_limited').should.be.equal('testt');
-      fr.getValue('test_blob_limited').toString().should.be.equal('testtes');
+      Buffer.from(fr.getValue('test_blob')).toString().should.be.equal(Buffer.from('test').toString());
+      Buffer.from(fr.getValue('test_blob_limited')).toString().should.be.equal(Buffer.from('testtes').toString());
       fr.getValue('test space').toString().should.be.equal('space space');
       fr.getValue('test-dash').toString().should.be.equal('dash-dash');
     });
@@ -459,9 +459,9 @@ describe('GeoPackage Feature table create tests', function () {
         fr.getValue('test_real').should.be.equal(3.0);
         fr.getValue('test_boolean').should.be.equal(true);
         fr.getValue('test_integer').should.be.equal(5);
-        fr.getValue('test_blob').toString().should.be.equal('test');
         fr.getValue('test_text_limited').should.be.equal('testt');
-        fr.getValue('test_blob_limited').toString().should.be.equal('testtes');
+        Buffer.from(fr.getValue('test_blob')).toString().should.be.equal(Buffer.from('test').toString());
+        Buffer.from(fr.getValue('test_blob_limited')).toString().should.be.equal(Buffer.from('testtes').toString());
       });
 
       it('should delete the feature', function () {

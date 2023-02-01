@@ -3,7 +3,7 @@ import { TileGrid } from './tileGrid';
 import { BoundingBox } from '../boundingBox';
 import { TileMatrix } from './matrix/tileMatrix';
 import { Point } from '@ngageoint/simple-features-js';
-import { GeometryTransform } from '@ngageoint/simple-features-proj-js/dist/lib/GeometryTransform';
+import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
 import { ImageRectangle } from './imageRectangle';
 
 /**

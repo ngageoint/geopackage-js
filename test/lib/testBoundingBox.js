@@ -1,6 +1,6 @@
-import { ProjectionConstants, Projections } from '@ngageoint/projections-js';
 var TileBoundingBoxUtils = require('../../lib/tiles/tileBoundingBoxUtils').TileBoundingBoxUtils,
-  BoundingBox = require('../../lib/boundingBox').BoundingBox;
+  BoundingBox = require('../../lib/boundingBox').BoundingBox,
+  { ProjectionConstants, Projections } = require('@ngageoint/projections-js');
 
 describe('BoundingBox tests', function () {
   it('should create a BoundingBox', function () {

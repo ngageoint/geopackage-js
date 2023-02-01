@@ -488,21 +488,8 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
         );
       }
       contentValues.put(columnName, stringValue);
-    } else if (value instanceof Buffer) {
+    } else if (value instanceof Buffer || value instanceof Uint8Array) {
       this.validateValue(column, value, ['Buffer']);
-      if (column.getMax() != null && value.length > column.getMax()) {
-        throw new GeoPackageException(
-          'Byte array is larger than the column max. Size: ' +
-            value.length +
-            ', Max: ' +
-            column.getMax() +
-            ', Column: ' +
-            columnName,
-        );
-      }
-      contentValues.put(columnName, value);
-    } else if (value instanceof Uint8Array) {
-      this.validateValue(column, value, ['UInt8Array']);
       if (column.getMax() != null && value.length > column.getMax()) {
         throw new GeoPackageException(
           'Byte array is larger than the column max. Size: ' +

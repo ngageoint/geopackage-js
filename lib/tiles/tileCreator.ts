@@ -329,7 +329,8 @@ export class TileCreator {
           }
 
           // Draw the resulting bitmap with the matching tiles
-          let geoPackageTile = await this.drawTile(tileMatrix, tileResults, tilesBoundingBox, tileWidth, tileHeight);
+          let geoPackageTile;
+          geoPackageTile = await this.drawTile(tileMatrix, tileResults, tilesBoundingBox, tileWidth, tileHeight);
 
           tileResults.close();
 

@@ -2,6 +2,7 @@ import { default as testSetup } from '../../../../testSetup';
 import { GeometryType } from '@ngageoint/simple-features-js';
 import { FeatureColumn } from '../../../../../lib/features/user/featureColumn';
 import { GeoPackageDataType } from '../../../../../lib/db/geoPackageDataType';
+import exp from "constants";
 
 var FeatureTableStyles = require('../../../../../lib/extension/nga/style/featureTableStyles').FeatureTableStyles,
   IconCache = require('../../../../../lib/extension/nga/style/iconCache').IconCache,
@@ -40,21 +41,25 @@ describe('IconCache Tests', function () {
     return iconRow;
   };
 
-  var compareImages = function (imageA, imageB) {
+  var compareImages = function (actualImage, expectedImage) {
     return new Promise(function (resolve) {
       var actualCanvas, actualCtx, expectedCanvas, expectedCtx;
-      actualCanvas = Canvas.create(imageA.getWidth(), imageA.getHeight());
+      actualCanvas = Canvas.create(actualImage.getWidth(), actualImage.getHeight());
       actualCtx = actualCanvas.getContext('2d');
-      expectedCanvas = Canvas.create(imageB.getWidth(), imageB.getHeight());
+      expectedCanvas = Canvas.create(expectedImage.getWidth(), expectedImage.getHeight());
       expectedCtx = expectedCanvas.getContext('2d');
-      actualCtx.drawImage(imageA.getImage(), 0, 0);
-      expectedCtx.drawImage(imageB.getImage(), 0, 0);
+      actualCtx.drawImage(actualImage.getImage(), 0, 0);
+      expectedCtx.drawImage(expectedImage.getImage(), 0, 0);
 
-      const result = actualCanvas.toDataURL() === expectedCanvas.toDataURL();
+      const result = actualCanvas.toDataURL('image/png') === expectedCanvas.toDataURL('image/png');
+      if (!result) {
+        console.log('actual: ' + actualCanvas.toDataURL('image/png'));
+        console.log('expected: ' + expectedCanvas.toDataURL('image/png'));
+      }
       Canvas.disposeCanvas(actualCanvas);
       Canvas.disposeCanvas(expectedCanvas);
-      Canvas.disposeImage(imageA);
-      Canvas.disposeImage(imageB);
+      Canvas.disposeImage(actualImage);
+      Canvas.disposeImage(expectedImage);
       resolve(result);
     });
   };
@@ -200,7 +205,7 @@ describe('IconCache Tests', function () {
       );
       var image = await iconCache.createScaledIconNoCache(iconRow, 2.0);
       should.not.exist(iconCache.getIconForIconRow(iconRow));
-      var result = await compareImages(expectedImage, image);
+      var result = await compareImages(image, expectedImage);
       result.should.be.equal(true);
     }),
   );
@@ -213,9 +218,10 @@ describe('IconCache Tests', function () {
       iconRow.setId(0, true);
       var expectedImage = await ImageUtils.getImage(
         path.join(__dirname, '..', '..', '..', '..', 'fixtures', isWeb ? 'web' : '', 'point_2x.png'),
+        'image/png',
       );
       var image = await iconCache.createScaledIcon(iconRow, 2.0);
-      var result = await compareImages(expectedImage, image);
+      var result = await compareImages(image, expectedImage);
       result.should.be.equal(true);
       should.exist(iconCache.getIconForIconRow(iconRow));
     }),

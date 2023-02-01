@@ -42,35 +42,41 @@ describe('GeoPackage Tile Scaling Extension Tests', function () {
       this.timeout(30000);
       try {
         var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-        gpr.getTile(13683, 24889, 16).then(function (tile) {
-          testSetup.diffImages(
-            tile.getData(),
-            path.join(
-              __dirname,
-              '..',
-              '..',
-              '..',
-              '..',
-              'fixtures',
-              'tiles',
-              '16',
-              '13683',
-              isWeb ? 'web' : '',
-              isLinux ? '24889_linux.png' : '24889.png',
-            ),
-            function (err, equal) {
-              try {
-                equal.should.be.equal(true);
-                done();
-              } catch (e) {
-                console.error(e);
-                done(e);
-              }
-            },
-          );
-        });
+        gpr
+          .getTile(13683, 24889, 16)
+          .then((tile) => {
+            testSetup.diffImages(
+              tile.getData(),
+              path.join(
+                __dirname,
+                '..',
+                '..',
+                '..',
+                '..',
+                'fixtures',
+                'tiles',
+                '16',
+                '13683',
+                isWeb ? 'web' : '',
+                isLinux ? '24889_linux.png' : '24889.png',
+              ),
+              function (err, equal) {
+                try {
+                  equal.should.be.equal(true);
+                  done();
+                } catch (e) {
+                  console.error(e);
+                  done(e);
+                }
+              },
+            );
+          })
+          .catch((e) => {
+            done(e);
+          });
       } catch (e) {
         console.error(e);
+        done(e);
       }
     });
 

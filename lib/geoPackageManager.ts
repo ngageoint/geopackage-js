@@ -52,9 +52,10 @@ export class GeoPackageManager {
    * In Node, create a GeoPackage file at the given file path, or in a browser,
    * create an in-memory GeoPackage.
    * @param  {string} gppath path of the created GeoPackage file; ignored in the browser
-   * @return {Promise<typeof GeoPackage>} promise that resolves with the open {@link GeoPackage} object or rejects with an  `Error`
+   * @param  {string} name name for the GeoPackage
+   * @return {Promise<GeoPackage>} promise that resolves with the open {@link GeoPackage} object or rejects with an  `Error`
    */
-  static async create(gppath?: string): Promise<GeoPackage> {
+  static async create(gppath?: string, name?: string): Promise<GeoPackage> {
     let geoPackage: GeoPackage;
     const valid =
       typeof gppath !== 'string' ||
@@ -83,9 +84,9 @@ export class GeoPackageManager {
       connection.setUserVersion();
 
       if (gppath) {
-        geoPackage = new GeoPackage(path.basename(gppath), gppath, connection);
+        geoPackage = new GeoPackage(name ? name : path.basename(gppath), gppath, connection);
       } else {
-        geoPackage = new GeoPackage('geopackage', undefined, connection);
+        geoPackage = new GeoPackage(name ? name : 'geopackage', undefined, connection);
       }
       // Create the minimum required tables
       const tableCreator = new GeoPackageTableCreator(geoPackage);

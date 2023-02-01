@@ -1,11 +1,12 @@
-import path from 'path';
-import testSetup from '../../../../testSetup';
-import { PropertiesExtension } from '../../../../../lib/extension/nga/properties/propertiesExtension';
-import { GeoPackageManager } from '../../../../../lib/geoPackageManager';
-import { PropertiesManager } from '../../../../../lib/extension/nga/properties/propertiesManager';
-import { PropertyNames } from '../../../../../lib/extension/nga/properties/propertyNames';
 const should = require('chai').should();
 const assert = require('chai').assert;
+const path = require('path');
+const testSetup = require('../../../../testSetup').default;
+const PropertiesExtension =
+  require('../../../../../lib/extension/nga/properties/propertiesExtension').PropertiesExtension;
+const GeoPackageManager = require('../../../../../lib/geoPackageManager').GeoPackageManager;
+const PropertiesManager = require('../../../../../lib/extension/nga/properties/propertiesManager').PropertiesManager;
+const PropertyNames = require('../../../../../lib/extension/nga/properties/propertyNames').PropertyNames;
 
 describe('GeoPackage Properties Manager tests', function () {
   const GEOPACKAGE_COUNT = 12;
@@ -32,35 +33,21 @@ describe('GeoPackage Properties Manager tests', function () {
 
   async function createGeoPackages() {
     const geoPackages = [];
-    const geoPackageFiles = await createGeoPackageFiles();
-
-    let i = 1;
-    for (const geoPackageFile of geoPackageFiles) {
-      const name = GEOPACKAGE_NAME + i++;
-      const geoPackage = await GeoPackageManager.open(geoPackageFile, name).catch(() => {
-        should.fail('Failed to open GeoPackage');
-      });
-      geoPackages.push(geoPackage);
-    }
-    return geoPackages;
-  }
-
-  async function createGeoPackageFiles() {
-    const geoPackageFiles = [];
 
     for (let i = 0; i < GEOPACKAGE_COUNT; i++) {
       var tmpGpPath = path.join(__dirname, 'tmp', GEOPACKAGE_FILE_NAME + i + '.gpkg');
-      var geoPackage = await testSetup.createGeoPackage(tmpGpPath).catch(() => {
+      const name = GEOPACKAGE_NAME + (i + 1);
+
+      var geoPackage = await testSetup.createGeoPackage(tmpGpPath, name).catch(() => {
         should.fail('Failed to create GeoPackage');
       });
       if (i < GEOPACKAGE_WITH_PROPERTIES_COUNT) {
         addProperties(geoPackage, i);
       }
-      geoPackageFiles.push(geoPackage.getPath());
-      geoPackage.close();
+      geoPackages.push(geoPackage);
     }
 
-    return geoPackageFiles;
+    return geoPackages;
   }
 
   function addProperties(geoPackage, i) {

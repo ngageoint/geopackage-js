@@ -476,7 +476,7 @@ export class BoundingBox {
    * @return transformed bounding box
    */
   public transform(transform: GeometryTransform | ProjectionTransform): BoundingBox {
-    const geometryTransform = transform instanceof GeometryTransform ? transform : GeometryTransform.create(transform);
+    const geometryTransform = new GeometryTransform(transform.getFromProjection(), transform.getToProjection());
     let transformed: BoundingBox = this.copy();
     if (!transform.getFromProjection().equalsProjection(transform.getToProjection())) {
       if (
@@ -485,11 +485,16 @@ export class BoundingBox {
           .getToProjection()
           .equals(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR.toString())
       ) {
-        transformed = BoundingBox.boundDegreesBoundingBoxWithWebMercatorLimits(this);
+        transformed = BoundingBox.boundDegreesBoundingBoxWithWebMercatorLimits(transformed);
       }
       const envelope = BoundingBox.buildEnvelope(transformed);
       const transformedEnvelope = geometryTransform.transformEnvelope(envelope);
-      transformed = new BoundingBox(transformedEnvelope);
+      transformed = new BoundingBox(
+        transformedEnvelope.minX,
+        transformedEnvelope.minY,
+        transformedEnvelope.maxX,
+        transformedEnvelope.maxY,
+      );
     }
     return transformed;
   }

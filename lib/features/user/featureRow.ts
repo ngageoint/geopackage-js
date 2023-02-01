@@ -119,10 +119,7 @@ export class FeatureRow extends UserRow<FeatureColumn, FeatureTable> {
         contentValues.put(columnName, value);
       } else {
         throw new GeoPackageException(
-          'Unsupported update geometry column value type. column: ' +
-            columnName +
-            ', value type: ' +
-            value.getClass().getName(),
+          'Unsupported update geometry column value type. column: ' + columnName + ', value type: ' + typeof value,
         );
       }
     } else {

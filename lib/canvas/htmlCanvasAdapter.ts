@@ -52,11 +52,11 @@ export class HtmlCanvasAdapter implements CanvasAdapter {
       const image = new Image();
       // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
       image.onload = () => {
-        const result = new GeoPackageImage(image, image.width, image.height);
+        const result = new GeoPackageImage(image, image.width, image.height, contentType);
         resolve(result);
       };
-      image.onerror = (error: any): void => {
-        reject(error);
+      image.onerror = (e): void => {
+        reject(e);
       };
       image.crossOrigin = 'Anonymous';
       image.src = src;
@@ -134,7 +134,8 @@ export class HtmlCanvasAdapter implements CanvasAdapter {
     const canvas: any = this.create(scaledWidth, scaledHeight);
     const ctx = canvas.getContext('2d');
     ctx.drawImage(image.getImage(), 0, 0, scaledWidth, scaledHeight);
-    const result = await this.createImage(await this.toDataURL(canvas, 'image/png'), 'image/png');
+    const dataUrl = await this.toDataURL(canvas, 'image/png');
+    const result = await this.createImage(dataUrl, 'image/png');
     this.disposeCanvas(canvas);
     return result;
   }
@@ -163,7 +164,7 @@ export class HtmlCanvasAdapter implements CanvasAdapter {
       // TODO: do something different
     }
     const dataUrl = canvas.toDataURL(canvas, ImageType.getMimeType(imageFormat), compressionQuality);
-    return Promise.resolve(CanvasUtils.base64toUInt8Array(dataUrl));
+    return Promise.resolve(CanvasUtils.base64ToUInt8ArrayBrowser(dataUrl));
   }
 
   /**
@@ -194,6 +195,6 @@ export class HtmlCanvasAdapter implements CanvasAdapter {
    */
   toBytes(canvas: any, imageFormat: ImageType, compressionQuality?: number): Promise<Uint8Array> {
     const dataUrl = canvas.toDataURL(canvas, ImageType.getMimeType(imageFormat), compressionQuality);
-    return Promise.resolve(CanvasUtils.base64toUInt8Array(dataUrl));
+    return Promise.resolve(CanvasUtils.base64ToUInt8ArrayBrowser(dataUrl.split(',')[1]));
   }
 }

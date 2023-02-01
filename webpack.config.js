@@ -3,7 +3,7 @@ const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 const NodePolyfillWebpackPlugin = require('node-polyfill-webpack-plugin');
 
-const browserConfig = {
+module.exports = {
   mode: 'production',
   devtool: 'source-map',
   entry: './index.ts',
@@ -45,6 +45,14 @@ const browserConfig = {
     fallback: {
       fs: false,
     },
+    alias: {
+      '@ngageoint/projections-js': path.join(__dirname, './node_modules/@ngageoint/projections-js/dist/index.js'),
+      '@ngageoint/simple-features-js': path.join(__dirname, '/node_modules/@ngageoint/simple-features-js/dist/index.js'),
+      '@ngageoint/simple-features-proj-js': path.join(__dirname, '/node_modules/@ngageoint/simple-features-proj-js/dist/index.js'),
+      '@ngageoint/simple-features-wkb-js': path.join(__dirname, '/node_modules/@ngageoint/simple-features-wkb-js/dist/index.js'),
+      '@ngageoint/simple-features-wkt-js': path.join(__dirname, '/node_modules/@ngageoint/simple-features-wkt-js/dist/index.js'),
+      '@ngageoint/simple-features-geojson-js': path.join(__dirname, '/node_modules/@ngageoint/simple-features-geojson-js/dist/index.js'),
+    },
   },
   output: {
     filename: 'geopackage.min.js',
@@ -56,5 +64,3 @@ const browserConfig = {
   },
   externals: ['better-sqlite3']
 };
-
-module.exports = [browserConfig];

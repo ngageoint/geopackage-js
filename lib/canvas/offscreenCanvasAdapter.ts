@@ -42,7 +42,7 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
       if (data instanceof Buffer || Object.prototype.toString.call(data) === '[object Uint8Array]') {
         blob = new Blob([data], { type: contentType });
       } else if (typeof data === 'string') {
-        blob = new Blob([CanvasUtils.base64toUInt8Array(data.split(',')[1])], { type: contentType });
+        blob = new Blob([CanvasUtils.base64ToUInt8ArrayBrowser(data.split(',')[1])], { type: contentType });
       } else {
         blob = data as Blob;
       }
@@ -199,7 +199,7 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
   toBytes(canvas: any, imageFormat: ImageType, compressionQuality?: number): Promise<Uint8Array> {
     return new Promise((resolve) => {
       this.toDataURL(canvas, ImageType.getMimeType(imageFormat), compressionQuality).then((result) => {
-        resolve(CanvasUtils.base64toUInt8Array(result));
+        resolve(CanvasUtils.base64ToUInt8ArrayBrowser(result.split(',')[1]));
       });
     });
   }

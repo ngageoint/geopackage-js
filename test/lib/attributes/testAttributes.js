@@ -576,10 +576,10 @@ describe('GeoPackage Attribute table create tests', function () {
     attributeRow.setValue('test_real', 3.0);
     attributeRow.setValue('test_boolean', true);
     attributeRow.setValue('test_boolean2', false);
-    attributeRow.setValue('test_blob', Buffer.from('test'));
+    attributeRow.setValue('test_blob', testSetup.encode('test'));
     attributeRow.setValue('test_integer', 5);
     attributeRow.setValue('test_text_limited', 'testt');
-    attributeRow.setValue('test_blob_limited', Buffer.from('testtes'));
+    attributeRow.setValue('test_blob_limited', testSetup.encode('testtes'));
     attributeRow.setValue('test space', 'space space');
     attributeRow.setValue('test-dash', 'dash-dash');
     attributeDao.create(attributeRow);
@@ -592,9 +592,9 @@ describe('GeoPackage Attribute table create tests', function () {
       ar.getValue('test_real').should.be.equal(3.0);
       ar.getValue('test_boolean').should.be.equal(true);
       ar.getValue('test_integer').should.be.equal(5);
-      ar.getValue('test_blob').toString().should.be.equal('test');
+      testSetup.decode(ar.getValue('test_blob')).should.be.equal('test');
       ar.getValue('test_text_limited').should.be.equal('testt');
-      ar.getValue('test_blob_limited').toString().should.be.equal('testtes');
+      testSetup.decode(ar.getValue('test_blob_limited')).should.be.equal('testtes');
       ar.getValue('test space').toString().should.be.equal('space space');
       ar.getValue('test-dash').toString().should.be.equal('dash-dash');
     }
@@ -625,10 +625,10 @@ describe('GeoPackage Attribute table create tests', function () {
     attributeRow.setValue('test_real', 3.0);
     attributeRow.setValue('test_boolean', attributeRow.toObjectValue(3, 1));
     attributeRow.setValue('test_boolean2', attributeRow.toObjectValue(10, 0));
-    attributeRow.setValue('test_blob', Buffer.from('test'));
+    attributeRow.setValue('test_blob', testSetup.encode('test'));
     attributeRow.setValue('test_integer', 5);
     attributeRow.setValue('test_text_limited', 'testt');
-    attributeRow.setValue('test_blob_limited', Buffer.from('testtes'));
+    attributeRow.setValue('test_blob_limited', testSetup.encode('testtes'));
     attributeRow.setValue('test space', 'space space');
     attributeRow.setValue('test-dash', 'dash-dash');
 
@@ -644,9 +644,9 @@ describe('GeoPackage Attribute table create tests', function () {
     ar.getValue('test_boolean').should.be.equal(true);
     ar.getValue('test_boolean2').should.be.equal(false);
     ar.getValue('test_integer').should.be.equal(5);
-    ar.getValue('test_blob').toString().should.be.equal('test');
+    testSetup.decode(ar.getValue('test_blob')).should.be.equal('test');
     ar.getValue('test_text_limited').should.be.equal('testt');
-    ar.getValue('test_blob_limited').toString().should.be.equal('testtes');
+    testSetup.decode(ar.getValue('test_blob_limited')).should.be.equal('testtes');
     ar.getValue('test space').toString().should.be.equal('space space');
     ar.getValue('test-dash').toString().should.be.equal('dash-dash');
     attributesResultSet.close();

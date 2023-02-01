@@ -181,7 +181,7 @@ export class IconCache {
    * @return {Promise<GeoPackageImage>} icon image
    */
   async createAndCacheScaledIcon(icon: IconRow, scale: number, iconCache: IconCache): Promise<GeoPackageImage> {
-    let iconImage = null;
+    let iconImage: GeoPackageImage = null;
     if (icon != null) {
       const iconId = icon.getId();
 
@@ -198,8 +198,8 @@ export class IconCache {
           );
         }
 
-        const dataWidth = iconImage.width;
-        const dataHeight = iconImage.height;
+        const dataWidth = iconImage.getWidth();
+        const dataHeight = iconImage.getHeight();
         let iconWidth = icon.getWidth();
         let iconHeight = icon.getHeight();
 

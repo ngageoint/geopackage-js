@@ -1,12 +1,11 @@
-import { FeatureTableMetadata } from '../lib/features/user/featureTableMetadata';
-import { GeometryColumns } from '../lib/features/columns/geometryColumns';
-import { TableColumnKey } from '../lib/db/tableColumnKey';
-import { BoundingBox } from '../lib/boundingBox';
-
 var path = require('path'),
   assert = require('chai').assert,
   Canvas = require('../lib/canvas/canvas').Canvas,
   GeoPackage = require('../lib/geoPackage').GeoPackage,
+  BoundingBox = require('../lib/boundingBox').BoundingBox,
+  TableColumnKey = require('../lib/db/tableColumnKey').TableColumnKey,
+  GeometryColumns = require('../lib/features/columns/geometryColumns').GeometryColumns,
+  FeatureTableMetadata = require('../lib/features/user/featureTableMetadata').FeatureTableMetadata,
   crypto = require('crypto'),
   ImageUtils = require('../lib/image/imageUtils').ImageUtils,
   CanvasCompare = require('canvas-compare'),
@@ -16,7 +15,6 @@ var path = require('path'),
   SchemaExtension = require('../lib/extension/schema/schemaExtension').SchemaExtension,
   DataColumnConstraints = require('../lib/extension/schema/constraints/dataColumnConstraints').DataColumnConstraints,
   DataColumns = require('../lib/extension/schema/columns/dataColumns').DataColumns,
-  ProjectionConstants = require('@ngageoint/projections-js').ProjectionConstants,
   FeatureColumn = require('../lib/features/user/featureColumn').FeatureColumn,
   GeoPackageDataType = require('../lib/db/geoPackageDataType').GeoPackageDataType,
   TileTable = require('../lib/tiles/user/tileTable').TileTable,
@@ -92,14 +90,30 @@ module.exports.createTmpGeoPackage = async function () {
   };
 };
 
-module.exports.createGeoPackage = async function (gppath) {
+module.exports.createGeoPackage = async function (gppath, name) {
   if (isNode) {
     var fs = require('fs-extra');
     await fs.mkdirp(path.dirname(gppath));
     await fs.open(gppath, 'w');
-    return GeoPackageManager.create(gppath);
+    return GeoPackageManager.create(gppath, name);
   } else {
-    return GeoPackageManager.create();
+    return GeoPackageManager.create(undefined, name);
+  }
+};
+
+module.exports.encode = function (text) {
+  if (isNode) {
+    return Buffer.from(text);
+  } else {
+    return new TextEncoder().encode(text);
+  }
+};
+
+module.exports.decode = function (binary) {
+  if (isNode) {
+    return binary.toString();
+  } else {
+    return new TextDecoder('utf-8').decode(binary);
   }
 };
 
@@ -162,7 +176,7 @@ module.exports.diffCanvas = async function (actualCanvas, expectedTilePath, call
   if (isNode) {
     return ImageUtils.getImage(expectedTilePath).then((img) => {
       var expectedCanvas = Canvas.create(256, 256);
-      expectedCanvas.getContext('2d').drawImage(img.image, 0, 0);
+      expectedCanvas.getContext('2d').drawImage(img.getImage(), 0, 0);
       let same = actualCanvas.toDataURL() === expectedCanvas.toDataURL();
       Canvas.disposeCanvas(expectedCanvas);
       Canvas.disposeImage(img);
@@ -198,9 +212,9 @@ module.exports.diffCanvas = async function (actualCanvas, expectedTilePath, call
 module.exports.diffCanvasesContexts = function (actualCtx, expectedCtx, width, height) {
   var actualData = actualCtx.getImageData(0, 0, width, height);
   var expectedData = expectedCtx.getImageData(0, 0, width, height);
-  if (actualData.data.length != expectedData.data.length) return false;
-  for (var i = 0; i < actualData.data.length; ++i) {
-    if (actualData.data[i] != expectedData.data[i]) {
+  if (actualData.data.length !== expectedData.data.length) return false;
+  for (let i = 0; i < actualData.data.length; ++i) {
+    if (actualData.data[i] !== expectedData.data[i]) {
       return false;
     }
   }
@@ -212,12 +226,12 @@ module.exports.diffImagesWithDimensions = function (actualTile, expectedTilePath
     const actual = Canvas.create(width, height);
     let actualCtx = actual.getContext('2d');
     actualCtx.drawImage(actualImage.getImage(), 0, 0);
-    const actualDataUrl = actual.toDataURL();
+    const actualDataUrl = actual.toDataURL('image/png');
 
     new Promise((resolve) => {
       if (!isNode) {
-        module.exports.loadTile(expectedTilePath).then((expectedTileFileData) => {
-          ImageUtils.getImage(Buffer.from(expectedTileFileData)).then((expectedImage) => {
+        module.exports.loadTile(expectedTilePath).then((data) => {
+          ImageUtils.getImage(data).then((expectedImage) => {
             resolve(expectedImage);
           });
         });
@@ -230,55 +244,51 @@ module.exports.diffImagesWithDimensions = function (actualTile, expectedTilePath
       const expected = Canvas.create(width, height);
       let expectedCtx = expected.getContext('2d');
       expectedCtx.drawImage(expectedImage.image, 0, 0);
-      const expectedDataUrl = expected.toDataURL();
-      const same = actualDataUrl === expectedDataUrl;
-      if (!same) {
-        console.log('actual');
-        console.log(actualDataUrl);
-        console.log('expected');
-        console.log(expectedDataUrl);
-      }
-
+      const expectedDataUrl = expected.toDataURL('image/png');
+      let same = this.diffCanvasesContexts(actualCtx, expectedCtx, width, height);
       // if web, let's show on browser page
       if (!isNode) {
         if (!same) {
-          var h1Tags = document.getElementsByTagName('h1');
-          var h2Tags = document.getElementsByTagName('li');
-          var currentTag;
-          if (h2Tags.length === 0) {
-            currentTag = h1Tags.item(h1Tags.length - 1);
-          } else {
-            currentTag = h2Tags.item(h2Tags.length - 1).parentNode;
-          }
-          var div = document.createElement('div');
-          var span1 = document.createElement('span');
-          span1.style.width = width + 'px';
-          span1.style.display = 'inline-block';
-          span1.innerHTML = 'Actual';
-          var span2 = document.createElement('span');
-          span2.style.width = width + 'px';
-          span2.style.display = 'inline-block';
-          span2.innerHTML = 'Expected';
-          var span3 = document.createElement('span');
-          span3.style.width = width + 'px';
-          span3.style.display = 'inline-block';
-          span3.innerHTML = 'Diff';
-
-          div.appendChild(span1);
-          div.appendChild(span2);
-          div.appendChild(span3);
-          currentTag.appendChild(div);
-          currentTag.appendChild(actual);
-          currentTag.appendChild(expected);
-
           CanvasCompare.setImageData(ImageData);
           CanvasCompare.canvasCompare({
             baseImageUrl: actual.toDataURL(),
             targetImageUrl: expected.toDataURL(),
           })
             .then(function (result) {
-              currentTag.appendChild(result.producePreview());
-              callback(null, false);
+              same = result.getPixels() === 0;
+              if (!same) {
+                console.log('actual\n' + actualDataUrl + '\nexpected\n' + expectedDataUrl);
+                var h1Tags = document.getElementsByTagName('h1');
+                var h2Tags = document.getElementsByTagName('li');
+                var currentTag;
+                if (h2Tags.length === 0) {
+                  currentTag = h1Tags.item(h1Tags.length - 1);
+                } else {
+                  currentTag = h2Tags.item(h2Tags.length - 1).parentNode;
+                }
+                var div = document.createElement('div');
+                var span1 = document.createElement('span');
+                span1.style.width = width + 'px';
+                span1.style.display = 'inline-block';
+                span1.innerHTML = 'Actual';
+                var span2 = document.createElement('span');
+                span2.style.width = width + 'px';
+                span2.style.display = 'inline-block';
+                span2.innerHTML = 'Expected';
+                var span3 = document.createElement('span');
+                span3.style.width = width + 'px';
+                span3.style.display = 'inline-block';
+                span3.innerHTML = 'Diff';
+
+                div.appendChild(span1);
+                div.appendChild(span2);
+                div.appendChild(span3);
+                currentTag.appendChild(div);
+                currentTag.appendChild(actual);
+                currentTag.appendChild(expected);
+                currentTag.appendChild(result.producePreview());
+              }
+              callback(null, same);
             })
             .catch(function (reason) {
               console.error(reason);
@@ -367,9 +377,7 @@ module.exports.buildFeatureTable = function (
   geometryType,
   additionalColumns,
 ) {
-  const srs = geoPackage
-    .getSpatialReferenceSystemDao()
-    .getOrCreateCode(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+  const srs = geoPackage.getSpatialReferenceSystemDao().createWgs84();
 
   const geometryColumns = new GeometryColumns();
   geometryColumns.setId(new TableColumnKey(tableName, geometryColumnName));

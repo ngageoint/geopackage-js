@@ -19,7 +19,6 @@ require('./lib/extension/nga/properties/testPropertiesManager');
 require('./lib/extension/nga/scale/testTileScalingExtension');
 require('./lib/extension/nga/style/testIconCache');
 require('./lib/extension/nga/style/testStyleExtension');
-require('./lib/extension/properties/testPropertiesExtension');
 require('./lib/extension/relatedTables/testDublinCore');
 require('./lib/extension/relatedTables/testRelatedAttributes');
 require('./lib/extension/relatedTables/testRelatedMedia');
@@ -56,7 +55,6 @@ require('./lib/user/custom/testUserCustomTable');
 require('./lib/user/testUserTable');
 require('./lib/user/testUserTableReader');
 require('./lib/validate/testGeoPackageValidate');
-
 require('./lib/testBoundingBox');
 require('./lib/testFeatureCreate');
 require('./lib/testGeoPackage');

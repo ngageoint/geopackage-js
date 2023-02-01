@@ -101,11 +101,15 @@ export class MediaRow extends UserCustomRow {
 
   /**
    * Get the data
-   *
    * @return data
    */
   public getData(): Buffer {
-    return this.getValueWithIndex(this.getDataColumnIndex()) as Buffer;
+    let buffer: Buffer;
+    const data = this.getValueWithIndex(this.getDataColumnIndex());
+    if (data != null) {
+      buffer = Buffer.from(data);
+    }
+    return buffer;
   }
 
   /**

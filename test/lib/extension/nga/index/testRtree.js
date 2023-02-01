@@ -1,12 +1,10 @@
-import { default as testSetup } from '../../../../testSetup';
-import { RTreeIndexExtension } from '../../../../../lib/extension/rtree/rTreeIndexExtension';
-import { ProjectionConstants, Projections } from '@ngageoint/projections-js';
-import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
-import { ExtensionScopeType } from '../../../../../lib/extension/extensionScopeType';
-import { FeatureIndexManager } from '../../../../../lib/features/index/featureIndexManager';
-
-var BoundingBox = require('../../../../../lib/boundingBox').BoundingBox,
+var testSetup = require('../../../../testSetup').default,
+  BoundingBox = require('../../../../../lib/boundingBox').BoundingBox,
   assert = require('chai').assert,
+  { ProjectionConstants, Projections, ProjectionTransform } = require('@ngageoint/projections-js'),
+  { RTreeIndexExtension } = require('../../../../../lib/extension/rtree/rTreeIndexExtension'),
+  { ExtensionScopeType } = require('../../../../../lib/extension/extensionScopeType'),
+  { FeatureIndexManager } = require('../../../../../lib/features/index/featureIndexManager'),
   path = require('path');
 
 describe('RTree tests', function () {
@@ -28,80 +26,85 @@ describe('RTree tests', function () {
     });
 
     it('should test rtree index extension', function () {
-      try {
-        const extension = new RTreeIndexExtension(geoPackage);
+      const extension = new RTreeIndexExtension(geoPackage);
 
-        const featureTables = geoPackage.getFeatureTables();
-        for (const featureTable of featureTables) {
-          const featureDao = geoPackage.getFeatureDao(featureTable);
-          const table = featureDao.getTable();
+      const featureTables = geoPackage.getFeatureTables();
+      for (const featureTable of featureTables) {
+        const featureDao = geoPackage.getFeatureDao(featureTable);
+        const table = featureDao.getTable();
 
-          if (!extension.hasExtensionWithFeatureTable(table)) {
-            const createdExtension = extension.createWithFeatureTable(table);
-            assert.isNotNull(createdExtension);
-          }
+        if (!extension.hasExtensionWithFeatureTable(table)) {
+          const createdExtension = extension.createWithFeatureTable(table);
+          assert.isNotNull(createdExtension);
+        }
 
-          const tableDao = extension.getTableDao(featureDao);
-          assert.isTrue(tableDao.has());
-          featureDao.count().should.be.equal(tableDao.count());
+        const tableDao = extension.getTableDao(featureDao);
+        assert.isTrue(tableDao.has());
+        featureDao.count().should.be.equal(tableDao.count());
 
-          let totalEnvelope = null;
+        let totalEnvelope = null;
 
-          let expectedCount = 0;
+        let expectedCount = 0;
 
-          let resultSet = tableDao.queryForAll();
-          while (resultSet.moveToNext()) {
-            let row = tableDao.getRowWithUserCustomResultSet(resultSet);
-            assert.isNotNull(row);
+        let resultSet = tableDao.queryForAll();
+        while (resultSet.moveToNext()) {
+          let row = tableDao.getRowWithUserCustomResultSet(resultSet);
+          assert.isNotNull(row);
 
-            let featureRow = tableDao.getFeatureRow(row);
-            assert.isNotNull(featureRow);
+          let featureRow = tableDao.getFeatureRow(row);
+          assert.isNotNull(featureRow);
 
-            row.getId().should.be.equal(featureRow.getId());
+          row.getId().should.be.equal(featureRow.getId());
 
-            let minX = row.getMinX();
-            let maxX = row.getMaxX();
-            let minY = row.getMinY();
-            let maxY = row.getMaxY();
+          let minX = row.getMinX();
+          let maxX = row.getMaxX();
+          let minY = row.getMinY();
+          let maxY = row.getMaxY();
 
-            let envelope = featureRow.getGeometryEnvelope();
+          let envelope = featureRow.getGeometryEnvelope();
 
-            if (envelope != null) {
-              assert.isTrue(envelope.minX >= minX);
-              assert.isTrue(envelope.maxX <= maxX);
-              assert.isTrue(envelope.minY >= minY);
-              assert.isTrue(envelope.maxY <= maxY);
+          if (envelope != null) {
+            assert.isTrue(envelope.minX >= minX);
+            assert.isTrue(envelope.maxX <= maxX);
+            assert.isTrue(envelope.minY >= minY);
+            assert.isTrue(envelope.maxY <= maxY);
 
-              let results = tableDao.queryWithGeometryEnvelope(envelope);
-              assert.isTrue(results.getCount() > 0);
-              let found = false;
-              while (results.moveToNext()) {
-                let queryFeatureRow = tableDao.getFeatureRowWithUserCustomRow(results.getRow());
-                if (queryFeatureRow.getId() === featureRow.getId()) {
-                  found = true;
-                  break;
-                }
-              }
-              assert.isTrue(found);
-              results.close();
-
-              expectedCount++;
-              if (totalEnvelope == null) {
-                totalEnvelope = envelope;
-              } else {
-                totalEnvelope = totalEnvelope.union(envelope);
+            let results = tableDao.queryWithGeometryEnvelope(envelope);
+            assert.isTrue(results.getCount() > 0);
+            let found = false;
+            while (results.moveToNext()) {
+              let queryFeatureRow = tableDao.getFeatureRowWithUserCustomRow(results.getRow());
+              if (queryFeatureRow.getId() === featureRow.getId()) {
+                found = true;
+                break;
               }
             }
-          }
-          resultSet.close();
+            assert.isTrue(found);
+            results.close();
 
+            expectedCount++;
+            if (totalEnvelope == null) {
+              totalEnvelope = envelope;
+            } else {
+              totalEnvelope = totalEnvelope.union(envelope);
+            }
+          }
+        }
+        resultSet.close();
+
+        if (totalEnvelope != null) {
           let envelopeCount = tableDao.countWithGeometryEnvelope(totalEnvelope);
           assert.isTrue(envelopeCount >= expectedCount);
           let results = tableDao.queryWithGeometryEnvelope(totalEnvelope);
           envelopeCount.should.be.equal(results.getCount());
           results.close();
 
-          let boundingBox = new BoundingBox(totalEnvelope);
+          let boundingBox = new BoundingBox(
+            totalEnvelope.minX,
+            totalEnvelope.minY,
+            totalEnvelope.maxX,
+            totalEnvelope.maxY,
+          );
           let bboxCount = tableDao.countWithBoundingBoxAndProjection(boundingBox);
           assert.isTrue(bboxCount >= expectedCount);
           results = tableDao.queryWithBoundingBoxAndProjection(boundingBox);
@@ -113,20 +116,16 @@ describe('RTree tests', function () {
           if (projection.getAuthority() !== ProjectionConstants.AUTHORITY_NONE) {
             let queryProjection = null;
             if (projection.equals(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR)) {
-              queryProjection = Projections.getProjection(
-                ProjectionConstants.AUTHORITY_EPSG,
-                ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM,
-              );
+              queryProjection = Projections.getWGS84Projection();
             } else {
-              queryProjection = Projections.getProjection(
-                ProjectionConstants.AUTHORITY_EPSG,
-                ProjectionConstants.EPSG_WEB_MERCATOR,
-              );
+              queryProjection = Projections.getWebMercatorProjection();
             }
-            let transform = GeometryTransform.create(projection, queryProjection);
-
+            let transform = new ProjectionTransform(projection, queryProjection);
             let projectedBoundingBox = boundingBox.transform(transform);
-            let projectedBboxCount = tableDao.countWithBoundingBoxAndProjection(projectedBoundingBox, queryProjection);
+            let projectedBboxCount = tableDao.countWithBoundingBoxAndProjection(
+              projectedBoundingBox,
+              queryProjection,
+            );
             assert.isTrue(projectedBboxCount >= expectedCount);
             results = tableDao.queryWithBoundingBoxAndProjection(projectedBoundingBox, queryProjection);
             projectedBboxCount.should.be.equal(results.getCount());
@@ -134,8 +133,6 @@ describe('RTree tests', function () {
             assert.isTrue(projectedBboxCount >= expectedCount);
           }
         }
-      } catch (e) {
-        console.error(e);
       }
     });
   });
