@@ -23,7 +23,7 @@ export class GeoPackageTileRetriever implements TileRetriever {
    * @param height height
    * @param imageFormat image format
    */
-  public constructor(tileDao: TileDao, width: number, height: number, imageFormat = 'image/png') {
+  public constructor(tileDao: TileDao, width?: number, height?: number, imageFormat = 'image/png') {
     tileDao.adjustTileMatrixLengths();
     this.tileCreator = new TileCreator(tileDao, width, height, imageFormat);
   }

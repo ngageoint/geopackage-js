@@ -14,6 +14,7 @@ import { ImageUtils } from '../image/imageUtils';
 import { GeoPackageImage } from '../image/geoPackageImage';
 import { TileScalingType } from '../extension/nga/scale/tileScalingType';
 import { ImageType } from '../image/imageType';
+import { TileUtils } from './tileUtils';
 
 /**
  * Tile Creator, creates a tile from a tile matrix to the desired projection
@@ -82,7 +83,12 @@ export class TileCreator {
    * @param height request height
    * @param imageFormat image format
    */
-  public constructor(tileDao: TileDao, width: number, height: number, imageFormat: string) {
+  public constructor(
+    tileDao: TileDao,
+    width: number = TileUtils.TILE_PIXELS_DEFAULT,
+    height: number = TileUtils.TILE_PIXELS_DEFAULT,
+    imageFormat: string,
+  ) {
     this.tileDao = tileDao;
     this.width = width;
     this.height = height;

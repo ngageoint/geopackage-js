@@ -38,6 +38,13 @@ export class GeoJSONResultSet implements IterableIterator<Feature> {
   }
 
   /**
+   * Count of geojson features
+   */
+  public count(): number {
+    return this.featureIndexResultSet.count();
+  }
+
+  /**
    * Get the geometry transform needed to convert the geometries into the WGS84 projection
    * @param featureDao
    * @private

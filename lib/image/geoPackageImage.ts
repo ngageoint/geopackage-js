@@ -72,4 +72,11 @@ export class GeoPackageImage {
     const offset = y * this.width + x;
     return imageData[offset + 3] === 0;
   }
+
+  /**
+   * Dispose of the image
+   */
+  public dispose(): void {
+    Canvas.disposeImage(this);
+  }
 }

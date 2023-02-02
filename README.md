@@ -52,7 +52,6 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 - Reworked UserRow, UserTable, and UserColumn and updated all super types
 - Added in FeatureConnection, TileConnection, AttributesConnection and UserCustomConnections.
 - Added GeoPackageCache
-- 
 
 ##### 4.2.3
 
@@ -134,89 +133,124 @@ View the latest [docs](https://ngageoint.github.io/geopackage-js/).
 
 #### Browser Usage ####
 ```html
-<script src="/path/to/geopackage/dist/geopackage.min.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test</title>
+  <script src="/path/to/geopackage.min.js"></script>
+</head>
+<body>
+<input id="fileInput" type="file"/>
+<script src="./index.js"></script>
+</body>
+</html>
 ```
 ```javascript
-
-// Specify folder containing the sql-wasm.wasm file. 
+// Specify folder containing the sql-wasm.wasm file.
 // By default, geopackage loads from https://server/public/sql-wasm.wasm
-window.GeoPackage.setSqljsWasmLocateFile(file => '/path/to/geopackage/dist/' + file);
+const {
+  GeoPackageManager,
+  Canvas,
+  TileUtils,
+  GeoPackageTileRetriever,
+  FeatureTiles,
+  FeatureIndexManager,
+  BoundingBox,
+  setSqljsWasmLocateFile
+} = window.GeoPackage
 
-// attach this method to a file input onchange event
-window.loadGeoPackage = function(files) {
-  var f = files[0];
-  var r = new FileReader();
-  r.onload = function() {
-    var array = new Uint8Array(r.result);
-    loadByteArray(array);
+setSqljsWasmLocateFile(file => 'public/' + file);
+
+// attach an event listener onto a file input
+document.getElementById('fileInput').addEventListener('change',  function () {
+  const file =this.files[0];
+  const fileReader = new FileReader();
+  fileReader.onload = function() {
+    loadByteArray(new Uint8Array(fileReader.result));
   }
-  r.readAsArrayBuffer(f);
-}
+  fileReader.readAsArrayBuffer(file);
+}, false);
 
-function loadByteArray(array, callback) {
-  window.GeoPackage.open(array).then(function(geoPackage) {
+function loadByteArray(array) {
+  GeoPackageManager.open(array).then(async (geoPackage) => {
     // get the tile table names
     const tileTables = geoPackage.getTileTables();
 
-    tileTables.forEach(table => {
+    for (let i = 0; i < tileTables.length; i++) {
+      const table = tileTables[i];
       // get tile dao
       const tileDao = geoPackage.getTileDao(table);
 
       // get table info
       const tableInfo = geoPackage.getInfoForTable(tileDao);
 
-      // draw a tile into a canvas for an XYZ tile
-      var canvas = canvasFromSomewhere;
-      var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-      var x = 0;
-      var y = 0;
-      var zoom = 0;
+      // Get a GeoPackageTile and then draw it into a canvas.
+      const canvas = Canvas.create(TileUtils.TILE_PIXELS_DEFAULT, TileUtils.TILE_PIXELS_DEFAULT);
+      const context = canvas.getContext('2d');
+      const gpr = new GeoPackageTileRetriever(tileDao);
+      const x = 0;
+      const y = 0;
+      const zoom = 0;
 
-      gpr.drawTileIn(x, y, zoom, canvas).then(() => {
-        // tile completed drawing
-      }).catch(e => {
-        // error drawing tile
-        console.error(e);
-      })
+      // Get the GeoPackageTile for a particular web mercator tile
+      const geoPackageTile = await gpr.getTile(x, y, zoom)
+      // get the tile data as a Buffer
+      let tileData = geoPackageTile.getData();
+      // Get the GeoPackageImage from the GeoPackageTile
+      const geoPackageImage = await geoPackageTile.getGeoPackageImage()
+      // draw the tile and use the canvas to get the Data URL
+      context.drawImage(geoPackageImage.getImage(), 0, 0);
+      const base64String = canvas.toDataURL('image/png');
 
-      // or get a tile base64 data URL for an XYZ tile
-      gpr.getTile(x, y, zoom).then(base64DataUrl => {
-        console.log(base64DataUrl);
-      }).catch(e => {
-        // error retrieving tile
-        console.error(e);
-      });
+      // In node.js, users must dispose of any GeoPackageImage and Canvas created to prevent memory leaks
+      Canvas.disposeImage(geoPackageImage);
+      Canvas.disposeCanvas(canvas);
 
-      // or get a tile from a GeoPackage tile column and tile row
-      const tileRow = tileDao.queryForTile(tileColumn, tileRow, zoom);
-      var tileData = tileRow.tileData();  // the raw bytes from the GeoPackage
-    });
+      // Query tile table directly.
+      const tileRow = tileDao.queryForTile(x, y, zoom);
+      tileData = tileRow.getTileData();  // the raw bytes from the GeoPackage
+    }
 
     // get the feature table names
     const featureTables = geoPackage.getFeatureTables();
 
-    featureTables.forEach(table => {
+    for (let i = 0; i < featureTables.length; i++) {
+      const table = featureTables[i];
       // get the feature dao
       const featureDao = geoPackage.getFeatureDao(table);
 
       // get the info for the table
-      const tableInfo = geoPackage.geoPackage.getInfoForTable(featureDao);
+      const tableInfo = geoPackage.getInfoForTable(featureDao);
 
       // draw tiles using features
-      const ft = new FeatureTiles(featureDao);
+      const canvas = Canvas.create(TileUtils.TILE_PIXELS_DEFAULT, TileUtils.TILE_PIXELS_DEFAULT);
+      const context = canvas.getContext('2d');
+      const ft = new FeatureTiles(geoPackage, featureDao);
       var x = 0;
       var y = 0;
       var zoom = 0;
-      ft.drawTile(x, y, zoom).then(base64DataUrl => {
-        console.log(base64DataUrl);
-      }).catch(e => {
-        // error retrieving tile
-        console.error(e);
-      });
+      const geoPackageImage = await ft.drawTile(x, y, zoom);
+      context.drawImage(geoPackageImage.getImage(), 0, 0);
+      const base64String = canvas.toDataURL('image/png');
+      Canvas.disposeImage(geoPackageImage);
+      Canvas.disposeCanvas(canvas);
 
-      // query for all features as geojson
-      const geojsonFeatures = geoPackage.queryForGeoJSONFeaturesInTable(table);
-    });
+      // iterate over indexed features that intersect the bounding box
+      const featureIndexManager = new FeatureIndexManager(geoPackage, table);
+      const resultSet = featureIndexManager.query();
+      for (const featureRow of resultSet) {
+        // ...
+      }
+      resultSet.close();
+
+      // iterate over all features in a table in the geojson format
+      const geoJSONResultSet = geoPackage.queryForGeoJSONFeatures(table);
+      for (const feature of geoJSONResultSet) {
+        // ...
+      }
+      geoJSONResultSet.close();
+    }
   }).catch(function(error) {
     console.error(error);
   });
@@ -225,6 +259,39 @@ function loadByteArray(array, callback) {
 ```
 
 #### Web Worker Usage ####
+##### index.html #####
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test</title>
+    <script src="/path/to/geopackage.min.js"></script>
+</head>
+<body>
+<input id="fileInput" type="file" onchange="openConnection(this.files)"/>
+<canvas id="canvas" width="256px" height="256px"></canvas>
+<br>
+<input id="table" type="text">Table:</input>
+<br>
+<input id="column" type="number">X:</input>
+<br>
+<input id="row" type="number">Y:</input>
+<br>
+<input id="zoom" type="number">Zoom:</input>
+<br>
+<button onclick="drawFeatureTileInCanvas(document.getElementById('table').value, document.getElementById('column').value, document.getElementById('row').value, document.getElementById('zoom').value)">GetFeatureTile</button>
+<br>
+<button onclick="drawTileInCanvas(document.getElementById('table').value, document.getElementById('column').value, document.getElementById('row').value, document.getElementById('zoom').value)">DrawTileInCanvas</button>
+<br>
+<button onclick="getFeatureTableAsGeoJSON(document.getElementById('table').value)">GetFeatureTableAsGeoJSON</button>
+<br>
+<button onclick="closeConnection()">Close</button>
+<br>
+<script src="./index.js"></script>
+</body>
+</html>
+```
 ##### index.js #####
 ```javascript
 // canvas for drawing, will need to be defined in html file.
@@ -234,18 +301,13 @@ var canvas = document.getElementById('canvas');
 var geopackageWorker;
 if (window.Worker) {
   geopackageWorker = new Worker("worker.js");
-  
+
   // handle responses from the geopackage web worker
   geopackageWorker.onmessage = function(e) {
     // draw tile
     if (e.data.type === 'tile') {
       const ctx = canvas.getContext('2d');
-      const img = new Image();
-      img.onload = function () {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0);
-      };
-      img.src = e.data.tile
+      ctx.putImageData(e.data.tileImageData, 0, 0);
       // print geojson
     } else if (e.data.type === 'geojson') {
       console.log(e.data.geojson)
@@ -273,7 +335,7 @@ openConnection = function(files) {
 }
 
 /**
- * Closes the geopackage connection inside of the worker
+ * Closes the geopackage connection inside the worker
  */
 closeConnection = function () {
   geopackageWorker.postMessage({
@@ -289,6 +351,7 @@ closeConnection = function () {
  * @param z
  */
 drawFeatureTileInCanvas = function (table, x, y, z) {
+  console.log([table, x, y, z]);
   geopackageWorker.postMessage({
     type: 'get-feature-tile',
     table: table,
@@ -333,15 +396,25 @@ getFeatureTableAsGeoJSON = function (table) {
 ##### worker.js ####
 ```javascript
 // import the geopackage browser library
-self.importScripts('/path/to/geopackage/dist/geopackage.min.js');
+self.importScripts('/path/to/geopackage.min.js');
+const {
+  GeoPackageManager,
+  Canvas,
+  TileUtils,
+  GeoPackageTileRetriever,
+  FeatureTiles,
+  BoundingBox,
+  setSqljsWasmLocateFile
+} = GeoPackage;
+
 // specify the location of the sql.wasm file
-GeoPackage.setSqljsWasmLocateFile(file => '/path/to/geopackage/dist/' + file);
+setSqljsWasmLocateFile(file => 'public/' + file);
 
 // message listener
 onmessage = function(e) {
   // open geopackage connection to fileData provided in message
   if (e.data.type === 'load') {
-    GeoPackage.GeoPackageManager.open(e.data.file).then(gp => {
+    GeoPackageManager.open(e.data.file).then(gp => {
       self.gp = gp;
     });
     // close the geopackage connection
@@ -356,11 +429,11 @@ onmessage = function(e) {
     const width = parseInt(e.data.width);
     const height = parseInt(e.data.height);
     const featureDao = self.gp.getFeatureDao(table);
-    const ft = new GeoPackage.FeatureTiles(featureDao, width, height);
+    const ft = new FeatureTiles(self.gp, featureDao, width, height);
     ft.drawTile(x, y, z).then(tile => {
       postMessage({
         type: 'tile',
-        tile: tile
+        tileImageData: tile.getImageData()
       });
     });
     // request a tile from a tile table
@@ -371,23 +444,23 @@ onmessage = function(e) {
     const z = parseInt(e.data.z);
     const width = parseInt(e.data.width);
     const height = parseInt(e.data.height);
-    const tile = self.gp.xyzTile(table, x, y, z, 256, 256)
-    postMessage(tile);
+    self.gp.xyzTile(table, x, y, z, width, height).then(gpTile => {
+      gpTile.getGeoPackageImage().then(gpImage => {
+        postMessage({
+          type: 'tile',
+          tileImageData: gpImage.getImageData()
+        });
+      })
+    })
     // request the features from a feature table in geojson format
   } else if (e.data.type === 'get-geojson') {
     const table = e.data.table;
-    const featureDao = self.gp.getFeatureDao(table);
-    const srs = featureDao.srs
-    let iterator = featureDao.queryForEach()
-    const features = []
-    for (let row of iterator) {
-      if (!isNil(row)) {
-        const featureRow = featureDao.getRow(row)
-        const feature = GeoPackage.GeoPackage.parseFeatureRowIntoGeoJSON(featureRow, srs)
-        feature.type = 'Feature'
-        features.push(feature)
-      }
+    const features = [];
+    const featureResultSet = self.gp.queryForGeoJSONFeatures(table);
+    for(const feature of featureResultSet) {
+      features.push(feature);
     }
+    featureResultSet.close();
     const featureCollection = {
       type: 'FeatureCollection',
       features: features
@@ -398,114 +471,105 @@ onmessage = function(e) {
     });
   }
 }
-
 ```
 
 #### NodeJS Usage ####
-
 ```javascript
-var {
+const {
+  setCanvasKitWasmLocateFile,
   GeoPackageManager,
   GeoPackageTileRetriever,
   FeatureTiles,
-  setCanvasKitWasmLocateFile,
-  SpatialReferenceSystem,
-  Projection
+  Canvas,
+  FeatureIndexManager,
+  BoundingBox,
+  TileUtils
 } = require('@ngageoint/geopackage');
+const { Projections } = require('@ngageoint/projections-js')
+const { GeometryType } = require('@ngageoint/simple-features-js')
 
-setCanvasKitWasmLocateFile(file => 'path/to/geopackage/dist/canvaskit/' + file);
+// specify the CanvasKit WebAssembly module's location.
+setCanvasKitWasmLocateFile(file => '/path/to/node_modules/@ngageoint/geopackage/dist/canvaskit/' + file);
 
 // open the .gpkg file
-GeoPackageManager.open('filename.gpkg').then(geoPackage => {
+GeoPackageManager.open('/path/to/file.gpkg').then(async (geoPackage) => {
   // get the tile table names
   const tileTables = geoPackage.getTileTables();
-  
-  tileTables.forEach(table => {
+
+  for (let i = 0; i < tileTables.length; i++) {
+    const table = tileTables[i];
     // get tile dao
     const tileDao = geoPackage.getTileDao(table);
-    
+
     // get table info
     const tableInfo = geoPackage.getInfoForTable(tileDao);
 
-    // draw a tile into a canvas for an XYZ tile
-    var canvas = canvasFromSomewhere;
-    var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-    var x = 0;
-    var y = 0;
-    var zoom = 0;
+    // Get a GeoPackageTile and then draw it into a canvas.
+    const canvas = Canvas.create(TileUtils.TILE_PIXELS_DEFAULT, TileUtils.TILE_PIXELS_DEFAULT);
+    const context = canvas.getContext('2d');
+    const gpr = new GeoPackageTileRetriever(tileDao);
+    const x = 0;
+    const y = 0;
+    const zoom = 0;
 
-    gpr.drawTileIn(x, y, zoom, canvas).then(() => {
-      // tile completed drawing
-    }).catch(e => {
-      // error drawing tile
-      console.error(e);
-    })
+    // Get the GeoPackageTile for a particular web mercator tile
+    const geoPackageTile = await gpr.getTile(x, y, zoom)
+    // get the tile data as a Buffer
+    let tileData = geoPackageTile.getData();
+    // Get the GeoPackageImage from the GeoPackageTile
+    const geoPackageImage = await geoPackageTile.getGeoPackageImage()
+    // draw the tile and use the canvas to get the Data URL
+    context.drawImage(geoPackageImage.getImage(), 0, 0);
+    const base64String = canvas.toDataURL('image/png');
 
-    // or get a tile base64 data URL for an XYZ tile
-    gpr.getTile(x, y, zoom).then(base64DataUrl => {
-      console.log(base64DataUrl);
-    }).catch(e => {
-      // error retrieving tile
-      console.error(e);
-    });
+    // In node.js, users must dispose of any GeoPackageImage and Canvas created to prevent memory leaks
+    Canvas.disposeImage(geoPackageImage);
+    Canvas.disposeCanvas(canvas);
 
-    // or get a tile from a GeoPackage tile column and tile row
-    const tileRow = tileDao.queryForTile(tileColumn, tileRow, zoom);
-    var tileData = tileRow.tileData();  // the raw bytes from the GeoPackage
-  });
+    // Query tile table directly.
+    const tileRow = tileDao.queryForTile(x, y, zoom);
+    tileData = tileRow.getTileData();  // the raw bytes from the GeoPackage
+  }
 
   // get the feature table names
   const featureTables = geoPackage.getFeatureTables();
-  
-  featureTables.forEach(table => {
+
+  for (let i = 0; i < featureTables.length; i++) {
+    const table = featureTables[i];
     // get the feature dao
     const featureDao = geoPackage.getFeatureDao(table);
-    
+
     // get the info for the table
-    const tableInfo = geoPackage.geoPackage.getInfoForTable(featureDao);
-    
+    const tableInfo = geoPackage.getInfoForTable(featureDao);
+
     // draw tiles using features
-    const ft = new FeatureTiles(featureDao);
+    const canvas = Canvas.create(TileUtils.TILE_PIXELS_DEFAULT, TileUtils.TILE_PIXELS_DEFAULT);
+    const context = canvas.getContext('2d');
+    const ft = new FeatureTiles(geoPackage, featureDao);
     var x = 0;
     var y = 0;
     var zoom = 0;
-    ft.drawTile(x, y, zoom).then(base64DataUrl => {
-      console.log(base64DataUrl);
-    }).catch(e => {
-      // error retrieving tile
-      console.error(e);
-    });
-    
-    // query for all features as geojson
-    const geojsonFeatures = geoPackage.queryForGeoJSONFeaturesInTable(table);
-  });
-  
-  // add a spatial reference system to the geopackage
-  const srs = new SpatialReferenceSystem();
-  srs.srs_name = 'NAD27 / UTM zone 11N';
-  srs.srs_id = 26711;
-  srs.organization = 'EPSG';
-  srs.organization_coordsys_id = 26711;
-  srs.definition = 'PROJCS["NAD27 / UTM zone 11N",GEOGCS["NAD27",DATUM["North_American_Datum_1927",SPHEROID["Clarke 1866",6378206.4,294.9786982138982,AUTHORITY["EPSG","7008"]],AUTHORITY["EPSG","6267"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4267"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",-117],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",500000],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","26711"]]';
-  geoPackage.createSpatialReferenceSystem(srs);
-  
-  // create a tile table using the spatial reference system
-  // bounding box is the bounds for EPSG:26711
-  const boundingBox = new BoundingBox(202161.66, 568941.68, 2982030.40, 8674415.25);
-  geoPackage.createTileTableWithTableName(
-    tableName,
-    boundingBox,
-    srs.srs_id,
-    boundingBox,
-    srs.srs_id,
-  );
+    const geoPackageImage = await ft.drawTile(x, y, zoom);
+    context.drawImage(geoPackageImage.getImage(), 0, 0);
+    // canvas.toDataURL('image/png'));
+    Canvas.disposeImage(geoPackageImage);
+    Canvas.disposeCanvas(canvas);
 
-  /**
-   * Note: any projection in the spatial reference system table is loaded into proj4 for use throughout the geopackage api
-   * By default, this includes EPSG:3856 and EPSG:4326
-   */
-  // Load a projection to be used by API, but not saved to spatial reference system table.
-  Projection.loadProjection('EPSG:26711', srs.definition)
+    // iterate over indexed features that intersect the bounding box
+    const featureIndexManager = new FeatureIndexManager(geoPackage, table);
+    const resultSet = featureIndexManager.queryWithBoundingBoxAndProjection(new BoundingBox(0, -90, 180, 90), Projections.getWGS84Projection());
+    for (const featureRow of resultSet) {
+      // ...
+    }
+    resultSet.close();
+
+    // iterate over all features in a table in the geojson format
+    const geoJSONResultSet = geoPackage.queryForGeoJSONFeatures(table);
+    for (const feature of geoJSONResultSet) {
+      // ...
+    }
+    geoJSONResultSet.close();
+  }
 });
 
 ```
