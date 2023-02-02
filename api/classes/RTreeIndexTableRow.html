@@ -1,0 +1,826 @@
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>RTreeIndexTableRow | @ngageoint/geopackage - v5.0.0-beta</title><meta name="description" content="Documentation for @ngageoint/geopackage - v5.0.0-beta"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script async src="../assets/search.js" id="search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<div class="tsd-toolbar-contents container">
+<div class="table-cell" id="tsd-search" data-base="..">
+<div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
+<div class="field">
+<div id="tsd-toolbar-links"></div></div>
+<ul class="results">
+<li class="state loading">Preparing search index...</li>
+<li class="state failure">The search index is not available</li></ul><a href="../index.html" class="title">@ngageoint/geopackage - v5.0.0-beta</a></div>
+<div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="2" fill="var(--color-text)"></rect><rect x="1" y="7" width="14" height="2" fill="var(--color-text)"></rect><rect x="1" y="11" width="14" height="2" fill="var(--color-text)"></rect></svg></a></div></div></header>
+<div class="container container-main">
+<div class="col-8 col-content">
+<div class="tsd-page-title">
+<ul class="tsd-breadcrumb">
+<li><a href="../modules.html">@ngageoint/geopackage - v5.0.0-beta</a></li>
+<li><a href="RTreeIndexTableRow.html">RTreeIndexTableRow</a></li></ul>
+<h1>Class RTreeIndexTableRow</h1></div>
+<section class="tsd-panel tsd-comment">
+<div class="tsd-comment tsd-typography"><p>RTree Index Table Row containing the values from a single result set row</p>
+</div></section>
+<section class="tsd-panel tsd-hierarchy">
+<h4>Hierarchy</h4>
+<ul class="tsd-hierarchy">
+<li><a href="UserCustomRow.html" class="tsd-signature-type" data-tsd-kind="Class">UserCustomRow</a>
+<ul class="tsd-hierarchy">
+<li><span class="target">RTreeIndexTableRow</span></li></ul></li></ul></section><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/extension/rtree/rTreeIndexTableRow.ts#L7">lib/extension/rtree/rTreeIndexTableRow.ts:7</a></li></ul></aside>
+<section class="tsd-panel-group tsd-index-group">
+<section class="tsd-panel tsd-index-panel">
+<details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
+<h5 class="tsd-index-heading uppercase" role="button" aria-expanded="false" tabIndex=0><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.5 5.50969L8 11.6609L14.5 5.50969L12.5466 3.66086L8 7.96494L3.45341 3.66086L1.5 5.50969Z" fill="var(--color-text)"></path></svg> Index</h5></summary>
+<div class="tsd-accordion-details">
+<section class="tsd-index-section">
+<h3 class="tsd-index-heading">Constructors</h3>
+<div class="tsd-index-list"><a href="RTreeIndexTableRow.html#constructor" class="tsd-index-link tsd-kind-constructor tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#4D7FFF" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-512-path"></rect><path d="M11.898 16.1201C11.098 16.1201 10.466 15.8961 10.002 15.4481C9.53803 15.0001 9.30603 14.3841 9.30603 13.6001V9.64012C9.30603 8.85612 9.53803 8.24012 10.002 7.79212C10.466 7.34412 11.098 7.12012 11.898 7.12012C12.682 7.12012 13.306 7.34812 13.77 7.80412C14.234 8.25212 14.466 8.86412 14.466 9.64012H13.386C13.386 9.14412 13.254 8.76412 12.99 8.50012C12.734 8.22812 12.37 8.09212 11.898 8.09212C11.426 8.09212 11.054 8.22412 10.782 8.48812C10.518 8.75212 10.386 9.13212 10.386 9.62812V13.6001C10.386 14.0961 10.518 14.4801 10.782 14.7521C11.054 15.0161 11.426 15.1481 11.898 15.1481C12.37 15.1481 12.734 15.0161 12.99 14.7521C13.254 14.4801 13.386 14.0961 13.386 13.6001H14.466C14.466 14.3761 14.234 14.9921 13.77 15.4481C13.306 15.8961 12.682 16.1201 11.898 16.1201Z" fill="var(--color-text)" id="icon-512-text"></path></svg><span>constructor</span></a>
+</div></section>
+<section class="tsd-index-section">
+<h3 class="tsd-index-heading">Properties</h3>
+<div class="tsd-index-list"><a href="RTreeIndexTableRow.html#columnTypes" class="tsd-index-link tsd-kind-property tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF984D" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-1024-path"></rect><path d="M9.354 16V7.24H12.174C12.99 7.24 13.638 7.476 14.118 7.948C14.606 8.412 14.85 9.036 14.85 9.82C14.85 10.604 14.606 11.232 14.118 11.704C13.638 12.168 12.99 12.4 12.174 12.4H10.434V16H9.354ZM10.434 11.428H12.174C12.646 11.428 13.022 11.284 13.302 10.996C13.59 10.7 13.734 10.308 13.734 9.82C13.734 9.324 13.59 8.932 13.302 8.644C13.022 8.356 12.646 8.212 12.174 8.212H10.434V11.428Z" fill="var(--color-text)" id="icon-1024-text"></path></svg><span>column<wbr/>Types</span></a>
+<a href="RTreeIndexTableRow.html#columns" class="tsd-index-link tsd-kind-property tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>columns</span></a>
+<a href="RTreeIndexTableRow.html#table" class="tsd-index-link tsd-kind-property tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>table</span></a>
+<a href="RTreeIndexTableRow.html#values" class="tsd-index-link tsd-kind-property tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>values</span></a>
+</div></section>
+<section class="tsd-index-section">
+<h3 class="tsd-index-heading">Accessors</h3>
+<div class="tsd-index-list"><a href="RTreeIndexTableRow.html#columnCount" class="tsd-index-link tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF4D4D" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-262144-path"></rect><path d="M8.85 16L11.13 7.24H12.582L14.85 16H13.758L13.182 13.672H10.53L9.954 16H8.85ZM10.746 12.76H12.954L12.282 10.06C12.154 9.548 12.054 9.12 11.982 8.776C11.91 8.432 11.866 8.208 11.85 8.104C11.834 8.208 11.79 8.432 11.718 8.776C11.646 9.12 11.546 9.544 11.418 10.048L10.746 12.76Z" fill="var(--color-text)" id="icon-262144-text"></path></svg><span>column<wbr/>Count</span></a>
+<a href="RTreeIndexTableRow.html#columnNames" class="tsd-index-link tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg><span>column<wbr/>Names</span></a>
+<a href="RTreeIndexTableRow.html#idColumn" class="tsd-index-link tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg><span>id<wbr/>Column</span></a>
+<a href="RTreeIndexTableRow.html#pkColumn" class="tsd-index-link tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg><span>pk<wbr/>Column</span></a>
+<a href="RTreeIndexTableRow.html#pkColumnIndex" class="tsd-index-link tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg><span>pk<wbr/>Column<wbr/>Index</span></a>
+</div></section>
+<section class="tsd-index-section">
+<h3 class="tsd-index-heading">Methods</h3>
+<div class="tsd-index-list"><a href="RTreeIndexTableRow.html#columnToContentValue" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF4DB8" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-2048-path"></rect><path d="M9.162 16V7.24H10.578L11.514 10.072C11.602 10.328 11.674 10.584 11.73 10.84C11.794 11.088 11.842 11.28 11.874 11.416C11.906 11.28 11.954 11.088 12.018 10.84C12.082 10.584 12.154 10.324 12.234 10.06L13.122 7.24H14.538V16H13.482V12.82C13.482 12.468 13.49 12.068 13.506 11.62C13.53 11.172 13.558 10.716 13.59 10.252C13.622 9.78 13.654 9.332 13.686 8.908C13.726 8.476 13.762 8.1 13.794 7.78L12.366 12.16H11.334L9.894 7.78C9.934 8.092 9.97 8.456 10.002 8.872C10.042 9.28 10.078 9.716 10.11 10.18C10.142 10.636 10.166 11.092 10.182 11.548C10.206 12.004 10.218 12.428 10.218 12.82V16H9.162Z" fill="var(--color-text)" id="icon-2048-text"></path></svg><span>column<wbr/>To<wbr/>Content<wbr/>Value</span></a>
+<a href="RTreeIndexTableRow.html#copy" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>copy</span></a>
+<a href="RTreeIndexTableRow.html#copyValue" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>copy<wbr/>Value</span></a>
+<a href="RTreeIndexTableRow.html#getColumn" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Column</span></a>
+<a href="RTreeIndexTableRow.html#getColumnIndexWithColumnName" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Column<wbr/>Index<wbr/>With<wbr/>Column<wbr/>Name</span></a>
+<a href="RTreeIndexTableRow.html#getColumnNameWithIndex" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Column<wbr/>Name<wbr/>With<wbr/>Index</span></a>
+<a href="RTreeIndexTableRow.html#getColumnWithIndex" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Column<wbr/>With<wbr/>Index</span></a>
+<a href="RTreeIndexTableRow.html#getColumns" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Columns</span></a>
+<a href="RTreeIndexTableRow.html#getId" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Id</span></a>
+<a href="RTreeIndexTableRow.html#getMaxX" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>MaxX</span></a>
+<a href="RTreeIndexTableRow.html#getMaxY" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>MaxY</span></a>
+<a href="RTreeIndexTableRow.html#getMinX" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>MinX</span></a>
+<a href="RTreeIndexTableRow.html#getMinY" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>MinY</span></a>
+<a href="RTreeIndexTableRow.html#getRowColumnTypeWithColumnName" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Row<wbr/>Column<wbr/>Type<wbr/>With<wbr/>Column<wbr/>Name</span></a>
+<a href="RTreeIndexTableRow.html#getRowColumnTypeWithIndex" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Row<wbr/>Column<wbr/>Type<wbr/>With<wbr/>Index</span></a>
+<a href="RTreeIndexTableRow.html#getRowColumnTypes" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Row<wbr/>Column<wbr/>Types</span></a>
+<a href="RTreeIndexTableRow.html#getTable" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Table</span></a>
+<a href="RTreeIndexTableRow.html#getValue" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Value</span></a>
+<a href="RTreeIndexTableRow.html#getValueWithIndex" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Value<wbr/>With<wbr/>Index</span></a>
+<a href="RTreeIndexTableRow.html#getValues" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Values</span></a>
+<a href="RTreeIndexTableRow.html#hasId" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>has<wbr/>Id</span></a>
+<a href="RTreeIndexTableRow.html#hasIdColumn" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>has<wbr/>Id<wbr/>Column</span></a>
+<a href="RTreeIndexTableRow.html#resetId" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>reset<wbr/>Id</span></a>
+<a href="RTreeIndexTableRow.html#setId" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>set<wbr/>Id</span></a>
+<a href="RTreeIndexTableRow.html#setValue" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>set<wbr/>Value</span></a>
+<a href="RTreeIndexTableRow.html#setValueNoValidationWithIndex" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>set<wbr/>Value<wbr/>No<wbr/>Validation<wbr/>With<wbr/>Index</span></a>
+<a href="RTreeIndexTableRow.html#setValueWithIndex" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>set<wbr/>Value<wbr/>With<wbr/>Index</span></a>
+<a href="RTreeIndexTableRow.html#toContentValues" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>to<wbr/>Content<wbr/>Values</span></a>
+<a href="RTreeIndexTableRow.html#toDatabaseValue" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>to<wbr/>Database<wbr/>Value</span></a>
+<a href="RTreeIndexTableRow.html#toObjectValue" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>to<wbr/>Object<wbr/>Value</span></a>
+<a href="RTreeIndexTableRow.html#validateValue" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>validate<wbr/>Value</span></a>
+</div></section></div></details></section></section>
+<section class="tsd-panel-group tsd-member-group">
+<h2>Constructors</h2>
+<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class"><a id="constructor" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>constructor</span><a href="#constructor" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="constructor.new_RTreeIndexTableRow">new RTree<wbr/>Index<wbr/>Table<wbr/>Row<span class="tsd-signature-symbol">(</span>userCustomRow<span class="tsd-signature-symbol">: </span><a href="UserCustomRow.html" class="tsd-signature-type" data-tsd-kind="Class">UserCustomRow</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="RTreeIndexTableRow.html" class="tsd-signature-type" data-tsd-kind="Class">RTreeIndexTableRow</a><a href="#constructor.new_RTreeIndexTableRow" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Constructor</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>userCustomRow: <a href="UserCustomRow.html" class="tsd-signature-type" data-tsd-kind="Class">UserCustomRow</a></h5>
+<div class="tsd-comment tsd-typography"><p>user custom row</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="RTreeIndexTableRow.html" class="tsd-signature-type" data-tsd-kind="Class">RTreeIndexTableRow</a></h4><aside class="tsd-sources">
+<p>Overrides <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#constructor">constructor</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/extension/rtree/rTreeIndexTableRow.ts#L12">lib/extension/rtree/rTreeIndexTableRow.ts:12</a></li></ul></aside></li></ul></section></section>
+<section class="tsd-panel-group tsd-member-group">
+<h2>Properties</h2>
+<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><a id="columnTypes" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagProtected">Protected</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span>column<wbr/>Types</span><a href="#columnTypes" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<div class="tsd-signature">column<wbr/>Types<span class="tsd-signature-symbol">:</span> <a href="../enums/GeoPackageDataType-1.html" class="tsd-signature-type" data-tsd-kind="Enumeration">GeoPackageDataType</a><span class="tsd-signature-symbol">[]</span></div>
+<div class="tsd-comment tsd-typography"><p>Column types of this row, based upon the data values</p>
+</div><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#columnTypes">columnTypes</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L24">lib/user/userRow.ts:24</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><a id="columns" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagProtected">Protected</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span>columns</span><a href="#columns" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<div class="tsd-signature">columns<span class="tsd-signature-symbol">:</span> <a href="UserColumns.html" class="tsd-signature-type" data-tsd-kind="Class">UserColumns</a><span class="tsd-signature-symbol">&lt;</span><a href="UserCustomColumn.html" class="tsd-signature-type" data-tsd-kind="Class">UserCustomColumn</a><span class="tsd-signature-symbol">&gt;</span></div>
+<div class="tsd-comment tsd-typography"><p>User columns</p>
+</div><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#columns">columns</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L19">lib/user/userRow.ts:19</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><a id="table" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagProtected">Protected</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span>table</span><a href="#table" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<div class="tsd-signature">table<span class="tsd-signature-symbol">:</span> <a href="UserCustomTable.html" class="tsd-signature-type" data-tsd-kind="Class">UserCustomTable</a></div>
+<div class="tsd-comment tsd-typography"><p>User table</p>
+</div><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#table">table</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L14">lib/user/userRow.ts:14</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><a id="values" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagProtected">Protected</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span>values</span><a href="#values" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<div class="tsd-signature">values<span class="tsd-signature-symbol">:</span> <a href="../types/DBValue.html" class="tsd-signature-type" data-tsd-kind="Type alias">DBValue</a><span class="tsd-signature-symbol">[]</span></div>
+<div class="tsd-comment tsd-typography"><p>Array of row values</p>
+</div><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#values">values</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L29">lib/user/userRow.ts:29</a></li></ul></aside></section></section>
+<section class="tsd-panel-group tsd-member-group">
+<h2>Accessors</h2>
+<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><a id="columnCount" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>column<wbr/>Count</span><a href="#columnCount" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature" id="columnCount.columnCount-1"><span class="tsd-signature-symbol">get</span> columnCount<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the column count</p>
+
+<h3>Returns</h3><p>column count</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
+<p>Inherited from UserCustomRow.columnCount</p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L171">lib/user/userRow.ts:171</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><a id="columnNames" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>column<wbr/>Names</span><a href="#columnNames" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature" id="columnNames.columnNames-1"><span class="tsd-signature-symbol">get</span> columnNames<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the column names</p>
+
+<h3>Returns</h3><p>column names</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h4><aside class="tsd-sources">
+<p>Inherited from UserCustomRow.columnNames</p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L178">lib/user/userRow.ts:178</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><a id="idColumn" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>id<wbr/>Column</span><a href="#idColumn" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature" id="idColumn.idColumn-1"><span class="tsd-signature-symbol">get</span> idColumn<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="UserColumn.html" class="tsd-signature-type" data-tsd-kind="Class">UserColumn</a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Gets the id column</p>
+
+<h3>Returns</h3></div>
+<h4 class="tsd-returns-title">Returns <a href="UserColumn.html" class="tsd-signature-type" data-tsd-kind="Class">UserColumn</a></h4><aside class="tsd-sources">
+<p>Inherited from UserCustomRow.idColumn</p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L164">lib/user/userRow.ts:164</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><a id="pkColumn" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>pk<wbr/>Column</span><a href="#pkColumn" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature" id="pkColumn.pkColumn-1"><span class="tsd-signature-symbol">get</span> pkColumn<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="UserColumn.html" class="tsd-signature-type" data-tsd-kind="Class">UserColumn</a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the primary key column</p>
+
+<h3>Returns</h3><p>pk column</p>
+</div>
+<h4 class="tsd-returns-title">Returns <a href="UserColumn.html" class="tsd-signature-type" data-tsd-kind="Class">UserColumn</a></h4><aside class="tsd-sources">
+<p>Inherited from UserCustomRow.pkColumn</p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L294">lib/user/userRow.ts:294</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><a id="pkColumnIndex" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>pk<wbr/>Column<wbr/>Index</span><a href="#pkColumnIndex" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature" id="pkColumnIndex.pkColumnIndex-1"><span class="tsd-signature-symbol">get</span> pkColumnIndex<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the primary key column Index</p>
+
+<h3>Returns</h3><p>pk index</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
+<p>Inherited from UserCustomRow.pkColumnIndex</p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L287">lib/user/userRow.ts:287</a></li></ul></aside></li></ul></section></section>
+<section class="tsd-panel-group tsd-member-group">
+<h2>Methods</h2>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><a id="columnToContentValue" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagProtected">Protected</code> <span>column<wbr/>To<wbr/>Content<wbr/>Value</span><a href="#columnToContentValue" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-protected tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="columnToContentValue.columnToContentValue-1">column<wbr/>To<wbr/>Content<wbr/>Value<span class="tsd-signature-symbol">(</span>contentValues<span class="tsd-signature-symbol">: </span><a href="ContentValues.html" class="tsd-signature-type" data-tsd-kind="Class">ContentValues</a>, column<span class="tsd-signature-symbol">: </span><a href="UserCustomColumn.html" class="tsd-signature-type" data-tsd-kind="Class">UserCustomColumn</a>, value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#columnToContentValue.columnToContentValue-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Map the column to the content values</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>contentValues: <a href="ContentValues.html" class="tsd-signature-type" data-tsd-kind="Class">ContentValues</a></h5>
+<div class="tsd-comment tsd-typography"><p>content values</p>
+</div></li>
+<li>
+<h5>column: <a href="UserCustomColumn.html" class="tsd-signature-type" data-tsd-kind="Class">UserCustomColumn</a></h5>
+<div class="tsd-comment tsd-typography"><p>column</p>
+</div></li>
+<li>
+<h5>value: <span class="tsd-signature-type">any</span></h5>
+<div class="tsd-comment tsd-typography"><p>value</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#columnToContentValue">columnToContentValue</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L469">lib/user/userRow.ts:469</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="copy" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>copy</span><a href="#copy" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="copy.copy-1">copy<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="UserCustomRow.html" class="tsd-signature-type" data-tsd-kind="Class">UserCustomRow</a><a href="#copy.copy-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Copy the row</p>
+
+<h3>Returns</h3><p>row copy</p>
+</div>
+<h4 class="tsd-returns-title">Returns <a href="UserCustomRow.html" class="tsd-signature-type" data-tsd-kind="Class">UserCustomRow</a></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#copy">copy</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/custom/userCustomRow.ts#L65">lib/user/custom/userCustomRow.ts:65</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><a id="copyValue" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagProtected">Protected</code> <span>copy<wbr/>Value</span><a href="#copyValue" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-protected tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="copyValue.copyValue-1">copy<wbr/>Value<span class="tsd-signature-symbol">(</span>column<span class="tsd-signature-symbol">: </span><a href="UserCustomColumn.html" class="tsd-signature-type" data-tsd-kind="Class">UserCustomColumn</a>, value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><a href="#copyValue.copyValue-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Copy the value of the data type</p>
+
+<h3>Returns</h3><p>copy value</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>column: <a href="UserCustomColumn.html" class="tsd-signature-type" data-tsd-kind="Class">UserCustomColumn</a></h5>
+<div class="tsd-comment tsd-typography"><p>table column</p>
+</div></li>
+<li>
+<h5>value: <span class="tsd-signature-type">any</span></h5>
+<div class="tsd-comment tsd-typography"><p>value</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#copyValue">copyValue</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L129">lib/user/userRow.ts:129</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="getColumn" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Column</span><a href="#getColumn" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="getColumn.getColumn-1">get<wbr/>Column<span class="tsd-signature-symbol">(</span>columnName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="UserColumn.html" class="tsd-signature-type" data-tsd-kind="Class">UserColumn</a><a href="#getColumn.getColumn-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the column of the column name</p>
+
+<h3>Returns</h3><p>column</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>columnName: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>column name</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="UserColumn.html" class="tsd-signature-type" data-tsd-kind="Class">UserColumn</a></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#getColumn">getColumn</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L279">lib/user/userRow.ts:279</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="getColumnIndexWithColumnName" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Column<wbr/>Index<wbr/>With<wbr/>Column<wbr/>Name</span><a href="#getColumnIndexWithColumnName" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="getColumnIndexWithColumnName.getColumnIndexWithColumnName-1">get<wbr/>Column<wbr/>Index<wbr/>With<wbr/>Column<wbr/>Name<span class="tsd-signature-symbol">(</span>columnName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#getColumnIndexWithColumnName.getColumnIndexWithColumnName-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the column index of the column name</p>
+
+<h3>Returns</h3><p>column index</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>columnName: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>column name</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#getColumnIndexWithColumnName">getColumnIndexWithColumnName</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L194">lib/user/userRow.ts:194</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="getColumnNameWithIndex" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Column<wbr/>Name<wbr/>With<wbr/>Index</span><a href="#getColumnNameWithIndex" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="getColumnNameWithIndex.getColumnNameWithIndex-1">get<wbr/>Column<wbr/>Name<wbr/>With<wbr/>Index<span class="tsd-signature-symbol">(</span>index<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><a href="#getColumnNameWithIndex.getColumnNameWithIndex-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the column name at the index</p>
+
+<h3>Returns</h3><p>column name</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>index: <span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>index</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#getColumnNameWithIndex">getColumnNameWithIndex</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L186">lib/user/userRow.ts:186</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="getColumnWithIndex" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Column<wbr/>With<wbr/>Index</span><a href="#getColumnWithIndex" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="getColumnWithIndex.getColumnWithIndex-1">get<wbr/>Column<wbr/>With<wbr/>Index<span class="tsd-signature-symbol">(</span>index<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="UserColumn.html" class="tsd-signature-type" data-tsd-kind="Class">UserColumn</a><a href="#getColumnWithIndex.getColumnWithIndex-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the column at the index</p>
+
+<h3>Returns</h3><p>column</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>index: <span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>index</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="UserColumn.html" class="tsd-signature-type" data-tsd-kind="Class">UserColumn</a></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#getColumnWithIndex">getColumnWithIndex</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L271">lib/user/userRow.ts:271</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="getColumns" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Columns</span><a href="#getColumns" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="getColumns.getColumns-1">get<wbr/>Columns<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="UserCustomColumns.html" class="tsd-signature-type" data-tsd-kind="Class">UserCustomColumns</a><a href="#getColumns.getColumns-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get columns</p>
+
+<h3>Returns</h3></div>
+<h4 class="tsd-returns-title">Returns <a href="UserCustomColumns.html" class="tsd-signature-type" data-tsd-kind="Class">UserCustomColumns</a></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#getColumns">getColumns</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/custom/userCustomRow.ts#L56">lib/user/custom/userCustomRow.ts:56</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getId" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Id</span><a href="#getId" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="getId.getId-1">get<wbr/>Id<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#getId.getId-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the ID</p>
+
+<h3>Returns</h3><p>ID</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
+<p>Overrides <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#getId">getId</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/extension/rtree/rTreeIndexTableRow.ts#L26">lib/extension/rtree/rTreeIndexTableRow.ts:26</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getMaxX" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>MaxX</span><a href="#getMaxX" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="getMaxX.getMaxX-1">get<wbr/>MaxX<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#getMaxX.getMaxX-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the max x</p>
+
+<h3>Returns</h3><p>max x</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/extension/rtree/rTreeIndexTableRow.ts#L44">lib/extension/rtree/rTreeIndexTableRow.ts:44</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getMaxY" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>MaxY</span><a href="#getMaxY" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="getMaxY.getMaxY-1">get<wbr/>MaxY<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#getMaxY.getMaxY-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the max y</p>
+
+<h3>Returns</h3><p>max y</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/extension/rtree/rTreeIndexTableRow.ts#L62">lib/extension/rtree/rTreeIndexTableRow.ts:62</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getMinX" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>MinX</span><a href="#getMinX" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="getMinX.getMinX-1">get<wbr/>MinX<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#getMinX.getMinX-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the min x</p>
+
+<h3>Returns</h3><p>min x</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/extension/rtree/rTreeIndexTableRow.ts#L35">lib/extension/rtree/rTreeIndexTableRow.ts:35</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getMinY" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>MinY</span><a href="#getMinY" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="getMinY.getMinY-1">get<wbr/>MinY<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#getMinY.getMinY-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the min y</p>
+
+<h3>Returns</h3><p>min y</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/extension/rtree/rTreeIndexTableRow.ts#L53">lib/extension/rtree/rTreeIndexTableRow.ts:53</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="getRowColumnTypeWithColumnName" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Row<wbr/>Column<wbr/>Type<wbr/>With<wbr/>Column<wbr/>Name</span><a href="#getRowColumnTypeWithColumnName" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="getRowColumnTypeWithColumnName.getRowColumnTypeWithColumnName-1">get<wbr/>Row<wbr/>Column<wbr/>Type<wbr/>With<wbr/>Column<wbr/>Name<span class="tsd-signature-symbol">(</span>columnName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#getRowColumnTypeWithColumnName.getRowColumnTypeWithColumnName-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the row column type of the column name</p>
+
+<h3>Returns</h3><p>row column type</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>columnName: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>column name</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#getRowColumnTypeWithColumnName">getRowColumnTypeWithColumnName</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L263">lib/user/userRow.ts:263</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="getRowColumnTypeWithIndex" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Row<wbr/>Column<wbr/>Type<wbr/>With<wbr/>Index</span><a href="#getRowColumnTypeWithIndex" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="getRowColumnTypeWithIndex.getRowColumnTypeWithIndex-1">get<wbr/>Row<wbr/>Column<wbr/>Type<wbr/>With<wbr/>Index<span class="tsd-signature-symbol">(</span>index<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../enums/GeoPackageDataType-1.html" class="tsd-signature-type" data-tsd-kind="Enumeration">GeoPackageDataType</a><a href="#getRowColumnTypeWithIndex.getRowColumnTypeWithIndex-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the row column type at the index</p>
+
+<h3>Returns</h3><p>row column type</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>index: <span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>index</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="../enums/GeoPackageDataType-1.html" class="tsd-signature-type" data-tsd-kind="Enumeration">GeoPackageDataType</a></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#getRowColumnTypeWithIndex">getRowColumnTypeWithIndex</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L255">lib/user/userRow.ts:255</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="getRowColumnTypes" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Row<wbr/>Column<wbr/>Types</span><a href="#getRowColumnTypes" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="getRowColumnTypes.getRowColumnTypes-1">get<wbr/>Row<wbr/>Column<wbr/>Types<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><a href="#getRowColumnTypes.getRowColumnTypes-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the row column data types</p>
+
+<h3>Returns</h3><p>row column types</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#getRowColumnTypes">getRowColumnTypes</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L112">lib/user/userRow.ts:112</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="getTable" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Table</span><a href="#getTable" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="getTable.getTable-1">get<wbr/>Table<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="UserCustomTable.html" class="tsd-signature-type" data-tsd-kind="Class">UserCustomTable</a><a href="#getTable.getTable-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Return the table</p>
+</div>
+<h4 class="tsd-returns-title">Returns <a href="UserCustomTable.html" class="tsd-signature-type" data-tsd-kind="Class">UserCustomTable</a></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#getTable">getTable</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L431">lib/user/userRow.ts:431</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="getValue" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Value</span><a href="#getValue" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="getValue.getValue-1">get<wbr/>Value<span class="tsd-signature-symbol">(</span>columnName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><a href="#getValue.getValue-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the value of the column name</p>
+
+<h3>Returns</h3><p>value</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>columnName: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>column name</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#getValue">getValue</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L214">lib/user/userRow.ts:214</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="getValueWithIndex" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Value<wbr/>With<wbr/>Index</span><a href="#getValueWithIndex" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="getValueWithIndex.getValueWithIndex-1">get<wbr/>Value<wbr/>With<wbr/>Index<span class="tsd-signature-symbol">(</span>index<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><a href="#getValueWithIndex.getValueWithIndex-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the value at the index</p>
+
+<h3>Returns</h3><p>value</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>index: <span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>index</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#getValueWithIndex">getValueWithIndex</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L202">lib/user/userRow.ts:202</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="getValues" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Values</span><a href="#getValues" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="getValues.getValues-1">get<wbr/>Values<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/DBValue.html" class="tsd-signature-type" data-tsd-kind="Type alias">DBValue</a><span class="tsd-signature-symbol">[]</span><a href="#getValues.getValues-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the row values</p>
+
+<h3>Returns</h3><p>values</p>
+</div>
+<h4 class="tsd-returns-title">Returns <a href="../types/DBValue.html" class="tsd-signature-type" data-tsd-kind="Type alias">DBValue</a><span class="tsd-signature-symbol">[]</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#getValues">getValues</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L103">lib/user/userRow.ts:103</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="hasId" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>has<wbr/>Id</span><a href="#hasId" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="hasId.hasId-1">has<wbr/>Id<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><a href="#hasId.hasId-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#hasId">hasId</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L391">lib/user/userRow.ts:391</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="hasIdColumn" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>has<wbr/>Id<wbr/>Column</span><a href="#hasIdColumn" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="hasIdColumn.hasIdColumn-1">has<wbr/>Id<wbr/>Column<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><a href="#hasIdColumn.hasIdColumn-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#hasIdColumn">hasIdColumn</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L388">lib/user/userRow.ts:388</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="resetId" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>reset<wbr/>Id</span><a href="#resetId" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="resetId.resetId-1">reset<wbr/>Id<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#resetId.resetId-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Clears the id so the row can be used as part of an insert or create</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#resetId">resetId</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L402">lib/user/userRow.ts:402</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="setId" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>set<wbr/>Id</span><a href="#setId" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="setId.setId-1">set<wbr/>Id<span class="tsd-signature-symbol">(</span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, pkModifiable<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#setId.setId-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Set the id and optionally validate</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>id: <span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>id value</p>
+</div></li>
+<li>
+<h5>pkModifiable: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = ...</span></h5>
+<div class="tsd-comment tsd-typography"><p>primary key modifiable</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#setId">setId</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L411">lib/user/userRow.ts:411</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="setValue" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>set<wbr/>Value</span><a href="#setValue" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="setValue.setValue-1">set<wbr/>Value<span class="tsd-signature-symbol">(</span>columnName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#setValue.setValue-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Set the value of the column name</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>columnName: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>column name</p>
+</div></li>
+<li>
+<h5>value: <span class="tsd-signature-type">any</span></h5>
+<div class="tsd-comment tsd-typography"><p>value</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#setValue">setValue</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L337">lib/user/userRow.ts:337</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="setValueNoValidationWithIndex" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>set<wbr/>Value<wbr/>No<wbr/>Validation<wbr/>With<wbr/>Index</span><a href="#setValueNoValidationWithIndex" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="setValueNoValidationWithIndex.setValueNoValidationWithIndex-1">set<wbr/>Value<wbr/>No<wbr/>Validation<wbr/>With<wbr/>Index<span class="tsd-signature-symbol">(</span>index<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#setValueNoValidationWithIndex.setValueNoValidationWithIndex-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Set the value at the index without validation</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>index: <span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>index</p>
+</div></li>
+<li>
+<h5>value: <span class="tsd-signature-type">any</span></h5>
+<div class="tsd-comment tsd-typography"><p>value</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#setValueNoValidationWithIndex">setValueNoValidationWithIndex</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L329">lib/user/userRow.ts:329</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="setValueWithIndex" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>set<wbr/>Value<wbr/>With<wbr/>Index</span><a href="#setValueWithIndex" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="setValueWithIndex.setValueWithIndex-1">set<wbr/>Value<wbr/>With<wbr/>Index<span class="tsd-signature-symbol">(</span>index<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#setValueWithIndex.setValueWithIndex-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Set the value at the index</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>index: <span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>index</p>
+</div></li>
+<li>
+<h5>value: <span class="tsd-signature-type">any</span></h5>
+<div class="tsd-comment tsd-typography"><p>value</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#setValueWithIndex">setValueWithIndex</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L302">lib/user/userRow.ts:302</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="toContentValues" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>to<wbr/>Content<wbr/>Values</span><a href="#toContentValues" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="toContentValues.toContentValues-1">to<wbr/>Content<wbr/>Values<span class="tsd-signature-symbol">(</span>includeNulls<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="ContentValues.html" class="tsd-signature-type" data-tsd-kind="Class">ContentValues</a><a href="#toContentValues.toContentValues-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Convert the row to content values</p>
+
+<h3>Returns</h3><p>content values</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>includeNulls: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = true</span></h5>
+<div class="tsd-comment tsd-typography"><p>include null values (default is true)</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="ContentValues.html" class="tsd-signature-type" data-tsd-kind="Class">ContentValues</a></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#toContentValues">toContentValues</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L440">lib/user/userRow.ts:440</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="toDatabaseValue" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>to<wbr/>Database<wbr/>Value</span><a href="#toDatabaseValue" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="toDatabaseValue.toDatabaseValue-1">to<wbr/>Database<wbr/>Value<span class="tsd-signature-symbol">(</span>columnName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/DBValue.html" class="tsd-signature-type" data-tsd-kind="Type alias">DBValue</a><a href="#toDatabaseValue.toDatabaseValue-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the value which will be persisted to the database based on the column</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>columnName: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>name of the column</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="../types/DBValue.html" class="tsd-signature-type" data-tsd-kind="Type alias">DBValue</a></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#toDatabaseValue">toDatabaseValue</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L242">lib/user/userRow.ts:242</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="toObjectValue" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>to<wbr/>Object<wbr/>Value</span><a href="#toObjectValue" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="toObjectValue.toObjectValue-1">to<wbr/>Object<wbr/>Value<span class="tsd-signature-symbol">(</span>index<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, value<span class="tsd-signature-symbol">: </span><a href="../types/DBValue.html" class="tsd-signature-type" data-tsd-kind="Type alias">DBValue</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><a href="#toObjectValue.toObjectValue-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get the value from the database as an object based on the column</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>index: <span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>column index</p>
+</div></li>
+<li>
+<h5>value: <a href="../types/DBValue.html" class="tsd-signature-type" data-tsd-kind="Type alias">DBValue</a></h5>
+<div class="tsd-comment tsd-typography"><p>value from the database</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#toObjectValue">toObjectValue</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L230">lib/user/userRow.ts:230</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><a id="validateValue" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagProtected">Protected</code> <span>validate<wbr/>Value</span><a href="#validateValue" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-protected tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="validateValue.validateValue-1">validate<wbr/>Value<span class="tsd-signature-symbol">(</span>column<span class="tsd-signature-symbol">: </span><a href="UserCustomColumn.html" class="tsd-signature-type" data-tsd-kind="Class">UserCustomColumn</a>, value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, valueTypes<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#validateValue.validateValue-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Validate the value and its actual value types against the column data type class</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>column: <a href="UserCustomColumn.html" class="tsd-signature-type" data-tsd-kind="Class">UserCustomColumn</a></h5>
+<div class="tsd-comment tsd-typography"><p>column</p>
+</div></li>
+<li>
+<h5>value: <span class="tsd-signature-type">any</span></h5>
+<div class="tsd-comment tsd-typography"><p>value</p>
+</div></li>
+<li>
+<h5>valueTypes: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+<div class="tsd-comment tsd-typography"><p>value type</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="UserCustomRow.html">UserCustomRow</a>.<a href="UserCustomRow.html#validateValue">validateValue</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/63a895a6/lib/user/userRow.ts#L519">lib/user/userRow.ts:519</a></li></ul></aside></li></ul></section></section></div>
+<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+<div class="tsd-navigation settings">
+<details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
+<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)"></path></svg> Settings</h3></summary>
+<div class="tsd-accordion-details">
+<div class="tsd-filter-visibility">
+<h4 class="uppercase">Member Visibility</h4><form>
+<ul id="tsd-filter-options">
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></form></div>
+<div class="tsd-theme-toggle">
+<h4 class="uppercase">Theme</h4><select id="theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
+<nav class="tsd-navigation primary">
+<details class="tsd-index-accordion" open><summary class="tsd-accordion-summary">
+<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)"></path></svg> Modules</h3></summary>
+<div class="tsd-accordion-details">
+<ul>
+<li><a href="../modules.html">@ngageoint/geopackage -<wbr/> v5.0.0-<wbr/>beta</a>
+<ul>
+<li class="tsd-kind-namespace"><a href="../modules/ConstraintType.html">Constraint<wbr/>Type</a></li>
+<li class="tsd-kind-namespace"><a href="../modules/ContentsDataType.html">Contents<wbr/>Data<wbr/>Type</a></li>
+<li class="tsd-kind-namespace"><a href="../modules/DataColumnConstraintType.html">Data<wbr/>Column<wbr/>Constraint<wbr/>Type</a></li>
+<li class="tsd-kind-namespace"><a href="../modules/ExtensionScopeType.html">Extension<wbr/>Scope<wbr/>Type</a></li>
+<li class="tsd-kind-namespace"><a href="../modules/FeatureDrawType.html">Feature<wbr/>Draw<wbr/>Type</a></li>
+<li class="tsd-kind-namespace"><a href="../modules/FeatureIndexType.html">Feature<wbr/>Index<wbr/>Type</a></li>
+<li class="tsd-kind-namespace"><a href="../modules/GeoPackageDataType.html">Geo<wbr/>Package<wbr/>Data<wbr/>Type</a></li>
+<li class="tsd-kind-namespace"><a href="../modules/ImageType.html">Image<wbr/>Type</a></li>
+<li class="tsd-kind-namespace"><a href="../modules/MetadataScopeType.html">Metadata<wbr/>Scope<wbr/>Type</a></li>
+<li class="tsd-kind-namespace"><a href="../modules/ReferenceScopeType.html">Reference<wbr/>Scope<wbr/>Type</a></li>
+<li class="tsd-kind-namespace"><a href="../modules/SQLiteMasterColumn.html">SQLite<wbr/>Master<wbr/>Column</a></li>
+<li class="tsd-kind-namespace"><a href="../modules/SQLiteMasterType.html">SQLite<wbr/>Master<wbr/>Type</a></li>
+<li class="tsd-kind-namespace"><a href="../modules/TileFormatType.html">Tile<wbr/>Format<wbr/>Type</a></li>
+<li class="tsd-kind-namespace"><a href="../modules/TileScalingType.html">Tile<wbr/>Scaling<wbr/>Type</a></li></ul></li></ul></div></details></nav>
+<nav class="tsd-navigation secondary menu-sticky">
+<ul>
+<li class="current tsd-kind-class"><a href="RTreeIndexTableRow.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-class)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-128-path"></rect><path d="M11.898 16.1201C11.098 16.1201 10.466 15.8961 10.002 15.4481C9.53803 15.0001 9.30603 14.3841 9.30603 13.6001V9.64012C9.30603 8.85612 9.53803 8.24012 10.002 7.79212C10.466 7.34412 11.098 7.12012 11.898 7.12012C12.682 7.12012 13.306 7.34812 13.77 7.80412C14.234 8.25212 14.466 8.86412 14.466 9.64012H13.386C13.386 9.14412 13.254 8.76412 12.99 8.50012C12.734 8.22812 12.37 8.09212 11.898 8.09212C11.426 8.09212 11.054 8.22412 10.782 8.48812C10.518 8.75212 10.386 9.13212 10.386 9.62812V13.6001C10.386 14.0961 10.518 14.4801 10.782 14.7521C11.054 15.0161 11.426 15.1481 11.898 15.1481C12.37 15.1481 12.734 15.0161 12.99 14.7521C13.254 14.4801 13.386 14.0961 13.386 13.6001H14.466C14.466 14.3761 14.234 14.9921 13.77 15.4481C13.306 15.8961 12.682 16.1201 11.898 16.1201Z" fill="var(--color-text)" id="icon-128-text"></path></svg><span>RTree<wbr/>Index<wbr/>Table<wbr/>Row</span></a>
+<ul>
+<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="RTreeIndexTableRow.html#constructor" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-512-path"></use><use href="#icon-512-text"></use></svg>constructor</a></li>
+<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><a href="RTreeIndexTableRow.html#columnTypes" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>column<wbr/>Types</a></li>
+<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><a href="RTreeIndexTableRow.html#columns" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>columns</a></li>
+<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><a href="RTreeIndexTableRow.html#table" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>table</a></li>
+<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><a href="RTreeIndexTableRow.html#values" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>values</a></li>
+<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#columnCount" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg>column<wbr/>Count</a></li>
+<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#columnNames" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg>column<wbr/>Names</a></li>
+<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#idColumn" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg>id<wbr/>Column</a></li>
+<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#pkColumn" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg>pk<wbr/>Column</a></li>
+<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#pkColumnIndex" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg>pk<wbr/>Column<wbr/>Index</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><a href="RTreeIndexTableRow.html#columnToContentValue" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>column<wbr/>To<wbr/>Content<wbr/>Value</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#copy" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>copy</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><a href="RTreeIndexTableRow.html#copyValue" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>copy<wbr/>Value</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#getColumn" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Column</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#getColumnIndexWithColumnName" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Column<wbr/>Index<wbr/>With<wbr/>Column<wbr/>Name</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#getColumnNameWithIndex" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Column<wbr/>Name<wbr/>With<wbr/>Index</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#getColumnWithIndex" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Column<wbr/>With<wbr/>Index</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#getColumns" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Columns</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="RTreeIndexTableRow.html#getId" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Id</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="RTreeIndexTableRow.html#getMaxX" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>MaxX</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="RTreeIndexTableRow.html#getMaxY" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>MaxY</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="RTreeIndexTableRow.html#getMinX" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>MinX</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="RTreeIndexTableRow.html#getMinY" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>MinY</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#getRowColumnTypeWithColumnName" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Row<wbr/>Column<wbr/>Type<wbr/>With<wbr/>Column<wbr/>Name</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#getRowColumnTypeWithIndex" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Row<wbr/>Column<wbr/>Type<wbr/>With<wbr/>Index</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#getRowColumnTypes" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Row<wbr/>Column<wbr/>Types</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#getTable" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Table</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#getValue" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Value</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#getValueWithIndex" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Value<wbr/>With<wbr/>Index</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#getValues" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Values</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#hasId" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>has<wbr/>Id</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#hasIdColumn" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>has<wbr/>Id<wbr/>Column</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#resetId" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>reset<wbr/>Id</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#setId" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>set<wbr/>Id</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#setValue" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>set<wbr/>Value</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#setValueNoValidationWithIndex" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>set<wbr/>Value<wbr/>No<wbr/>Validation<wbr/>With<wbr/>Index</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#setValueWithIndex" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>set<wbr/>Value<wbr/>With<wbr/>Index</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#toContentValues" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>to<wbr/>Content<wbr/>Values</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#toDatabaseValue" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>to<wbr/>Database<wbr/>Value</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="RTreeIndexTableRow.html#toObjectValue" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>to<wbr/>Object<wbr/>Value</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected tsd-is-inherited"><a href="RTreeIndexTableRow.html#validateValue" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>validate<wbr/>Value</a></li></ul></li></ul></nav></div></div>
+<div class="container tsd-generator">
+<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div>
+<div class="overlay"></div><script src="../assets/main.js"></script></body></html>
