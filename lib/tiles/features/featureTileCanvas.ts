@@ -1,6 +1,7 @@
 import { EmulatedCanvas2D } from '../../../@types/canvaskit';
 import { Canvas } from '../../canvas/canvas';
-import { GeoPackageImage } from '../../image/geoPackageImage';
+import { GeoPackageTile } from '../geoPackageTile';
+import { ImageType } from '../../image/imageType';
 
 /**
  * Feature Tile Canvas for creating layered tiles to draw ordered features.
@@ -117,8 +118,8 @@ export class FeatureTileCanvas {
    * Create the final image from the layers, resets the layers
    * @return image
    */
-  public async createImage(): Promise<GeoPackageImage> {
-    let image = null;
+  public async createTile(): Promise<GeoPackageTile> {
+    let tile = null;
     let context = null;
     for (let layer = 0; layer < 4; layer++) {
       const layeredCanvas = this.layeredCanvas[layer];
@@ -133,13 +134,13 @@ export class FeatureTileCanvas {
       }
     }
     if (this.canvas != null && !this.isTransparent(this.canvas)) {
-      const dataUrl = await Canvas.toDataURL(this.canvas);
-      image = Canvas.createImage(dataUrl);
+      const data = await Canvas.toBytes(this.canvas, ImageType.PNG);
       if (!this.userProvidedCanvas) {
         Canvas.disposeCanvas(this.canvas);
       }
+      tile = new GeoPackageTile(this.tileWidth, this.tileHeight, data, ImageType.PNG);
     }
-    return image;
+    return tile;
   }
 
   /**

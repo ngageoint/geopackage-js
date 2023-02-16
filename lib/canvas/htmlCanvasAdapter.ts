@@ -143,8 +143,8 @@ export class HtmlCanvasAdapter implements CanvasAdapter {
   /**
    * @inheritDoc
    */
-  toDataURL(canvas: any, format = 'image/png'): Promise<string> {
-    return Promise.resolve(canvas.toDataURL(format));
+  toDataURL(canvas: any, format = 'image/png', compressionQuality?: number): Promise<string> {
+    return Promise.resolve(canvas.toDataURL(format, compressionQuality));
   }
 
   /**
@@ -164,7 +164,7 @@ export class HtmlCanvasAdapter implements CanvasAdapter {
       // TODO: do something different
     }
     const dataUrl = canvas.toDataURL(canvas, ImageType.getMimeType(imageFormat), compressionQuality);
-    return Promise.resolve(CanvasUtils.base64ToUInt8ArrayBrowser(dataUrl));
+    return Promise.resolve(CanvasUtils.base64ToUInt8ArrayBrowser(dataUrl.split(',')[1]));
   }
 
   /**

@@ -38,6 +38,11 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 
 ### Changelog
 
+##### 5.0.1
+- Added in FeatureTileGenerator
+- Added in UrlTileGenerator
+- Rebuilt CanvasKit to add support for webp and jpeg
+
 ##### 5.0.0
 - GeoPackage JS's API has been updated to more closely match GeoPackage Java v6.4.0
   - Not yet implemented: 2D Gridded Tile Coverage Extension and OGC API Feature Generator 

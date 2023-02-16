@@ -18,6 +18,7 @@ import { TileTable } from './user/tileTable';
 import { ImageUtils } from '../image/imageUtils';
 import { ImageType } from '../image/imageType';
 import type { GeoPackage } from '../geoPackage';
+import { GeoPackageTile } from './geoPackageTile';
 
 /**
  * Creates a set of tiles within a GeoPackage
@@ -119,7 +120,7 @@ export abstract class TileGenerator {
    * @param projection tiles projection
    * @param zoomLevels zoom levels
    */
-  public constructor(
+  protected constructor(
     geoPackage: GeoPackage,
     tableName: string,
     boundingBox: BoundingBox,
@@ -434,9 +435,9 @@ export abstract class TileGenerator {
 
     // Create the tiles
     try {
-      const contents = tileMatrixSet.getContents();
+      const contents = tileMatrixSetDao.getContents(tileMatrixSet);
       const tileMatrixDao = this.geoPackage.getTileMatrixDao();
-      const tileDao = this.geoPackage.getTileDao(tileMatrixSet);
+      const tileDao = this.geoPackage.getTileDaoWithTileMatrixSet(tileMatrixSet);
 
       // Create the new matrix tiles
       for (let zoom = minZoom; zoom <= maxZoom && (this.progress == null || this.progress.isActive()); zoom++) {
@@ -446,7 +447,7 @@ export abstract class TileGenerator {
           // Determine the matrix width and height for XYZ format
           if (this.xyzTiles) {
             this.matrixWidth = TileBoundingBoxUtils.tilesPerSide(zoom);
-            this.matrixHeight = this.matrixWidth;
+            this.matrixHeight = TileBoundingBoxUtils.tilesPerSide(zoom);
           }
           // Get the local tile grid for GeoPackage format of where
           // the tiles belong
@@ -536,8 +537,8 @@ export abstract class TileGenerator {
       ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE,
     );
     const wgs84ToWebMercatorTransform = GeometryTransform.create(
-      ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM,
-      ProjectionConstants.EPSG_WEB_MERCATOR,
+      Projections.getWGS84Projection(),
+      Projections.getWebMercatorProjection(),
     );
     this.tileGridBoundingBox = standardWgs84Box.transform(wgs84ToWebMercatorTransform);
   }
@@ -672,7 +673,7 @@ export abstract class TileGenerator {
           const zoomMatrixWidth = this.matrixWidth * adjustment;
           const zoomMatrixHeight = this.matrixHeight * adjustment;
 
-          // Get the zoom level tile rows, starting with highest rows
+          // Get the zoom level tile rows, starting with the highest row
           // and columns so when updating we avoid constraint
           // violations
           const tileResultSet = tileDao.queryForTilesDescending(zoom);
@@ -688,7 +689,7 @@ export abstract class TileGenerator {
               tileRow.getTileRow(),
             );
 
-            // Get the mid lat and lon to find the new tile row
+            // Get the mid-lat and lon to find the new tile row
             // and column
             const midLatitude =
               tileBoundingBox.getMinLatitude() +
@@ -697,7 +698,7 @@ export abstract class TileGenerator {
               tileBoundingBox.getMinLongitude() +
               (tileBoundingBox.getMaxLongitude() - tileBoundingBox.getMinLongitude()) / 2.0;
 
-            // Get the new tile row and column with regards to
+            // Get the new tile row and column with regard to
             // the new bounding box
             const newTileRow = TileBoundingBoxUtils.getTileRow(this.tileGridBoundingBox, zoomMatrixHeight, midLatitude);
             const newTileColumn = TileBoundingBoxUtils.getTileColumn(
@@ -839,43 +840,41 @@ export abstract class TileGenerator {
         if (createTile) {
           try {
             // Create the tile
-            let tileBytes = this.createTile(zoomLevel, x, y);
+            const geoPackageTile = await this.createTile(zoomLevel, x, y);
+            if (geoPackageTile != null) {
+              let tileBytes = geoPackageTile.getData();
 
-            if (tileBytes != null && tileBytes.length > 0) {
-              let image = null;
+              if (tileBytes != null && tileBytes.length > 0) {
+                let image = null;
 
-              // Compress the image
-              if (this.compressFormat != null) {
-                image = ImageUtils.getImage(tileBytes);
-                if (image != null) {
-                  tileBytes = await ImageUtils.writeImageToBytes(image, this.compressFormat, this.compressQuality);
+                // Compress the image
+                if (this.compressFormat != null) {
+                  image = await geoPackageTile.getGeoPackageImage();
+                  if (image != null) {
+                    tileBytes = await ImageUtils.writeImageToBytes(image, this.compressFormat, this.compressQuality);
+                  }
                 }
-              }
 
-              // Create a new tile row
-              const newRow = tileDao.newRow();
-              newRow.setZoomLevel(zoomLevel);
+                // Create a new tile row
+                const newRow = tileDao.newRow();
+                newRow.setZoomLevel(zoomLevel);
 
-              // If an update, delete an existing row
-              if (update) {
-                tileDao.deleteTile(tileColumn, tileRow, zoomLevel);
-              }
-
-              newRow.setTileColumn(tileColumn);
-              newRow.setTileRow(tileRow);
-              newRow.setTileData(tileBytes);
-              tileDao.create(newRow);
-
-              count++;
-
-              // Determine the tile width and height
-              if (tileWidth == null) {
-                if (image == null) {
-                  image = ImageUtils.getImage(tileBytes);
+                // If an update, delete an existing row
+                if (update) {
+                  tileDao.deleteTile(tileColumn, tileRow, zoomLevel);
                 }
-                if (image != null) {
-                  tileWidth = image.getWidth();
-                  tileHeight = image.getHeight();
+
+                newRow.setTileColumn(tileColumn);
+                newRow.setTileRow(tileRow);
+                newRow.setTileData(tileBytes);
+                tileDao.create(newRow);
+
+                count++;
+
+                // Determine the tile width and height
+                if (tileWidth == null) {
+                  tileWidth = geoPackageTile.getWidth();
+                  tileHeight = geoPackageTile.getHeight();
                 }
               }
             }
@@ -962,5 +961,5 @@ export abstract class TileGenerator {
    * @param y  y coordinate
    * @return tile bytes
    */
-  protected abstract createTile(z: number, x: number, y: number): Buffer | Uint8Array;
+  protected abstract createTile(z: number, x: number, y: number): Promise<GeoPackageTile>;
 }

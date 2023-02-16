@@ -75,7 +75,6 @@ export class GeoPackageManager {
     try {
       await Canvas.initializeAdapter();
     } catch (e) {
-      console.error(e);
       throw new GeoPackageException('Unable to initialize canvas.');
     }
     try {

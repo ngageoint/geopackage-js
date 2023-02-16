@@ -2,9 +2,10 @@ import { Canvas } from '../../../canvas/canvas';
 import { CustomFeaturesTile } from '../customFeaturesTile';
 import { GeoPackageException } from '../../../geoPackageException';
 import { FeatureIndexResults } from '../../../features/index/featureIndexResults';
-import { GeoPackageImage } from '../../../image/geoPackageImage';
 import { FeatureResultSet } from '../../../features/user/featureResultSet';
 import { EmulatedCanvas2D } from '../../../../@types/canvaskit';
+import { ImageType } from '../../../image/imageType';
+import { GeoPackageTile } from '../../geoPackageTile';
 
 /**
  * Draws a tile indicating the number of features that exist within the tile,
@@ -279,7 +280,7 @@ export class NumberFeaturesTile implements CustomFeaturesTile {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     featureIndexResults: FeatureIndexResults,
     canvas?: EmulatedCanvas2D | HTMLCanvasElement,
-  ): Promise<GeoPackageImage> {
+  ): Promise<GeoPackageTile> {
     const featureText = tileFeatureCount.toString();
     return this.drawNumberFeaturesTile(tileWidth, tileHeight, featureText, canvas);
   }
@@ -295,14 +296,14 @@ export class NumberFeaturesTile implements CustomFeaturesTile {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     allFeatureResults: FeatureResultSet,
     canvas?: EmulatedCanvas2D | HTMLCanvasElement,
-  ): Promise<GeoPackageImage> {
-    let image = null;
+  ): Promise<GeoPackageTile> {
+    let tile = null;
     if (this.drawUnindexedTiles) {
       // Draw a tile indicating we have no idea if there are features inside.
       // The table is not indexed and more features exist than the max feature count set.
-      image = this.drawNumberFeaturesTile(tileWidth, tileHeight, '?', canvas);
+      tile = this.drawNumberFeaturesTile(tileWidth, tileHeight, '?', canvas);
     }
-    return image;
+    return tile;
   }
   /**
    * Draw a tile with the provided text label in the middle
@@ -317,64 +318,63 @@ export class NumberFeaturesTile implements CustomFeaturesTile {
     tileHeight: number,
     text: string,
     tileCanvas,
-  ): Promise<GeoPackageImage> {
+  ): Promise<GeoPackageTile> {
     // eslint-disable-next-line complexity
     await Canvas.initializeAdapter();
-    return new Promise((resolve) => {
-      const canvasProvided = tileCanvas != null;
-      let canvas = tileCanvas;
-      if (!canvasProvided) {
-        canvas = Canvas.create(tileWidth, tileHeight);
+    const canvasProvided = tileCanvas != null;
+    let canvas = tileCanvas;
+    if (!canvasProvided) {
+      canvas = Canvas.create(tileWidth, tileHeight);
+    }
+    const context = canvas.getContext('2d');
+    context.clearRect(0, 0, tileWidth, tileHeight);
+    // Draw the tile border
+    if (this.tileFillColor !== null) {
+      context.fillStyle = this.tileFillColor;
+      context.fillRect(0, 0, tileWidth, tileHeight);
+    }
+    // Draw the tile border
+    if (this.tileBorderColor !== null) {
+      context.strokeStyle = this.tileBorderColor;
+      context.lineWidth = this.tileBorderStrokeWidth;
+      context.strokeRect(0, 0, tileWidth, tileHeight);
+    }
+    const textWidth = Canvas.measureText(context, this.textFont, this.textSize, text);
+    const textHeight = this.textSize;
+    // Determine the center of the tile
+    const centerX = Math.round(tileWidth / 2.0);
+    const centerY = Math.round(tileHeight / 2.0);
+
+    // Draw the circle
+    if (this.circleColor != null || this.circleFillColor != null) {
+      const diameter = Math.max(textWidth, textHeight);
+      let radius = Math.round(diameter / 2.0);
+      radius = Math.round(radius + diameter * this.circlePaddingPercentage);
+
+      // Draw the filled circle
+      if (this.circleFillColor != null) {
+        context.fillStyle = this.circleFillColor;
+        context.beginPath();
+        context.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
+        context.closePath();
+        context.fill();
       }
-      const context = canvas.getContext('2d');
-      context.clearRect(0, 0, tileWidth, tileHeight);
-      // Draw the tile border
-      if (this.tileFillColor !== null) {
-        context.fillStyle = this.tileFillColor;
-        context.fillRect(0, 0, tileWidth, tileHeight);
-      }
-      // Draw the tile border
-      if (this.tileBorderColor !== null) {
-        context.strokeStyle = this.tileBorderColor;
-        context.lineWidth = this.tileBorderStrokeWidth;
-        context.strokeRect(0, 0, tileWidth, tileHeight);
-      }
-      const textWidth = Canvas.measureText(context, this.textFont, this.textSize, text);
-      const textHeight = this.textSize;
-      // Determine the center of the tile
-      const centerX = Math.round(tileWidth / 2.0);
-      const centerY = Math.round(tileHeight / 2.0);
 
       // Draw the circle
-      if (this.circleColor != null || this.circleFillColor != null) {
-        const diameter = Math.max(textWidth, textHeight);
-        let radius = Math.round(diameter / 2.0);
-        radius = Math.round(radius + diameter * this.circlePaddingPercentage);
-
-        // Draw the filled circle
-        if (this.circleFillColor != null) {
-          context.fillStyle = this.circleFillColor;
-          context.beginPath();
-          context.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
-          context.closePath();
-          context.fill();
-        }
-
-        // Draw the circle
-        if (this.circleColor != null) {
-          context.strokeStyle = this.circleColor;
-          context.lineWidth = this.circleStrokeWidth;
-          context.beginPath();
-          context.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
-          context.closePath();
-          context.stroke();
-        }
+      if (this.circleColor != null) {
+        context.strokeStyle = this.circleColor;
+        context.lineWidth = this.circleStrokeWidth;
+        context.beginPath();
+        context.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
+        context.closePath();
+        context.stroke();
       }
-      Canvas.drawText(context, text, [centerX, centerY], this.textFont, this.textSize, this.textColor);
-      Canvas.toDataURL(canvas, 'image/png').then((result) => {
-        Canvas.disposeCanvas(canvas);
-        resolve(Canvas.createImage(result));
-      });
-    });
+    }
+    Canvas.drawText(context, text, [centerX, centerY], this.textFont, this.textSize, this.textColor);
+    const data = await Canvas.toBytes(canvas, ImageType.PNG);
+    if (!canvasProvided) {
+      Canvas.disposeCanvas(canvas);
+    }
+    return new GeoPackageTile(tileWidth, tileHeight, data, ImageType.PNG);
   }
 }

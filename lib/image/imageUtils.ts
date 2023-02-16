@@ -34,13 +34,11 @@ export class ImageUtils {
               .then((image) => {
                 resolve(image);
               })
-              .catch((e) => {
-                console.error(e);
+              .catch(() => {
                 resolve(null);
               });
           })
-          .catch((e) => {
-            console.error(e);
+          .catch(() => {
             resolve(null);
           });
       }
@@ -65,15 +63,13 @@ export class ImageUtils {
                 Canvas.disposeImage(image);
                 resolve(scaledImage);
               })
-              .catch((e) => {
+              .catch(() => {
                 Canvas.disposeImage(image);
-                console.error(e);
                 resolve(null);
               });
           }
         })
-        .catch((e) => {
-          console.error(e);
+        .catch(() => {
           resolve(null);
         });
     });
@@ -93,9 +89,8 @@ export class ImageUtils {
           Canvas.disposeImage(image);
           resolve(scaledImage);
         })
-        .catch((e) => {
+        .catch(() => {
           Canvas.disposeImage(image);
-          console.error(e);
           resolve(null);
         });
     });

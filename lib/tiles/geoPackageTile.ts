@@ -1,5 +1,6 @@
 import { GeoPackageImage } from '../image/geoPackageImage';
 import { Canvas } from '../canvas/canvas';
+import { ImageType } from '../image/imageType';
 
 /**
  * GeoPackage tile wrapper containing tile dimensions and the image or raw image
@@ -27,15 +28,22 @@ export class GeoPackageTile {
   private data: Buffer | Uint8Array;
 
   /**
+   * Image format
+   */
+  private imageFormat: ImageType;
+
+  /**
    * Constructor
    * @param width tile width
    * @param height tile height
    * @param data tile data
+   * @param imageFormat tile data format
    */
-  public constructor(width: number, height: number, data: Buffer | Uint8Array) {
+  public constructor(width: number, height: number, data: Buffer | Uint8Array, imageFormat: ImageType = ImageType.PNG) {
     this.width = width;
     this.height = height;
     this.data = data;
+    this.imageFormat = imageFormat;
   }
 
   /**
@@ -76,5 +84,19 @@ export class GeoPackageTile {
    */
   public setData(data: Buffer): void {
     this.data = data;
+  }
+
+  /**
+   * Get the mime type of the data
+   */
+  public getMimeType(): string {
+    return ImageType.getMimeType(this.imageFormat);
+  }
+
+  /**
+   * Get the image format
+   */
+  public getImageFormat(): ImageType {
+    return this.imageFormat;
   }
 }

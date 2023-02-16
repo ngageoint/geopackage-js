@@ -200,8 +200,8 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
   /**
    * @inheritDoc
    */
-  toDataURL(canvas: any, format = 'image/png'): Promise<string> {
-    return Promise.resolve(canvas.toDataURL(format));
+  toDataURL(canvas: any, format = 'image/png', compressionQuality?: number): Promise<string> {
+    return Promise.resolve(canvas.toDataURL(format, compressionQuality));
   }
 
   /**
@@ -249,9 +249,17 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
    * @param imageFormat
    * @param compressionQuality
    */
-  writeImageToBytes(image: GeoPackageImage, imageFormat: ImageType, compressionQuality: number): Promise<Uint8Array> {
+  writeImageToBytes(image: GeoPackageImage, imageFormat: ImageType, compressionQuality = 0.92): Promise<Uint8Array> {
     const internalImage = image.getImage();
-    return Promise.resolve(internalImage.encodeToBytes(this.getTypeForImageFormat(imageFormat), compressionQuality));
+    let quality = 92;
+    if (compressionQuality != null) {
+      if (compressionQuality > 0 && compressionQuality <= 1.0) {
+        quality = Math.round(compressionQuality * 100);
+      } else {
+        quality = compressionQuality;
+      }
+    }
+    return internalImage.encodeToBytes(this.getTypeForImageFormat(imageFormat), quality);
   }
 
   /**
@@ -270,7 +278,7 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
    * @param toContext
    */
   mergeCanvas(fromCanvas: any, toContext: any): void {
-    const image = fromCanvas.bf.makeImageSnapshot();
+    const image = fromCanvas.We.makeImageSnapshot();
     toContext.drawImage(image, 0, 0);
   }
 
@@ -308,7 +316,7 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
    * @return Promise<Uint8Array>
    */
   async toBytes(canvas: any, imageFormat: ImageType = ImageType.PNG, compressionQuality = 100): Promise<Uint8Array> {
-    const image = canvas.bf.makeImageSnapshot();
+    const image = canvas.We.makeImageSnapshot();
     return Promise.resolve(image.encodeToBytes(this.getTypeForImageFormat(imageFormat), compressionQuality));
   }
 }

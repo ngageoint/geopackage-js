@@ -85,7 +85,6 @@ export abstract class BaseExtension {
 
         this.extensionsDao.create(extension);
       } catch (e) {
-        console.error(e);
         throw new GeoPackageException(
           "Failed to create '" +
             extensionName +

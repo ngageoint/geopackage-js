@@ -824,7 +824,6 @@ export class SQLUtils {
     try {
       return this.insertOrThrow(connection, table, values);
     } catch (e) {
-      console.error(e);
       console.warn('Error inserting into table: ' + table + ', Values: ' + values);
       return -1;
     }

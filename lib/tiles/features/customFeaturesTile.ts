@@ -1,7 +1,7 @@
-import { GeoPackageImage } from '../../image/geoPackageImage';
 import { FeatureIndexResults } from '../../features/index/featureIndexResults';
 import { FeatureResultSet } from '../../features/user/featureResultSet';
 import { EmulatedCanvas2D } from '../../../@types/canvaskit';
+import { GeoPackageTile } from '../geoPackageTile';
 
 /**
  * Custom Feature Tile
@@ -23,7 +23,7 @@ export interface CustomFeaturesTile {
     tileFeatureCount: number,
     featureIndexResults: FeatureIndexResults,
     canvas?: HTMLCanvasElement | OffscreenCanvas | EmulatedCanvas2D,
-  ): Promise<GeoPackageImage>;
+  ): Promise<GeoPackageTile>;
 
   /**
    * Draw a custom tile when the number of features within the tile is
@@ -43,5 +43,5 @@ export interface CustomFeaturesTile {
     totalFeatureCount: number,
     allFeatureResults: FeatureResultSet,
     canvas?: HTMLCanvasElement | OffscreenCanvas | EmulatedCanvas2D,
-  ): Promise<GeoPackageImage>;
+  ): Promise<GeoPackageTile>;
 }

@@ -198,7 +198,6 @@ export abstract class UserResultSet<
           columnTypes.push(column.getDataType());
         }
       } catch (e) {
-        console.error(e);
         throw new GeoPackageException('Failed to retrieve the row');
       }
       row = this.getRowWithColumnTypesAndValues(columnTypes, values);

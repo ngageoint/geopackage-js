@@ -1,4 +1,5 @@
 import { Canvas } from '../canvas/canvas';
+import { ImageType } from './imageType';
 
 /**
  * Image class to wrap HTML Images and CanvasKit Images and ImageBitmaps
@@ -57,6 +58,10 @@ export class GeoPackageImage {
       this.imageData = Canvas.getImageData(this);
     }
     return this.imageData;
+  }
+
+  public getImageType(): ImageType {
+    return ImageType.getTypeFromMimeType(this.format);
   }
 
   public getPixel(x: number, y: number): number {

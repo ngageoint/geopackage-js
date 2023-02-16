@@ -208,9 +208,7 @@ export class TableInfo {
             try {
               max = parseInt(maxString);
               type = type.substring(0, maxStart);
-            } catch (e) {
-              console.error(e);
-            }
+            } catch (e) {}
           }
         }
       }

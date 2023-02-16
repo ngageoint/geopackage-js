@@ -530,7 +530,7 @@ module.exports.addRowsToTileTable = function (geoPackage, tileMatrix, tileData) 
  */
 module.exports.createPoint = function (hasZ, hasM) {
   const x = Math.random() * 180.0 * (Math.random() < 0.5 ? 1 : -1);
-  const y = Math.random() * ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE * (Math.random() < 0.5 ? 1 : -1);
+  const y = Math.random() * -85.05112877980659 * (Math.random() < 0.5 ? 1 : -1);
   const point = new Point(hasZ, hasM, x, y);
   if (hasZ) {
     point.z = Math.random() * 1000.0;

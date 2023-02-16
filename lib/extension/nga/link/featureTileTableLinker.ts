@@ -47,7 +47,7 @@ export class FeatureTileTableLinker extends BaseExtension {
    * Constructor
    * @param geoPackage GeoPackage
    */
-  protected constructor(geoPackage: GeoPackage) {
+  public constructor(geoPackage: GeoPackage) {
     super(geoPackage);
     this.featureTileLinkDao = FeatureTileLinkDao.createDao(geoPackage);
   }

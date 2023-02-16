@@ -36,11 +36,11 @@ import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
 import { FeatureIndexManager } from '../../features/index/featureIndexManager';
 import { TileUtils } from '../tileUtils';
 import { FeatureResultSet } from '../../features/user/featureResultSet';
-import { GeoPackageImage } from '../../image/geoPackageImage';
 import { FeatureIndexResults } from '../../features/index/featureIndexResults';
 import { FeatureTileCanvas } from './featureTileCanvas';
 import { EmulatedCanvas2D } from '../../../@types/canvaskit';
 import type { GeoPackage } from '../../geoPackage';
+import { GeoPackageTile } from '../geoPackageTile';
 
 /**
  *  Tiles drawn from or linked to features. Used to query features and optionally draw tiles
@@ -167,10 +167,7 @@ export class FeatureTiles {
    * When not null and the number of features is greater than the max features
    * per tile, used to draw tiles for those tiles with more features than the
    * max
-   *
    * @see CustomFeaturesTile
-   * @see mil.nga.geopackage.tiles.features.custom.NumberFeaturesTile custom
-   *      features tile implementation
    */
   protected maxFeaturesTileDraw: CustomFeaturesTile;
 
@@ -476,6 +473,22 @@ export class FeatureTiles {
   }
 
   /**
+   * Set the max features per tile
+   * @param max
+   */
+  setMaxFeaturesPerTile(max: number): void {
+    this.maxFeaturesPerTile = max;
+  }
+
+  /**
+   * Set the max features tile draw
+   * @param maxFeaturesTileDraw
+   */
+  setMaxFeaturesTileDraw(maxFeaturesTileDraw: CustomFeaturesTile): void {
+    this.maxFeaturesTileDraw = maxFeaturesTileDraw;
+  }
+
+  /**
    * Set geometry cache's max size
    * @param {Number} maxSize
    */
@@ -609,6 +622,13 @@ export class FeatureTiles {
       }
     }
     return paint;
+  }
+  /**
+   * Set point icon
+   * @param {FeatureTilePointIcon} pointIcon
+   */
+  setPointIcon(pointIcon: FeatureTilePointIcon): void {
+    this.pointIcon = pointIcon;
   }
   /**
    * Get point color
@@ -765,7 +785,7 @@ export class FeatureTiles {
     y: number,
     z: number,
     canvas?: HTMLCanvasElement | OffscreenCanvas | EmulatedCanvas2D,
-  ): Promise<GeoPackageImage> {
+  ): Promise<GeoPackageTile> {
     if (this.isIndexQuery()) {
       return this.drawTileQueryIndex(x, y, z, canvas);
     } else {
@@ -785,7 +805,7 @@ export class FeatureTiles {
     y: number,
     z: number,
     canvas?: HTMLCanvasElement | OffscreenCanvas | EmulatedCanvas2D,
-  ): Promise<GeoPackageImage> {
+  ): Promise<GeoPackageTile> {
     if (this.isIndexQuery()) {
       return this.drawTileQueryIndexWGS84(x, y, z, canvas);
     } else {
@@ -808,9 +828,9 @@ export class FeatureTiles {
     y: number,
     zoom: number,
     canvas?: HTMLCanvasElement | OffscreenCanvas | EmulatedCanvas2D,
-  ): Promise<GeoPackageImage> {
+  ): Promise<GeoPackageTile> {
     const boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBox(x, y, zoom);
-    let image = null;
+    let tile = null;
     const totalCount = this.featureDao.count();
     // Draw if at least one geometry exists
     if (totalCount > 0) {
@@ -819,7 +839,7 @@ export class FeatureTiles {
       try {
         if (this.maxFeaturesPerTile == null || totalCount <= this.maxFeaturesPerTile) {
           // Draw the tile image
-          image = await this.drawTileWithFeatureResultSet(
+          tile = await this.drawTileWithFeatureResultSet(
             zoom,
             boundingBox,
             resultSet,
@@ -828,7 +848,7 @@ export class FeatureTiles {
           );
         } else if (this.maxFeaturesTileDraw != null) {
           // Draw the unindexed max features tile
-          image = await this.maxFeaturesTileDraw.drawUnindexedTile(
+          tile = await this.maxFeaturesTileDraw.drawUnindexedTile(
             this.tileWidth,
             this.tileHeight,
             totalCount,
@@ -840,7 +860,7 @@ export class FeatureTiles {
         resultSet.close();
       }
     }
-    return image;
+    return tile;
   }
 
   /**
@@ -858,9 +878,9 @@ export class FeatureTiles {
     y: number,
     zoom: number,
     canvas?: HTMLCanvasElement | OffscreenCanvas | EmulatedCanvas2D,
-  ): Promise<GeoPackageImage> {
+  ): Promise<GeoPackageTile> {
     const boundingBox = TileBoundingBoxUtils.getWGS84BoundingBox(x, y, zoom);
-    let image = null;
+    let tile = null;
     const totalCount = this.featureDao.count();
     // Draw if at least one geometry exists
     if (totalCount > 0) {
@@ -869,10 +889,10 @@ export class FeatureTiles {
       try {
         if (this.maxFeaturesPerTile == null || totalCount <= this.maxFeaturesPerTile) {
           // Draw the tile image
-          image = await this.drawTileWithFeatureResultSet(zoom, boundingBox, resultSet, FeatureTiles.WGS_84_PROJECTION);
+          tile = await this.drawTileWithFeatureResultSet(zoom, boundingBox, resultSet, FeatureTiles.WGS_84_PROJECTION);
         } else if (this.maxFeaturesTileDraw != null) {
           // Draw the unindexed max features tile
-          image = await this.maxFeaturesTileDraw.drawUnindexedTile(
+          tile = await this.maxFeaturesTileDraw.drawUnindexedTile(
             this.tileWidth,
             this.tileHeight,
             totalCount,
@@ -884,7 +904,7 @@ export class FeatureTiles {
         resultSet.close();
       }
     }
-    return image;
+    return tile;
   }
 
   /**
@@ -899,8 +919,8 @@ export class FeatureTiles {
     y: number,
     zoom: number,
     canvas?: HTMLCanvasElement | OffscreenCanvas | EmulatedCanvas2D,
-  ): Promise<GeoPackageImage> {
-    let image;
+  ): Promise<GeoPackageTile> {
+    let tile;
     const boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBox(x, y, zoom);
 
     const tileCount = this.queryIndexedFeaturesCountWithBoundingBox(boundingBox, FeatureTiles.WEB_MERCATOR_PROJECTION);
@@ -913,7 +933,7 @@ export class FeatureTiles {
       try {
         if (this.maxFeaturesPerTile == null || tileCount <= this.maxFeaturesPerTile) {
           // Draw the tile image
-          image = await this.drawTileWithFeatureIndexResults(
+          tile = await this.drawTileWithFeatureIndexResults(
             zoom,
             boundingBox,
             resultSet,
@@ -922,19 +942,13 @@ export class FeatureTiles {
           );
         } else if (this.maxFeaturesTileDraw != null) {
           // Draw the max features tile
-          image = await this.maxFeaturesTileDraw.drawTile(
-            this.tileWidth,
-            this.tileHeight,
-            tileCount,
-            resultSet,
-            canvas,
-          );
+          tile = await this.maxFeaturesTileDraw.drawTile(this.tileWidth, this.tileHeight, tileCount, resultSet, canvas);
         }
       } finally {
         resultSet.close();
       }
     }
-    return image;
+    return tile;
   }
 
   async drawTileQueryIndexWGS84(
@@ -942,8 +956,8 @@ export class FeatureTiles {
     y: number,
     zoom: number,
     canvas?: HTMLCanvasElement | OffscreenCanvas | EmulatedCanvas2D,
-  ): Promise<GeoPackageImage> {
-    let image;
+  ): Promise<GeoPackageTile> {
+    let tile;
     const boundingBox = TileBoundingBoxUtils.getWGS84BoundingBox(x, y, zoom);
     // Query for the geometry count matching the bounds in the index
     const tileCount = this.queryIndexedFeaturesCountWithBoundingBox(boundingBox, FeatureTiles.WGS_84_PROJECTION);
@@ -954,7 +968,7 @@ export class FeatureTiles {
       try {
         if (this.maxFeaturesPerTile == null || tileCount <= this.maxFeaturesPerTile) {
           // Draw the tile image
-          image = await this.drawTileWithFeatureIndexResults(
+          tile = await this.drawTileWithFeatureIndexResults(
             zoom,
             boundingBox,
             results,
@@ -963,13 +977,13 @@ export class FeatureTiles {
           );
         } else if (this.maxFeaturesTileDraw != null) {
           // Draw the max features tile
-          image = await this.maxFeaturesTileDraw.drawTile(this.tileWidth, this.tileHeight, tileCount, results, canvas);
+          tile = await this.maxFeaturesTileDraw.drawTile(this.tileWidth, this.tileHeight, tileCount, results, canvas);
         }
       } finally {
         results.close();
       }
     }
-    return image;
+    return tile;
   }
 
   /**
@@ -1070,7 +1084,7 @@ export class FeatureTiles {
     resultSet: FeatureIndexResults,
     projection: Projection,
     canvas?: HTMLCanvasElement | OffscreenCanvas | EmulatedCanvas2D,
-  ): Promise<GeoPackageImage> {
+  ): Promise<GeoPackageTile> {
     const featureTileCanvas = new FeatureTileCanvas(this.tileWidth, this.tileHeight, canvas);
     const transform = GeometryTransform.create(this.projection, projection);
     const expandedBoundingBox = this.expandBoundingBoxWithProjection(boundingBox, projection);
@@ -1081,15 +1095,15 @@ export class FeatureTiles {
         drawn = true;
       }
     }
-    let image = null;
+    let tile = null;
     if (drawn) {
-      image = featureTileCanvas.createImage();
+      tile = featureTileCanvas.createTile();
     }
     // only dispose of the canvas if it was created here
     if (canvas == null) {
       featureTileCanvas.dispose();
     }
-    return image;
+    return tile;
   }
 
   /**
@@ -1106,7 +1120,7 @@ export class FeatureTiles {
     resultSet: FeatureResultSet,
     projection: Projection,
     canvas?: HTMLCanvasElement | OffscreenCanvas | EmulatedCanvas2D,
-  ): Promise<GeoPackageImage> {
+  ): Promise<GeoPackageTile> {
     const featureTileCanvas = new FeatureTileCanvas(this.tileWidth, this.tileHeight, canvas);
     const transform = GeometryTransform.create(this.projection, projection);
     const expandedBoundingBox = this.expandBoundingBoxWithProjection(boundingBox, projection);
@@ -1116,11 +1130,11 @@ export class FeatureTiles {
         drawn = true;
       }
     }
-    let image = null;
+    let tile = null;
     if (drawn) {
-      image = featureTileCanvas.createImage();
+      tile = featureTileCanvas.createTile();
     }
-    return image;
+    return tile;
   }
 
   /**
@@ -1137,7 +1151,7 @@ export class FeatureTiles {
     featureRows: FeatureRow[],
     projection: Projection,
     canvas?: HTMLCanvasElement | OffscreenCanvas | EmulatedCanvas2D,
-  ): Promise<GeoPackageImage> {
+  ): Promise<GeoPackageTile> {
     const featureTileCanvas = new FeatureTileCanvas(this.tileWidth, this.tileHeight, canvas);
     const transform = GeometryTransform.create(this.projection, projection);
     const expandedBoundingBox = this.expandBoundingBoxWithProjection(boundingBox, projection);
@@ -1147,11 +1161,11 @@ export class FeatureTiles {
         drawn = true;
       }
     }
-    let image = null;
+    let tile = null;
     if (drawn) {
-      image = featureTileCanvas.createImage();
+      tile = featureTileCanvas.createTile();
     }
-    return image;
+    return tile;
   }
 
   /**
@@ -1612,7 +1626,6 @@ export class FeatureTiles {
       context.closePath();
       context.restore();
     } catch (e) {
-      console.error(e);
       drawn = false;
     }
     return drawn;

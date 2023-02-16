@@ -1,9 +1,10 @@
 import { Canvas } from '../../../canvas/canvas';
 import { CustomFeaturesTile } from '../customFeaturesTile';
-import { GeoPackageImage } from '../../../image/geoPackageImage';
 import { FeatureIndexResults } from '../../../features/index/featureIndexResults';
 import { EmulatedCanvas2D } from '../../../../@types/canvaskit';
 import { FeatureResultSet } from '../../../features/user/featureResultSet';
+import { GeoPackageTile } from '../../geoPackageTile';
+import { ImageType } from '../../../image/imageType';
 
 /**
  * Draws a tile which is shaded to indicate too many features. By default a
@@ -102,7 +103,7 @@ export class ShadedFeaturesTile implements CustomFeaturesTile {
    * @param totalFeatureCount
    * @param allFeatureResults
    * @param canvas
-   * @returns {Promise<GeoPackageImage>}
+   * @returns {Promise<GeoPackageTile>}
    */
   async drawUnindexedTile(
     tileWidth: number,
@@ -112,7 +113,7 @@ export class ShadedFeaturesTile implements CustomFeaturesTile {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     allFeatureResults: FeatureResultSet,
     canvas?: EmulatedCanvas2D | HTMLCanvasElement,
-  ): Promise<GeoPackageImage> {
+  ): Promise<GeoPackageTile> {
     let image = null;
     if (this.drawUnindexedTiles) {
       // Draw a tile indicating we have no idea if there are features
@@ -130,7 +131,7 @@ export class ShadedFeaturesTile implements CustomFeaturesTile {
    * @param tileFeatureCount
    * @param featureIndexResults
    * @param canvas
-   * @return {Promise<GeoPackageImage>}
+   * @return {Promise<GeoPackageTile>}
    */
   async drawTile(
     tileWidth: number,
@@ -139,36 +140,33 @@ export class ShadedFeaturesTile implements CustomFeaturesTile {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     featureIndexResults: FeatureIndexResults,
     canvas?: EmulatedCanvas2D | HTMLCanvasElement,
-  ): Promise<GeoPackageImage> {
+  ): Promise<GeoPackageTile> {
     await Canvas.initializeAdapter();
-    return new Promise((resolve) => {
-      let tileCanvas;
-      let dispose = false;
-      if (canvas !== undefined && canvas !== null) {
-        tileCanvas = canvas;
-      } else {
-        tileCanvas = Canvas.create(tileWidth, tileHeight);
-        dispose = true;
-      }
-      const context = tileCanvas.getContext('2d');
-      context.clearRect(0, 0, tileWidth, tileHeight);
-      // Draw the tile border
-      if (this.tileFillColor !== null) {
-        context.fillStyle = this.tileFillColor;
-        context.fillRect(0, 0, tileWidth, tileHeight);
-      }
-      // Draw the tile border
-      if (this.tileBorderColor !== null) {
-        context.strokeStyle = this.tileBorderColor;
-        context.lineWidth = this.tileBorderStrokeWidth;
-        context.strokeRect(0, 0, tileWidth, tileHeight);
-      }
-      Canvas.toDataURL(tileCanvas, 'image/png').then((result) => {
-        if (dispose) {
-          Canvas.disposeCanvas(tileCanvas);
-        }
-        resolve(Canvas.createImage(result));
-      });
-    });
+    let tileCanvas;
+    let dispose = false;
+    if (canvas !== undefined && canvas !== null) {
+      tileCanvas = canvas;
+    } else {
+      tileCanvas = Canvas.create(tileWidth, tileHeight);
+      dispose = true;
+    }
+    const context = tileCanvas.getContext('2d');
+    context.clearRect(0, 0, tileWidth, tileHeight);
+    // Draw the tile border
+    if (this.tileFillColor !== null) {
+      context.fillStyle = this.tileFillColor;
+      context.fillRect(0, 0, tileWidth, tileHeight);
+    }
+    // Draw the tile border
+    if (this.tileBorderColor !== null) {
+      context.strokeStyle = this.tileBorderColor;
+      context.lineWidth = this.tileBorderStrokeWidth;
+      context.strokeRect(0, 0, tileWidth, tileHeight);
+    }
+    const data = await Canvas.toBytes(tileCanvas, ImageType.PNG);
+    if (dispose) {
+      Canvas.disposeCanvas(tileCanvas);
+    }
+    return new GeoPackageTile(tileWidth, tileHeight, data, ImageType.PNG);
   }
 }

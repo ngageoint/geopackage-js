@@ -3,7 +3,7 @@
  */
 export class CanvasUtils {
   /**
-   * Convert base64 to Uint8array
+   * Convert base64 to Uint8Array
    * @param {string}data
    */
   static base64toUInt8Array(data): Uint8Array {

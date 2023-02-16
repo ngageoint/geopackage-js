@@ -82,9 +82,9 @@ export class Canvas {
     return Canvas.adapter.scaleImageToDimensions(image, scaledWidth, scaledHeight);
   }
 
-  static async toDataURL(canvas, format = 'image/png'): Promise<string> {
+  static async toDataURL(canvas, format = 'image/png', quality?: number): Promise<string> {
     Canvas.checkCanvasAdapter();
-    return Canvas.adapter.toDataURL(canvas, format);
+    return Canvas.adapter.toDataURL(canvas, format, quality);
   }
 
   static disposeImage(image: GeoPackageImage): void {

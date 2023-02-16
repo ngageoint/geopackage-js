@@ -458,6 +458,7 @@ export class TileCreator {
     let geoPackageTile: GeoPackageTile = null;
     let canvas: HTMLCanvasElement = null;
     let context: CanvasRenderingContext2D = null;
+    const imageFormat = ImageType.getTypeFromMimeType(this.imageFormat || 'image/png');
     while (tileResults.moveToNext()) {
       // Get the next tile
       const tileRow = tileResults.getRow();
@@ -493,7 +494,7 @@ export class TileCreator {
           const dest = TileBoundingBoxUtils.getRectangle(tileWidth, tileHeight, requestBoundingBox, overlap);
           if (src.isValid() && dest.isValid()) {
             if (this.imageFormat != null) {
-              // Create the bitmap first time through
+              // Create the canvas first time through
               if (canvas == null) {
                 canvas = Canvas.create(tileWidth, tileHeight);
                 context = canvas.getContext('2d');
@@ -517,7 +518,7 @@ export class TileCreator {
                   'Raw image only supported when the images are aligned with the tile format requiring no combining and cropping',
                 );
               }
-              geoPackageTile = new GeoPackageTile(tileWidth, tileHeight, tileRow.getTileData());
+              geoPackageTile = new GeoPackageTile(tileWidth, tileHeight, tileRow.getTileData(), imageFormat);
             }
           }
         }
@@ -526,8 +527,8 @@ export class TileCreator {
 
     // check if tile parts were drawn into the canvas
     if (geoPackageTile == null && canvas != null) {
-      const data = await Canvas.toBytes(canvas, ImageType.getTypeFromMimeType(this.imageFormat || 'image/png'), 1.0);
-      geoPackageTile = new GeoPackageTile(tileWidth, tileHeight, data);
+      const data = await Canvas.toBytes(canvas, imageFormat, 1.0);
+      geoPackageTile = new GeoPackageTile(tileWidth, tileHeight, data, imageFormat);
     }
 
     // Check if the entire image is transparent

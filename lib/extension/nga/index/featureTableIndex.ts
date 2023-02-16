@@ -202,7 +202,6 @@ export class FeatureTableIndex extends BaseExtension {
           this.geometryIndexDao.createOrUpdate(geometryIndex);
           indexed = true;
         } catch (e) {
-          console.error(e);
           throw new GeoPackageException(
             'Failed to create or update Geometry Index. GeoPackage: ' +
               this.geoPackage.getName() +
@@ -293,7 +292,6 @@ export class FeatureTableIndex extends BaseExtension {
     try {
       deleted = this.geometryIndexDao.deleteByIdWithKey(key);
     } catch (e) {
-      console.error(e);
       throw new GeoPackageException(
         'Failed to delete index, GeoPackage: ' +
           this.geoPackage.getName() +
@@ -963,7 +961,6 @@ export class FeatureTableIndex extends BaseExtension {
             );
             chunkCount = this.indexRows(tableIndex, resultSet);
           } catch (e) {
-            console.error(e);
           } finally {
             connection.unsafe(false);
           }

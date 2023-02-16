@@ -93,7 +93,6 @@ import { TileColumn } from './tiles/user/tileColumn';
 import { FeatureTiles } from './tiles/features/featureTiles';
 import { TileUtils } from './tiles/tileUtils';
 import { MetadataDao } from './extension/metadata/metadataDao';
-import { GeoPackageImage } from './image/geoPackageImage';
 import { SimpleAttributesRow } from './extension/related/simple/simpleAttributesRow';
 import { FeatureTileLinkDao } from './extension/nga/link/featureTileLinkDao';
 
@@ -3093,8 +3092,8 @@ export class GeoPackage {
     tileSize = TileUtils.TILE_PIXELS_DEFAULT,
   ): number {
     const tileGrid = TileBoundingBoxUtils.getTileGridWGS84(epsg4326TileBoundingBox, zoomLevel);
-    const matrixWidth = tileGrid.getWidth() + 1;
-    const matrixHeight = tileGrid.getHeight() + 1;
+    const matrixWidth = tileGrid.getWidth();
+    const matrixHeight = tileGrid.getHeight();
     const pixelXSize =
       (epsg4326TileBoundingBox.getMaxLongitude() - epsg4326TileBoundingBox.getMinLongitude()) / matrixWidth / tileSize;
     const pixelYSize =
@@ -3130,8 +3129,8 @@ export class GeoPackage {
     tileSize = TileUtils.TILE_PIXELS_DEFAULT,
   ): number {
     const tileGrid = TileBoundingBoxUtils.getTileGridWithBoundingBoxAndZoom(epsg3857TileBoundingBox, zoomLevel);
-    const matrixWidth = tileGrid.getWidth() + 1;
-    const matrixHeight = tileGrid.getHeight() + 1;
+    const matrixWidth = tileGrid.getWidth();
+    const matrixHeight = tileGrid.getHeight();
     const pixelXSize =
       (epsg3857TileBoundingBox.getMaxLongitude() - epsg3857TileBoundingBox.getMinLongitude()) / matrixWidth / tileSize;
     const pixelYSize =
@@ -3478,7 +3477,7 @@ export class GeoPackage {
     z: number,
     width: number,
     height: number,
-  ): Promise<GeoPackageImage> {
+  ): Promise<GeoPackageTile> {
     x = Number(x);
     y = Number(y);
     z = Number(z);

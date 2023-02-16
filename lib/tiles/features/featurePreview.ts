@@ -2,12 +2,12 @@ import { FeatureDao } from '../../features/user/featureDao';
 import { FeatureTiles } from './featureTiles';
 import { SQLUtils } from '../../db/sqlUtils';
 import { GeoPackageException } from '../../geoPackageException';
-import { GeoPackageImage } from '../../image/geoPackageImage';
 import { Projections } from '@ngageoint/projections-js';
 import { TileBoundingBoxUtils } from '../tileBoundingBoxUtils';
 import { FeatureResultSet } from '../../features/user/featureResultSet';
 import { EmulatedCanvas2D } from '../../../@types/canvaskit';
 import type { GeoPackage } from '../../geoPackage';
+import { GeoPackageTile } from '../geoPackageTile';
 
 /**
  * Feature Preview for drawing a preview tile from a feature table
@@ -239,8 +239,8 @@ export class FeaturePreview {
    * @param canvas optional canvas to draw into
    * @return preview image
    */
-  public draw(canvas?: HTMLCanvasElement | OffscreenCanvas | EmulatedCanvas2D): GeoPackageImage {
-    let image = null;
+  public async draw(canvas?: HTMLCanvasElement | OffscreenCanvas | EmulatedCanvas2D): Promise<GeoPackageTile> {
+    let tile = null;
 
     const featureDao = this.featureTiles.getFeatureDao();
     const table = featureDao.getTableName();
@@ -270,9 +270,9 @@ export class FeaturePreview {
         null,
         this.limit,
       );
-      image = this.featureTiles.drawTileWithFeatureResultSet(zoom, expandedBoundingBox, results, webMercator, canvas);
+      tile = this.featureTiles.drawTileWithFeatureResultSet(zoom, expandedBoundingBox, results, webMercator, canvas);
     }
 
-    return image;
+    return tile;
   }
 }

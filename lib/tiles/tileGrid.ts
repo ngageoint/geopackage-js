@@ -76,14 +76,14 @@ export class TileGrid {
    * Get width
    */
   public getWidth(): number {
-    return this.maxX - this.minX;
+    return this.maxX + 1 - this.minX;
   }
 
   /**
    * Get height
    */
   public getHeight(): number {
-    return this.maxY - this.minY;
+    return this.maxY + 1 - this.minY;
   }
 
   /**

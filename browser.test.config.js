@@ -38,6 +38,8 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
     fallback: {
       fs: false,
+      http: false,
+      https: false,
     },
     alias: {
       '@ngageoint/projections-js': path.join(__dirname, './node_modules/@ngageoint/projections-js/dist/index.js'),

@@ -78,8 +78,9 @@ export interface CanvasAdapter {
    * Converts the canvas to a base64 data url in the format specified
    * @param canvas
    * @param format
+   * @param quality 0 to 1
    */
-  toDataURL(canvas: any, format: string): Promise<string>;
+  toDataURL(canvas: any, format: string, quality?: number): Promise<string>;
 
   /**
    * Performs any cleanup needed for the specified image
@@ -91,7 +92,8 @@ export interface CanvasAdapter {
    * Writes the image to a buffer
    * @param image
    * @param imageFormat
-   * @param compressionQuality
+   * @param compressionQuality a Number between 0 and 1 indicating the image quality to be used when creating images
+   * using file formats that support lossy compression (such as jpg)
    */
   writeImageToBytes(image: GeoPackageImage, imageFormat: ImageType, compressionQuality: number): Promise<Uint8Array>;
 

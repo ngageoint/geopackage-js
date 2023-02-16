@@ -17,7 +17,7 @@ export namespace ImageType {
    * Gets the associated mime type for the ImageType provided
    * @param type
    */
-  export function getMimeType(type: ImageType): string {
+  export function getMimeType(type: ImageType = ImageType.PNG): string {
     let mimeType = null;
     switch (type) {
       case ImageType.PNG:
