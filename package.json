@@ -1,6 +1,6 @@
 {
   "name": "@ngageoint/geopackage",
-  "version": "5.0.1-beta",
+  "version": "5.0.2-beta",
   "description": "GeoPackage JavaScript Library",
   "keywords": [
     "NGA",
@@ -82,7 +82,7 @@
     "xhr-mock": "2.5.1"
   },
   "optionalDependencies": {
-    "better-sqlite3": "7.6.2",
+    "better-sqlite3": "8.1.0",
     "chalk": "4.1.1",
     "inquirer": "8.0.0"
   },
