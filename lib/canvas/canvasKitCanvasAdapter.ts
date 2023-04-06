@@ -37,7 +37,11 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
           CanvasKitCanvasAdapter.CanvasKit = CanvasKit;
           CanvasKitCanvasAdapter.initialized = true;
           resolve();
-        }).catch(() => {
+        }).catch(err => {
+          console.error('error initializing CanvasKit:', err);
+          if (err instanceof Error) {
+            return reject(err);
+          }
           reject('Failed to load the CanvasKit WebAssembly file at ' + CanvasKitCanvasAdapter.canvasKitWasmLocateFile('canvaskit.wasm') + '.\nUpdate file locator function using NodeCanvasAdapter.setCanvasKitWasmLocateFile.');
         });
       } catch (e) {
