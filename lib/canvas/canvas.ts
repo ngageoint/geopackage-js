@@ -18,8 +18,16 @@ export class Canvas {
   }
 
   static async initializeAdapter(): Promise<void> {
-    if (!Canvas.adapter.isInitialized()) {
+    if (Canvas.adapter.isInitialized()) {
+      return;
+    }
+    try {
       await Canvas.adapter.initialize();
+    } catch (err) {
+      if (err instanceof Error) {
+        throw err;
+      }
+      throw new Error('error intializing canvas adapter: ' + String(err));
     }
   }
 
