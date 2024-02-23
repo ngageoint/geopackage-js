@@ -89,7 +89,7 @@
     "xhr-mock": "2.5.1"
   },
   "optionalDependencies": {
-    "better-sqlite3": "7.4.1",
+    "better-sqlite3": "^9.1.1",
     "chalk": "4.1.1",
     "inquirer": "8.0.0"
   },
