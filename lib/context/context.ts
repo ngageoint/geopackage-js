@@ -29,9 +29,7 @@ export class Context {
       require('better-sqlite3');
       Db.registerDbAdapter(SqliteAdapter);
     } catch (e) {
-      console.error(
-        'Unable to register SqliteAdapter. The better-sqlite3 module was not found. Falling back to SqljsAdapter.',
-      );
+      console.error('Unable to register SqliteAdapter. The better-sqlite3 module was not found. Falling back to SqljsAdapter.', e);
       // fallback to sqljs adapter
       Db.registerDbAdapter(SqljsAdapter);
     }
