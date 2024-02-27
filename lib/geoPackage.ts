@@ -642,7 +642,7 @@ export class GeoPackage {
    */
   createMediaTable(
     tableName: string,
-    properties: { name: string; dataType: string; notNull?: boolean; defaultValue?: DBValue; max?: number }[],
+    properties?: { name: string; dataType: string; notNull?: boolean; defaultValue?: DBValue; max?: number }[],
   ): MediaDao<MediaRow> {
     const relatedTables = this.relatedTablesExtension;
     const columns = [];
