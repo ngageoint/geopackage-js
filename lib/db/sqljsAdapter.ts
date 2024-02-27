@@ -295,7 +295,7 @@ export class SqljsAdapter implements DBAdapter {
   bindAndInsert(statement: any, params?: [] | Record<string, DBValue>): number {
     if (params && !(params instanceof Array)) {
       for (const key in params) {
-        params['$' + key] = params[key];
+        params['$' + key] = typeof params[key] === 'undefined' ? null : params[key];
       }
     }
     return statement.run(params).lastInsertRowid;
