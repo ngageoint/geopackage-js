@@ -36,82 +36,6 @@ Software source code previously released under an open source license and then m
 
 The GeoPackage JavaScript library currently provides the ability to read GeoPackage files.  This library works both in the browser and in Node.  In the browser tiles are rendered using HTML5 Canvas and GeoPackages are read using [sql.js](https://github.com/kripken/sql.js/).  In Node tiles are rendered  [PureImage](https://github.com/joshmarinacci/node-pureimage) and GeoPackages are read using [node-sqlite3](https://github.com/mapbox/node-sqlite3).
 
-### Changelog
-
-##### 4.2.3
-
-- fix cached geometry error
-
-##### 4.2.2
-
-- fix simplify error
-
-##### 4.2.1
-
-- Fix for drawing geometries outside of the 3857 bounds
-
-##### 4.2.0
-
-- Support for drawing vector data into EPSG:4326 tiles
-- Added createStandardWGS84TileTable
-
-##### 4.1.0
-
-- Typescript updates
-- Extract converters, leaflet plugin, mobile optimizer, and viewer into their own packages
-
-##### 4.0.0
-
-- Alter tables functions (copy, rename for table and columns)
-- Publish separate node and browser module
-- GeoPackageJS can now be run in Node.js worker_threads and Web Workers
-
-##### 2.1.0
-
-- Implementation of the Feature Style Extension and Contents ID Extension
-
-##### 2.0.8
-
-- Checks for Electron when returning a tile creator
-
-##### 2.0
-
-- All new API utilizing Promises
-
-##### 1.1.4
-
-- Adds a method to retrieve tiles in EPSG:4326
-
-##### 1.1.3
-
-- Fixes issue #115
-
-##### 1.1.2
-
-- fix case where GeoPackage Zoom does not correspond to the web map zoom
-
-##### 1.1.1
-
-- fix more instances of proj4 bug for react
-- fixed tile generation for images with different x and y pixel densities
-
-##### 1.1.0
-
-- accept pull request adding support for react
-- fix bug with projected tiles that spanned the date line
-
-##### 1.0.25
-
-- ensure we use proj4 2.4.3 instead of 2.4.4
-
-##### 1.0.22
-
-- Fixed bug where querying for indexed features only returned the geometry instead of the entire feature
-
-##### 1.0.19
-
-- Remove dependency on Lwip
-
 ### Usage ###
 
 View the latest [docs](https://ngageoint.github.io/geopackage-js/).
@@ -122,7 +46,7 @@ View the latest [docs](https://ngageoint.github.io/geopackage-js/).
 ```
 ```javascript
 
-// Specify folder containing the sql-wasm.wasm file. 
+// Specify folder containing the sql-wasm.wasm file.
 // By default, geopackage loads from https://server/public/sql-wasm.wasm
 window.GeoPackage.setSqljsWasmLocateFile(file => '/path/to/geopackage/dist/' + file);
 
@@ -218,7 +142,7 @@ var canvas = document.getElementById('canvas');
 var geopackageWorker;
 if (window.Worker) {
   geopackageWorker = new Worker("worker.js");
-  
+
   // handle responses from the geopackage web worker
   geopackageWorker.onmessage = function(e) {
     // draw tile
@@ -388,7 +312,7 @@ onmessage = function(e) {
 #### NodeJS Usage ####
 
 ```javascript
-var { 
+var {
   GeoPackageAPI,
   GeoPackageTileRetriever,
   FeatureTiles,
@@ -403,11 +327,11 @@ setCanvasKitWasmLocateFile(file => 'path/to/geopackage/dist/canvaskit/' + file);
 GeoPackageAPI.open('filename.gpkg').then(geoPackage => {
   // get the tile table names
   const tileTables = geoPackage.getTileTables();
-  
+
   tileTables.forEach(table => {
     // get tile dao
     const tileDao = geoPackage.getTileDao(table);
-    
+
     // get table info
     const tableInfo = geoPackage.getInfoForTable(tileDao);
 
@@ -440,14 +364,14 @@ GeoPackageAPI.open('filename.gpkg').then(geoPackage => {
 
   // get the feature table names
   const featureTables = geoPackage.getFeatureTables();
-  
+
   featureTables.forEach(table => {
     // get the feature dao
     const featureDao = geoPackage.getFeatureDao(table);
-    
+
     // get the info for the table
     const tableInfo = geoPackage.geoPackage.getInfoForTable(featureDao);
-    
+
     // draw tiles using features
     const ft = new FeatureTiles(featureDao);
     var x = 0;
@@ -459,11 +383,11 @@ GeoPackageAPI.open('filename.gpkg').then(geoPackage => {
       // error retrieving tile
       console.error(e);
     });
-    
+
     // query for all features as geojson
     const geojsonFeatures = geoPackage.queryForGeoJSONFeaturesInTable(table);
   });
-  
+
   // add a spatial reference system to the geopackage
   const srs = new SpatialReferenceSystem();
   srs.srs_name = 'NAD27 / UTM zone 11N';
@@ -472,7 +396,7 @@ GeoPackageAPI.open('filename.gpkg').then(geoPackage => {
   srs.organization_coordsys_id = 26711;
   srs.definition = 'PROJCS["NAD27 / UTM zone 11N",GEOGCS["NAD27",DATUM["North_American_Datum_1927",SPHEROID["Clarke 1866",6378206.4,294.9786982138982,AUTHORITY["EPSG","7008"]],AUTHORITY["EPSG","6267"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4267"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",-117],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",500000],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","26711"]]';
   geoPackage.createSpatialReferenceSystem(srs);
-  
+
   // create a tile table using the spatial reference system
   // bounding box is the bounds for EPSG:26711
   const boundingBox = new BoundingBox(202161.66, 568941.68, 2982030.40, 8674415.25);
