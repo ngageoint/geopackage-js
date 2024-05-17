@@ -1,6 +1,6 @@
 {
   "name": "@ngageoint/geopackage",
-  "version": "4.2.5",
+  "version": "4.2.6",
   "description": "GeoPackage JavaScript Library",
   "keywords": [
     "NGA",
@@ -38,7 +38,7 @@
     "@turf/polygon-to-line": "6.5.0",
     "@types/geojson": "7946.0.8",
     "@types/proj4": "2.5.2",
-    "file-type": "12.4.0",
+    "file-type": "^16.5.4",
     "image-size": "0.8.3",
     "lodash": "4.17.21",
     "proj4": "2.8.0",

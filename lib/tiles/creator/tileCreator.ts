@@ -1,4 +1,4 @@
-import fileType from 'file-type';
+import * as fileType from 'file-type';
 import proj4 from 'proj4';
 import ProjectTile from './projectTile';
 
@@ -138,12 +138,12 @@ export class TileCreator {
 
   /**
    * Adds a tile and reprojects it if necessary before drawing it into the target canvas
-   * @param tileData
-   * @param gridColumn
-   * @param gridRow
+   * @param tileData a `string` file path or `Buffer` containing image data
+   * @param gridColumn `number`
+   * @param gridRow `number`
    */
   async addTile(tileData: any, gridColumn: number, gridRow: number): Promise<void> {
-    const type = fileType(tileData);
+    const type = await (typeof tileData === 'string' ? fileType.fromFile(tileData) : fileType.fromBuffer(tileData));
     const tile = await ImageUtils.getImage(tileData, type.mime);
     this.tileContext.clearRect(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height);
     this.tileContext.drawImage(tile.image, 0, 0);
