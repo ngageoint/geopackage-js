@@ -22,6 +22,9 @@
 - Added in FeatureConnection, TileConnection, AttributesConnection and UserCustomConnections.
 - Added GeoPackageCache
 
+##### 4.2.6
+- Upgrade the [`file-type`](https://www.npmjs.com/package/file-type) dependency to address [CVE-2022-36313](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-36313).
+
 ##### 4.2.5
 
 - Fix a bug that set `undefined` on sql.js prepared statement values causing sql.js to throw an error.
