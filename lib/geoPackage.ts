@@ -847,7 +847,7 @@ export class GeoPackage {
     const geometryData = new GeometryData();
     geometryData.setSrsId(srs.srs_id);
     if (!(srs.organization === ProjectionConstants.EPSG && srs.organization_coordsys_id === ProjectionConstants.EPSG_CODE_4326)) {
-      feature = reproject.reproject(feature, ProjectionConstants.EPSG_4326, featureDao.projection);
+      // feature = reproject.reproject(feature, ProjectionConstants.EPSG_4326, featureDao.projection);
     }
 
     const featureGeometry = typeof feature.geometry === 'string' ? JSON.parse(feature.geometry) : feature.geometry;
