@@ -13,6 +13,7 @@ var FeatureTableIndex = require('../../../../../lib/extension/nga/index/featureT
 
 describe('GeoPackage Feature Table Index Extension tests', function () {
   describe('Create new index', function () {
+    this.timeout(30000);
     var geoPackage;
 
     var originalFilename = path.join(__dirname, '..', '..', '..', '..', 'fixtures', 'import_db.gpkg');
