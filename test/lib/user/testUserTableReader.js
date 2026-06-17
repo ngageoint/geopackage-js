@@ -1,29 +1,28 @@
-import { default as testSetup } from '../../fixtures/testSetup'
+import { default as testSetup } from '../../testSetup';
 
-var path = require('path')
-  , should = require('chai').should()
-  , UserCustomTableReader = require('../../../lib/user/custom/userCustomTableReader').UserCustomTableReader
-  , UserCustomDao = require('../../../lib/user/custom/userCustomDao').UserCustomDao;
+var path = require('path'),
+  should = require('chai').should(),
+  UserCustomTableReader = require('../../../lib/user/custom/userCustomTableReader').UserCustomTableReader,
+  UserCustomDao = require('../../../lib/user/custom/userCustomDao').UserCustomDao;
 
-describe('UserTableReader tests', function() {
+describe('UserTableReader tests', function () {
   var geoPackage;
   var filename;
-  beforeEach('create the GeoPackage connection', async function() {
+  beforeEach('create the GeoPackage connection', async function () {
     var sampleFilename = path.join(__dirname, '..', '..', 'fixtures', 'gdal_sample.gpkg');
-    // @ts-ignore
     let result = await copyAndOpenGeopackage(sampleFilename);
     filename = result.path;
-    geoPackage = result.geopackage;
+    geoPackage = result.geoPackage;
   });
 
-  afterEach('close the geopackage connection', async function() {
+  afterEach('close the geoPackage connection', async function () {
     geoPackage.close();
     await testSetup.deleteGeoPackage(filename);
   });
 
-  it('should read the table', function() {
+  it('should read the table', function () {
     var reader = new UserCustomTableReader('point2d');
-    var table = reader.readTable(geoPackage.database);
+    var table = reader.readTable(geoPackage.getDatabase());
     table.getTableName().should.be.equal('point2d');
     table.getUserColumns().getColumns().length.should.be.equal(8);
     table.getUserColumns().getColumns()[0].getName().should.be.equal('fid');
@@ -36,15 +35,16 @@ describe('UserTableReader tests', function() {
     table.getUserColumns().getColumns()[7].getName().should.be.equal('binaryfield');
   });
 
-  it('should query the table', function() {
+  it('should query the table', function () {
     var reader = new UserCustomTableReader('point2d');
-    var table = reader.readTable(geoPackage.database);
-    var ud = new UserCustomDao(geoPackage, table);
-    var results = ud.queryForAll();
-    should.exist(results);
-    results.length.should.be.equal(2);
-    for (var i = 0; i < results.length; i++) {
-      var ur = ud.getRow(results[i]);
+    var table = reader.readTable(geoPackage.getDatabase());
+    var ud = new UserCustomDao(geoPackage.getName(), geoPackage, table);
+    var userCustomResultSet = ud.queryForAll();
+    should.exist(userCustomResultSet);
+    userCustomResultSet.getCount().should.be.equal(2);
+    var i = 0;
+    while (userCustomResultSet.moveToNext()) {
+      var ur = userCustomResultSet.getRow();
       ur.columnCount.should.be.equal(8);
       var names = ur.columnNames;
       names.should.include('fid');
@@ -57,16 +57,18 @@ describe('UserTableReader tests', function() {
       names.should.include('binaryfield');
       ur.getColumnNameWithIndex(0).should.be.equal('fid');
       ur.getColumnIndexWithColumnName('fid').should.be.equal(0);
-      ur.getValueWithIndex(0).should.be.equal(i+1);
-      ur.getValueWithColumnName('fid').should.be.equal(i+1);
+      ur.getValueWithIndex(0).should.be.equal(i + 1);
+      ur.getValue('fid').should.be.equal(i + 1);
       ur.getRowColumnTypeWithIndex(0).should.be.equal(5);
       ur.getRowColumnTypeWithColumnName('fid').should.be.equal(5);
-      ur.getColumnWithIndex(0).name.should.be.equal('fid');
-      ur.getColumnWithColumnName('fid').name.should.be.equal('fid');
-      ur.id.should.be.equal(i+1);
+      ur.getColumnWithIndex(0).getName().should.be.equal('fid');
+      ur.getColumn('fid').getName().should.be.equal('fid');
+      ur.getId().should.be.equal(i + 1);
       ur.pkColumn.getName().should.be.equal('fid');
       ur.getColumnWithIndex(0).getType().should.be.equal('INTEGER');
-      should.exist(ur.values);
+      should.exist(ur.getValues());
+      i++;
     }
+    userCustomResultSet.close();
   });
 });

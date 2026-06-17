@@ -1,21 +1,18 @@
 import { FeatureRow } from '../../features/user/featureRow';
-import { Geometry } from 'geojson';
-import { CrsGeometry } from '../../types/CrsGeometry';
+import { GeoPackageGeometryData } from '../../geom/geoPackageGeometryData';
 
 /**
- * Feature Paint Cache.
- * @module tiles/features
- */
-
-/**
- * Constructor, created with cache size of {@link #DEFAULT_GEOMETRY_CACHE_SIZE}
- * @constructor
+ * GeometryCache
  */
 export class GeometryCache {
   public static readonly DEFAULT_GEOMETRY_CACHE_SIZE = 100;
-  geometryCache: Record<number, Geometry & CrsGeometry>;
+  geometryCache: Record<number, GeoPackageGeometryData>;
   accessHistory: number[];
 
+  /**
+   * Constructor, created with cache size of {@link #DEFAULT_GEOMETRY_CACHE_SIZE}
+   * @constructor
+   */
   constructor(public cacheSize: number = GeometryCache.DEFAULT_GEOMETRY_CACHE_SIZE) {
     // this.cacheSize = size !== null ? size : GeometryCache.DEFAULT_GEOMETRY_CACHE_SIZE;
     this.geometryCache = {};
@@ -25,18 +22,18 @@ export class GeometryCache {
   /**
    * Get the cached geometry for the feature row
    * @param featureRow
-   * @returns {module:tiles/features~Geometry}
+   * @returns {Geometry}
    */
-  getGeometryForFeatureRow(featureRow: FeatureRow): Geometry & CrsGeometry {
-    return this.getGeometry(featureRow.id);
+  getGeometryDataForFeatureRow(featureRow: FeatureRow): GeoPackageGeometryData {
+    return this.getGeometryData(featureRow.getId());
   }
 
   /**
    * Get the cached geometry for the feature row id or null if not cached
    * @param {Number} featureRowId feature row id
-   * @return {module:tiles/features~Geometry} geometry or null
+   * @return {Geometry} geometry or null
    */
-  getGeometry(featureRowId: number): Geometry & CrsGeometry {
+  getGeometryData(featureRowId: number): GeoPackageGeometryData {
     const Geometry = this.geometryCache[featureRowId];
     if (!!Geometry) {
       const index = this.accessHistory.indexOf(featureRowId);
@@ -53,7 +50,7 @@ export class GeometryCache {
    * @param {Number} featureRowId feature row id
    * @param {Object} geometry geometry
    */
-  setGeometry(featureRowId: number, geometry: Geometry & CrsGeometry): void {
+  setGeometryData(featureRowId: number, geometry: GeoPackageGeometryData): void {
     const index = this.accessHistory.indexOf(featureRowId);
     if (index > -1) {
       this.accessHistory.splice(index, 1);
@@ -71,9 +68,9 @@ export class GeometryCache {
   /**
    * Remove the cached Geometry for the style row id
    * @param {Number} featureRowId style row id
-   * @return {module:tiles/features~Geometry} removed feature paint or null
+   * @return {Geometry} removed feature paint or null
    */
-  remove(featureRowId: number): Geometry & CrsGeometry {
+  remove(featureRowId: number): GeoPackageGeometryData {
     const removed = this.geometryCache[featureRowId];
     delete this.geometryCache[featureRowId];
     if (!!removed) {

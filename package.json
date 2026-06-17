@@ -1,6 +1,6 @@
 {
   "name": "@ngageoint/geopackage",
-  "version": "4.2.7",
+  "version": "5.0.2-beta",
   "description": "GeoPackage JavaScript Library",
   "keywords": [
     "NGA",
@@ -16,7 +16,7 @@
     "Christopher Caldwell <c.caldwell90@gmail.com>",
     "Jared Lincenberg <jaredlincenberg@gmail.com>"
   ],
-  "homepage": "http://ngageoint.github.io/geopackage-js/",
+  "homepage": "https://ngageoint.github.io/geopackage-js/",
   "repository": {
     "type": "git",
     "url": "https://github.com/ngageoint/geopackage-js.git"
@@ -26,37 +26,29 @@
   },
   "bin": "./cli",
   "dependencies": {
-    "@turf/bbox": "6.3.0",
-    "@turf/boolean-clockwise": "6.5.0",
-    "@turf/boolean-point-in-polygon": "6.5.0",
-    "@turf/boolean-within": "6.5.0",
-    "@turf/distance": "6.5.0",
-    "@turf/helpers": "6.5.0",
-    "@turf/intersect": "6.5.0",
-    "@turf/line-intersect": "6.5.0",
-    "@turf/point-to-line-distance": "6.5.0",
-    "@turf/polygon-to-line": "6.5.0",
-    "@types/geojson": "7946.0.8",
-    "@types/proj4": "2.5.2",
-    "file-type": "^16.5.4",
+    "@ngageoint/projections-js": "1.0.2",
+    "@ngageoint/simple-features-geojson-js": "1.1.1",
+    "@ngageoint/simple-features-js": "1.1.1",
+    "@ngageoint/simple-features-proj-js": "1.1.3",
+    "@ngageoint/simple-features-wkb-js": "1.1.1",
+    "@ngageoint/simple-features-wkt-js": "1.1.1",
+    "@types/geojson": "7946.0.10",
+    "@types/offscreencanvas": "^2019.7.0",
     "image-size": "0.8.3",
-    "lodash": "4.17.21",
-    "proj4": "2.8.0",
-    "reproject": "1.2.5",
+    "lodash.sortedindex": "4.1.0",
+    "lodash.sortedindexof": "4.1.0",
     "rtree-sql.js": "1.7.0",
-    "simplify-js": "1.2.4",
-    "webworkify": "1.5.0",
-    "wkx": "0.4.8"
+    "simplify-js": "1.2.4"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "0.1.3",
     "@types/chai": "4.2.7",
     "@types/fs-extra": "9.0.11",
     "@types/lodash": "^4.14.157",
-    "@types/mocha": "5.2.7",
-    "@types/node": "^20.0.0",
-    "@typescript-eslint/eslint-plugin": "^2.16.0",
-    "@typescript-eslint/parser": "^2.16.0",
+    "@types/mocha": "10.0.1",
+    "@types/node": "16.6.2",
+    "@typescript-eslint/eslint-plugin": "5.49.0",
+    "@typescript-eslint/parser": "5.49.0",
     "babel-polyfill": "^6.23.0",
     "browserify": "16.5.0",
     "browserify-css": "0.15.0",
@@ -64,26 +56,27 @@
     "chai": "4.2.0",
     "copy-webpack-plugin": "^8.1.1",
     "coveralls": "^3.0.0",
-    "eslint": "^6.8.0",
-    "eslint-config-prettier": "^6.9.0",
-    "eslint-plugin-prettier": "^3.1.2",
+    "eslint": "8.32.0",
+    "eslint-config-prettier": "8.6.0",
+    "eslint-plugin-prettier": "4.2.1",
     "fs-extra": "9.1.0",
     "json-loader": "^0.5.7",
-    "mocha": "6.2.2",
+    "mocha": "10.1.0",
     "mocha-lcov-reporter": "^1.3.0",
     "nock": "11.7.0",
     "node-loader": "^2.0.0",
     "node-polyfill-webpack-plugin": "^1.1.0",
     "nyc": "^14.1.1",
-    "prettier": "^1.19.1",
+    "prettier": "2.8.3",
     "sass": "^1.29.0",
     "sass-loader": "^10.0.5",
+    "source-map-loader": "^4.0.1",
     "source-map-support": "0.5.16",
     "ts-loader": "^9.3.0",
-    "ts-node": "^8.5.2",
-    "typedoc": "^0.15.4",
-    "typescript": "^4.5.4",
-    "webpack": "^5.75.0",
+    "ts-node": "^10.9.1",
+    "typedoc": "0.23.24",
+    "typescript": "4.9.4",
+    "webpack": "~5.75.0",
     "webpack-bundle-analyzer": "4.4.1",
     "webpack-cli": "4.7.0",
     "xhr-mock": "2.5.1"
@@ -101,6 +94,13 @@
     "cli",
     "converters"
   ],
+  "madge": {
+    "detectiveOptions": {
+      "ts": {
+        "skipTypeImports": true
+      }
+    }
+  },
   "nyc": {
     "extends": "@istanbuljs/nyc-config-typescript",
     "temp-dir": "./.test_run",
@@ -111,15 +111,16 @@
   },
   "scripts": {
     "gh-pages-build": "npm install && npm run typedoc --options typedoc.json",
-    "typedoc": "rm -rf ./api-docs; typedoc --tsconfig tsconfig.json --mode file --out api-docs index.ts",
+    "typedoc": "rm -rf ./docs/api; typedoc --tsconfig tsconfig.json --out docs/api index.ts",
     "clean": "rm -rf ./.test_run; rm -rf ./.nyc_output; rm -rf ./docs/coverage; npm run clean-dist; npm run clean-test;",
     "clean-dist": "rm -rf ./dist",
-    "clean-test": "rm -rf ./test/bundle ./test/sql-wasm.wasm ./test/node_modules ./test/tmp",
+    "clean-test": "rm -rf test/bundle test/sql-wasm.wasm test/node_modules test/tmp",
     "test-node": "npm run clean; nyc --no-clean mocha -r ts-node/register",
-    "build-browser-test": "npm run clean && webpack -c browser.test.config.js --output-filename browser.test.bundle.js --mode=development",
+    "build-browser-test": "npm run clean && webpack -c browser.test.config.js --output-filename browser.test.bundle.js",
     "test": "npm run test-node && npm run report",
     "report": "nyc report",
     "build": "npm run clean && webpack && tsc",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "lint": "eslint ."
   }
 }

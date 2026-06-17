@@ -4,7 +4,7 @@
 //
 // describe('GeoPackageManager tests', function() {
 //
-//   it('should open the geopackage', function(done) {
+//   it('should open the geoPackage', function(done) {
 //     var filename = path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg');
 //     GeoPackageManager.open(filename, function(err, gp) {
 //       should.not.exist(err);
@@ -16,7 +16,7 @@
 //     });
 //   });
 //
-//   it('should fail to open the geopackage due to the extension', function(done) {
+//   it('should fail to open the geoPackage due to the extension', function(done) {
 //     var filename = path.join(__dirname, __filename);
 //     GeoPackageManager.open(filename, function(err, gp) {
 //       should.exist(err);

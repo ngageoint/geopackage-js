@@ -1,0 +1,9 @@
+dist
+docs
+canvaskit
+node_modules
+@types
+karma.conf.js
+.prettierrc.js
+.mocharc.js
+webpack.config.js

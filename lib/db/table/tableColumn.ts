@@ -4,7 +4,6 @@ import { GeoPackageDataType } from '../geoPackageDataType';
  * Table raw or unparsed constraint
  */
 export class TableColumn {
-
   /**
    * Column index
    */
@@ -69,7 +68,18 @@ export class TableColumn {
    * @param primaryKey primary key flag
    * @param autoincrement autoincrement flag
    */
-  constructor(index: number, name: string, type: string, dataType: GeoPackageDataType, max: number, notNull: boolean, defaultValueString: string, defaultValue: any, primaryKey: boolean, autoincrement: boolean) {
+  constructor(
+    index: number,
+    name: string,
+    type: string,
+    dataType: GeoPackageDataType,
+    max: number,
+    notNull: boolean,
+    defaultValueString: string,
+    defaultValue: any,
+    primaryKey: boolean,
+    autoincrement: boolean,
+  ) {
     this.index = index;
     this.name = name;
     this.type = type;
@@ -79,7 +89,7 @@ export class TableColumn {
     this.defaultValueString = defaultValueString;
     this.defaultValue = defaultValue;
     this.primaryKey = primaryKey;
-    this.autoincrement = autoincrement
+    this.autoincrement = autoincrement;
   }
 
   /**
@@ -96,7 +106,7 @@ export class TableColumn {
    *
    * @return column name
    */
-  getName() {
+  getName(): string {
     return this.name;
   }
 
@@ -105,7 +115,7 @@ export class TableColumn {
    *
    * @return column type
    */
-  getType() {
+  getType(): string {
     return this.type;
   }
 
@@ -114,7 +124,7 @@ export class TableColumn {
    *
    * @return column data type, may be null
    */
-  getDataType() {
+  getDataType(): GeoPackageDataType {
     return this.dataType;
   }
 

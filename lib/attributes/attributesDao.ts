@@ -1,52 +1,70 @@
-/**
- * @module attributes/attributesDao
- */
 import { UserDao } from '../user/userDao';
-import { GeoPackage } from '../geoPackage';
 import { AttributesTable } from './attributesTable';
 import { AttributesRow } from './attributesRow';
-import { Contents } from '../core/contents/contents';
-import { DBValue } from '../db/dbAdapter';
-import { GeoPackageDataType } from '../db/geoPackageDataType';
+import { AttributesConnection } from './attributesConnection';
+import { AttributesColumn } from './attributesColumn';
+import { AttributesResultSet } from './attributesResultSet';
+import { GeoPackageException } from '../geoPackageException';
+import { BoundingBox } from '../boundingBox';
+import { Projection } from '@ngageoint/projections-js';
+import type { GeoPackage } from '../geoPackage';
 
 /**
  * Attribute DAO for reading attribute user data tables
- * @class AttributesDao
- * @extends UserDao
- * @param  {module:geoPackage~GeoPackage} geoPackage              geopackage object
- * @param  {module:attributes/attributesTable~AttributeTable} table           attribute table
  */
-export class AttributesDao<T extends AttributesRow> extends UserDao<AttributesRow> {
+export class AttributesDao extends UserDao<AttributesColumn, AttributesTable, AttributesRow, AttributesResultSet> {
   /**
-   * Contents of this AttributeDao
-   * @member {module:core/contents~Contents}
+   * Attributes connection
    */
-  contents: Contents;
+  private readonly attributesDb: AttributesConnection;
 
-  constructor(geoPackage: GeoPackage, table: AttributesTable) {
-    super(geoPackage, table);
-    if (!table.contents) {
-      throw new Error('Attributes table has null Contents');
+  /**
+   * Constructor
+   * @param database
+   * @param geoPackage
+   * @param table
+   */
+  constructor(database: string, geoPackage: GeoPackage, table: AttributesTable) {
+    super(database, geoPackage, new AttributesConnection(geoPackage.getConnection()), table);
+    this.attributesDb = this.getUserDb() as AttributesConnection;
+    if (table.getContents() == null) {
+      throw new GeoPackageException('AttributesTable ' + table.getTableName() + ' has null Contents');
     }
-
-    this.contents = table.contents;
   }
 
-  get table(): AttributesTable {
-    return this._table as AttributesTable;
+  /**
+   * Not supported for Attributes
+   */
+  public getBoundingBox(): BoundingBox {
+    throw new GeoPackageException('Bounding Box not supported for Attributes');
+  }
+
+  /**
+   * Not implemented
+   * @param projection
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public getBoundingBoxWithProjection(projection: Projection): BoundingBox {
+    throw new GeoPackageException('Bounding Box not supported for Attributes');
+  }
+
+  getTable(): AttributesTable {
+    return super.getTable() as AttributesTable;
   }
 
   /**
    * Create a new attribute row with the column types and values
-   * @param  {Array} columnTypes column types
-   * @param  {module:dao/columnValues~ColumnValues[]} values      values
-   * @return {module:attributes/attributesRow~AttributeRow}             attribute row
    */
-  newRow(columnTypes?: { [key: string]: GeoPackageDataType }, values?: Record<string, DBValue>): AttributesRow {
-    return new AttributesRow(this.table, columnTypes, values);
+  newRow(): AttributesRow {
+    return new AttributesRow(this.getTable());
   }
 
-  static readTable(geoPackage: GeoPackage, tableName: string): AttributesDao<AttributesRow> {
-    return geoPackage.getAttributeDao(tableName);
+  /**
+   * Get the Attributes connection
+   *
+   * @return attributes connection
+   */
+  public getAttributesDb(): AttributesConnection {
+    return this.attributesDb;
   }
 }

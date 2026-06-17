@@ -1,6 +1,3 @@
-/**
- * @module user/custom
- */
 import { FeatureColumn } from './featureColumn';
 import { UserColumns } from '../../user/userColumns';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
@@ -17,7 +14,7 @@ export class FeatureColumns extends UserColumns<FeatureColumn> {
   /**
    * Geometry column index
    */
-  geometryIndex: number = -1;
+  geometryIndex = -1;
 
   constructor(tableName: string, geometryColumn: string, columns: FeatureColumn[], custom: boolean) {
     super(tableName, columns, custom);
@@ -30,9 +27,9 @@ export class FeatureColumns extends UserColumns<FeatureColumn> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
-  updateColumns() {
+  updateColumns(): void {
     super.updateColumns();
     let index = null;
     if (this.geometryColumn !== null && this.geometryColumn !== undefined) {
@@ -67,7 +64,7 @@ export class FeatureColumns extends UserColumns<FeatureColumn> {
    * Set the geometry column name
    * @param geometryColumn geometry column name
    */
-  setGeometryColumnName(geometryColumn: string) {
+  setGeometryColumnName(geometryColumn: string): void {
     this.geometryColumn = geometryColumn;
   }
 
@@ -83,7 +80,7 @@ export class FeatureColumns extends UserColumns<FeatureColumn> {
    * Set the geometry index
    * @param geometryIndex  geometry index
    */
-  setGeometryIndex(geometryIndex: number) {
+  setGeometryIndex(geometryIndex: number): void {
     this.geometryIndex = geometryIndex;
   }
 

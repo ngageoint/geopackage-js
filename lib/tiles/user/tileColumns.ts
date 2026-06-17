@@ -1,63 +1,55 @@
-/**
- * @module tiles/user/tileColumn
- */
-
-import { UserColumn } from '../../user/userColumn';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { TileColumn } from './tileColumn';
 import { UserColumns } from '../../user/userColumns';
 
 /**
- * `TileColumn` models columns in [user tile pyramid tables]{@link module:tiles/user/tileTable~TileTable}.
- *
- * @class
- * @extends UserColumn
+ * `TileColumn` models columns in [user tile pyramid tables]{@link TileTable}.
  */
 export class TileColumns extends UserColumns<TileColumn> {
   /**
    * Id column name, Requirement 52
    */
-  static ID: string = 'id';
+  public static readonly ID = 'id';
 
   /**
    * Zoom level column name, Requirement 53
    */
-  static ZOOM_LEVEL: string = 'zoom_level';
+  public static readonly ZOOM_LEVEL = 'zoom_level';
 
   /**
    * Tile column column name, Requirement 54
    */
-  static TILE_COLUMN: string = 'tile_column';
+  public static readonly TILE_COLUMN = 'tile_column';
 
   /**
    * Tile row column name, Requirement 55
    */
-  static TILE_ROW: string = 'tile_row';
+  public static readonly TILE_ROW = 'tile_row';
 
   /**
    * Tile ID column name, implied requirement
    */
-  static TILE_DATA: string = 'tile_data';
+  public static readonly TILE_DATA = 'tile_data';
 
   /**
    * Zoom level column index
    */
-  zoomLevelIndex: number = -1;
+  public zoomLevelIndex = -1;
 
   /**
    * Tile column column index
    */
-  tileColumnIndex: number = -1;
+  public tileColumnIndex = -1;
 
   /**
    * Tile row column index
    */
-  tileRowIndex: number = -1;
+  public tileRowIndex = -1;
 
   /**
    * Tile data column index
    */
-  tileDataIndex: number = -1;
+  public tileDataIndex = -1;
 
   /**
    * Constructor
@@ -71,26 +63,25 @@ export class TileColumns extends UserColumns<TileColumn> {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   copy(): TileColumns {
-    let tileColumns = new TileColumns(this._tableName, this._columns, this._custom);
+    const tileColumns = new TileColumns(this.getTableName(), this.getColumns(), this.isCustom());
     tileColumns.zoomLevelIndex = this.zoomLevelIndex;
     tileColumns.tileColumnIndex = this.tileColumnIndex;
     tileColumns.tileRowIndex = this.tileRowIndex;
     tileColumns.tileDataIndex = this.tileDataIndex;
     return tileColumns;
-
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
-  updateColumns() {
+  updateColumns(): void {
     super.updateColumns();
 
     // Find the required columns
-    let zoomLevel = this.getColumnIndex(TileColumns.ZOOM_LEVEL, false);
+    const zoomLevel = this.getColumnIndex(TileColumns.ZOOM_LEVEL, false);
     if (!this.isCustom()) {
       this.missingCheck(zoomLevel, TileColumns.ZOOM_LEVEL);
     }
@@ -99,7 +90,7 @@ export class TileColumns extends UserColumns<TileColumn> {
       this.zoomLevelIndex = zoomLevel;
     }
 
-    let tileColumn = this.getColumnIndex(TileColumns.TILE_COLUMN, false);
+    const tileColumn = this.getColumnIndex(TileColumns.TILE_COLUMN, false);
     if (!this.isCustom()) {
       this.missingCheck(tileColumn, TileColumns.TILE_COLUMN);
     }
@@ -108,7 +99,7 @@ export class TileColumns extends UserColumns<TileColumn> {
       this.tileColumnIndex = tileColumn;
     }
 
-    let tileRow = this.getColumnIndex(TileColumns.TILE_ROW, false);
+    const tileRow = this.getColumnIndex(TileColumns.TILE_ROW, false);
     if (!this.isCustom()) {
       this.missingCheck(tileRow, TileColumns.TILE_ROW);
     }
@@ -117,7 +108,7 @@ export class TileColumns extends UserColumns<TileColumn> {
       this.tileRowIndex = tileRow;
     }
 
-    let tileData = this.getColumnIndex(TileColumns.TILE_DATA, false);
+    const tileData = this.getColumnIndex(TileColumns.TILE_DATA, false);
     if (!this.isCustom()) {
       this.missingCheck(tileData, TileColumns.TILE_DATA);
     }
@@ -125,7 +116,6 @@ export class TileColumns extends UserColumns<TileColumn> {
       this.typeCheck(GeoPackageDataType.BLOB, this.getColumnForIndex(tileData));
       this.tileDataIndex = tileData;
     }
-
   }
 
   /**
@@ -140,7 +130,7 @@ export class TileColumns extends UserColumns<TileColumn> {
    * Set the zoom level index
    * @param zoomLevelIndex zoom level index
    */
-  setZoomLevelIndex(zoomLevelIndex: number) {
+  setZoomLevelIndex(zoomLevelIndex: number): void {
     this.zoomLevelIndex = zoomLevelIndex;
   }
 
@@ -178,7 +168,7 @@ export class TileColumns extends UserColumns<TileColumn> {
    * @param tileColumnIndex
    *            tile column index
    */
-  setTileColumnIndex(tileColumnIndex: number) {
+  setTileColumnIndex(tileColumnIndex: number): void {
     this.tileColumnIndex = tileColumnIndex;
   }
 
@@ -214,7 +204,7 @@ export class TileColumns extends UserColumns<TileColumn> {
    * Set the tile row index
    * @param tileRowIndex tile row index
    */
-  setTileRowIndex(tileRowIndex: number) {
+  setTileRowIndex(tileRowIndex: number): void {
     this.tileRowIndex = tileRowIndex;
   }
 
@@ -250,7 +240,7 @@ export class TileColumns extends UserColumns<TileColumn> {
    * Set the tile data index
    * @param tileDataIndex tile data index
    */
-  setTileDataIndex(tileDataIndex: number) {
+  setTileDataIndex(tileDataIndex: number): void {
     this.tileDataIndex = tileDataIndex;
   }
 

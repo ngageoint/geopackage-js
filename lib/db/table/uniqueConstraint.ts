@@ -22,7 +22,7 @@ export class UniqueConstraint extends Constraint {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   buildSql(): string {
     let sql = '';
@@ -41,7 +41,7 @@ export class UniqueConstraint extends Constraint {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public copy(): UniqueConstraint {
     return new UniqueConstraint(this.name, ...this.columns);
@@ -51,8 +51,8 @@ export class UniqueConstraint extends Constraint {
    * Add columns
    * @param columns columns
    */
-  add(...columns: UserColumn[]) {
-    columns.forEach(column => {
+  add(...columns: UserColumn[]): void {
+    columns.forEach((column) => {
       this.columns.push(column);
     });
   }
@@ -65,5 +65,4 @@ export class UniqueConstraint extends Constraint {
   getColumns(): UserColumn[] {
     return this.columns;
   }
-
 }

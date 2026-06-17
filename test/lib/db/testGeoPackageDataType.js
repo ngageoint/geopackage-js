@@ -1,10 +1,7 @@
 var GeoPackageDataType = require('../../../lib/db/geoPackageDataType').GeoPackageDataType;
 
-var should = require('chai').should();
-
-describe('GeoPackageDataType tests', function() {
-
-  it('get the enum name', function() {
+describe('GeoPackageDataType tests', function () {
+  it('get the enum name', function () {
     var name = GeoPackageDataType.nameFromType(0);
     name.should.be.equal('BOOLEAN');
     name = GeoPackageDataType.nameFromType(1);
@@ -33,7 +30,7 @@ describe('GeoPackageDataType tests', function() {
     name.should.be.equal('DATETIME');
   });
 
-  it('get the enum values', function() {
+  it('get the enum values', function () {
     var name = GeoPackageDataType.fromName('BOOLEAN');
     name.should.be.equal(0);
     name = GeoPackageDataType.fromName('TINYINT');
@@ -61,5 +58,4 @@ describe('GeoPackageDataType tests', function() {
     name = GeoPackageDataType.fromName('DATETIME');
     name.should.be.equal(12);
   });
-
 });

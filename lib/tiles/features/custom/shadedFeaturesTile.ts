@@ -1,5 +1,10 @@
 import { Canvas } from '../../../canvas/canvas';
-import { CustomFeaturesTile } from './customFeaturesTile';
+import { CustomFeaturesTile } from '../customFeaturesTile';
+import { FeatureIndexResults } from '../../../features/index/featureIndexResults';
+import { EmulatedCanvas2D } from '../../../../@types/canvaskit';
+import { FeatureResultSet } from '../../../features/user/featureResultSet';
+import { GeoPackageTile } from '../../geoPackageTile';
+import { ImageType } from '../../../image/imageType';
 
 /**
  * Draws a tile which is shaded to indicate too many features. By default a
@@ -7,10 +12,32 @@ import { CustomFeaturesTile } from './customFeaturesTile';
  * paint objects for each draw type can be modified to or set to null (except
  * for the text paint object).
  */
-export class ShadedFeaturesTile extends CustomFeaturesTile {
-  constructor() {
-    super();
+export class ShadedFeaturesTile implements CustomFeaturesTile {
+  /**
+   * Tile Border stroke width
+   */
+  protected tileBorderStrokeWidth: number;
+
+  /**
+   * Tile Border color
+   */
+  protected tileBorderColor: string;
+
+  /**
+   * Tile fill color
+   */
+  protected tileFillColor: string;
+
+  /**
+   * Flag indicating whether tiles should be drawn for feature tables that are
+   * not indexed
+   */
+  private drawUnindexedTiles: boolean;
+
+  public constructor() {
+    this.drawUnindexedTiles = true;
   }
+
   /**
    * Get the tile border stroke width
    * @return {Number} tile border stroke width
@@ -68,39 +95,32 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
   setDrawUnindexedTiles(drawUnindexedTiles: boolean): void {
     this.drawUnindexedTiles = drawUnindexedTiles;
   }
-  /**
-   * Get the compression format
-   * @return {String} the compression format (either png or jpeg)
-   */
-  getCompressFormat(): string {
-    return this.compressFormat;
-  }
-  /**
-   * Set the compression format
-   * @param {String} compressFormat either 'png' or 'jpeg'
-   */
-  setCompressFormat(compressFormat: string): void {
-    this.compressFormat = compressFormat;
-  }
+
   /**
    * Draw unindexed tile
    * @param tileWidth
    * @param tileHeight
+   * @param totalFeatureCount
+   * @param allFeatureResults
    * @param canvas
-   * @returns {Promise<String|Buffer>}
+   * @returns {Promise<GeoPackageTile>}
    */
   async drawUnindexedTile(
     tileWidth: number,
     tileHeight: number,
-    canvas: any = null,
-  ): Promise<string | Buffer | Uint8Array> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    totalFeatureCount: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    allFeatureResults: FeatureResultSet,
+    canvas?: EmulatedCanvas2D | HTMLCanvasElement,
+  ): Promise<GeoPackageTile> {
     let image = null;
     if (this.drawUnindexedTiles) {
       // Draw a tile indicating we have no idea if there are features
       // inside.
       // The table is not indexed and more features exist than the max
       // feature count set.
-      image = this.drawTile(tileWidth, tileHeight, '?', canvas);
+      image = this.drawTile(tileWidth, tileHeight, totalFeatureCount, undefined, canvas);
     }
     return image;
   }
@@ -108,45 +128,45 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
    * Draw a tile with the provided text label in the middle
    * @param {Number} tileWidth
    * @param {Number} tileHeight
-   * @param {String} text
-   * @param tileCanvas
-   * @return {Promise<String|Buffer>}
+   * @param tileFeatureCount
+   * @param featureIndexResults
+   * @param canvas
+   * @return {Promise<GeoPackageTile>}
    */
   async drawTile(
     tileWidth: number,
     tileHeight: number,
-    text: string,
-    tileCanvas: null,
-  ): Promise<string | Buffer | Uint8Array> {
+    tileFeatureCount: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    featureIndexResults: FeatureIndexResults,
+    canvas?: EmulatedCanvas2D | HTMLCanvasElement,
+  ): Promise<GeoPackageTile> {
     await Canvas.initializeAdapter();
-    return new Promise(resolve => {
-      let canvas;
-      let dispose = false;
-      if (tileCanvas !== undefined && tileCanvas !== null) {
-        canvas = tileCanvas;
-      } else {
-        canvas = Canvas.create(tileWidth, tileHeight);
-        dispose = true;
-      }
-      const context = canvas.getContext('2d');
-      context.clearRect(0, 0, tileWidth, tileHeight);
-      // Draw the tile border
-      if (this.tileFillColor !== null) {
-        context.fillStyle = this.tileFillColor;
-        context.fillRect(0, 0, tileWidth, tileHeight);
-      }
-      // Draw the tile border
-      if (this.tileBorderColor !== null) {
-        context.strokeStyle = this.tileBorderColor;
-        context.lineWidth = this.tileBorderStrokeWidth;
-        context.strokeRect(0, 0, tileWidth, tileHeight);
-      }
-      Canvas.toDataURL(canvas, 'image/' + this.compressFormat).then(result => {
-        if (dispose) {
-          Canvas.disposeCanvas(canvas);
-        }
-        resolve(result);
-      });
-    });
+    let tileCanvas;
+    let dispose = false;
+    if (canvas !== undefined && canvas !== null) {
+      tileCanvas = canvas;
+    } else {
+      tileCanvas = Canvas.create(tileWidth, tileHeight);
+      dispose = true;
+    }
+    const context = tileCanvas.getContext('2d');
+    context.clearRect(0, 0, tileWidth, tileHeight);
+    // Draw the tile border
+    if (this.tileFillColor !== null) {
+      context.fillStyle = this.tileFillColor;
+      context.fillRect(0, 0, tileWidth, tileHeight);
+    }
+    // Draw the tile border
+    if (this.tileBorderColor !== null) {
+      context.strokeStyle = this.tileBorderColor;
+      context.lineWidth = this.tileBorderStrokeWidth;
+      context.strokeRect(0, 0, tileWidth, tileHeight);
+    }
+    const data = await Canvas.toBytes(tileCanvas, ImageType.PNG);
+    if (dispose) {
+      Canvas.disposeCanvas(tileCanvas);
+    }
+    return new GeoPackageTile(tileWidth, tileHeight, data, ImageType.PNG);
   }
 }

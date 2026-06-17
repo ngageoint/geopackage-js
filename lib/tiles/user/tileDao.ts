@@ -1,166 +1,179 @@
-import proj4 from 'proj4';
 import { UserDao } from '../../user/userDao';
-import { TileMatrixDao } from '../matrix/tileMatrixDao';
-import { TileMatrixSetDao } from '../matrixset/tileMatrixSetDao';
-import { TileRow } from './tileRow';
-import { TileColumn } from './tileColumn';
-import { TileGrid } from '../tileGrid';
-import { ColumnValues } from '../../dao/columnValues';
-import { TileMatrix } from '../matrix/tileMatrix';
-import { TileBoundingBoxUtils } from '../tileBoundingBoxUtils';
-import { BoundingBox } from '../../boundingBox';
-import { SpatialReferenceSystem } from '../../core/srs/spatialReferenceSystem';
 import { TileMatrixSet } from '../matrixset/tileMatrixSet';
-import { GeoPackage } from '../../geoPackage';
+import { TileColumn } from './tileColumn';
+import { TileConnection } from './tileConnection';
+import { TileResultSet } from './tileResultSet';
+import { TileRow } from './tileRow';
 import { TileTable } from './tileTable';
-import { GeoPackageDataType } from '../../db/geoPackageDataType';
-import { DBValue } from '../../db/dbAdapter';
+import { TileMatrix } from '../matrix/tileMatrix';
+import { BoundingBox } from '../../boundingBox';
+import { Projection, ProjectionConstants, Projections, ProjectionTransform } from '@ngageoint/projections-js';
+import { GeoPackageException } from '../../geoPackageException';
+import { TileBoundingBoxUtils } from '../tileBoundingBoxUtils';
+import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
+import { TileGrid } from '../tileGrid';
 import { TileDaoUtils } from './tileDaoUtils';
-import { Projection } from '../../projection/projection';
-import { ProjectionConstants } from '../../projection/projectionConstants';
+import { SpatialReferenceSystem } from '../../srs/spatialReferenceSystem';
+import { FieldValues } from '../../dao/fieldValues';
+import { TileMatrixSetDao } from '../matrixset/tileMatrixSetDao';
+import { TileMatrixDao } from '../matrix/tileMatrixDao';
+import type { GeoPackage } from '../../geoPackage';
 
 /**
- * `TileDao` is a {@link module:dao/dao~Dao} subclass for reading
- * [user tile tables]{@link module:tiles/user/tileTable~TileTable}.
- *
- * @class TileDao
- * @extends UserDao
- * @param  {GeoPackageConnection} connection
- * @param  {TileTable} table
- * @param  {TileMatrixSet} tileMatrixSet
- * @param  {TileMatrix[]} tileMatrices
+ * Tile DAO for reading tile user tables
  */
-export class TileDao<T extends TileRow> extends UserDao<TileRow> {
-  zoomLevelToTileMatrix: TileMatrix[];
-  widths: number[];
-  heights: number[];
-  minZoom: number;
-  maxZoom: number;
-  srs: SpatialReferenceSystem;
-  projection: string;
-  minWebMapZoom: number;
-  maxWebMapZoom: number;
-  webZoomToGeoPackageZooms: Record<number, number>;
-  constructor(
+export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultSet> {
+  /**
+   * Tile connection
+   */
+  private readonly tileDb: TileConnection;
+
+  /**
+   * Tile Matrix Set
+   */
+  private readonly tileMatrixSet: TileMatrixSet;
+
+  /**
+   * Tile Matrices
+   */
+  private readonly tileMatrices: TileMatrix[];
+
+  /**
+   * Mapping between zoom levels and the tile matrix
+   */
+  private readonly zoomLevelToTileMatrix = {};
+
+  /**
+   * Min zoom
+   */
+  private readonly minZoom: number;
+
+  /**
+   * Max zoom
+   */
+  private readonly maxZoom: number;
+
+  /**
+   * Array of widths of the tiles at each zoom level in default units
+   */
+  private readonly widths: number[];
+
+  /**
+   * Array of heights of the tiles at each zoom level in default units
+   */
+  private readonly heights: number[];
+
+  private readonly webZoomToGeoPackageZooms: Map<number, number>;
+
+  /**
+   * Constructor
+   *
+   * @param database database
+   * @param geoPackage GeoPackage
+   * @param tileMatrixSet tile matrix set
+   * @param tileMatrices tile matrices
+   * @param table tile table
+   */
+  public constructor(
+    database: string,
     geoPackage: GeoPackage,
+    tileMatrixSet: TileMatrixSet,
+    tileMatrices: TileMatrix[],
     table: TileTable,
-    public tileMatrixSet: TileMatrixSet,
-    public tileMatrices: TileMatrix[],
   ) {
-    super(geoPackage, table);
-    this.zoomLevelToTileMatrix = [];
+    super(database, geoPackage, new TileConnection(geoPackage.getConnection()), table);
+    this.tileDb = this.getUserDb() as TileConnection;
+    this.tileMatrixSet = tileMatrixSet;
+    this.tileMatrices = tileMatrices;
     this.widths = [];
     this.heights = [];
-    if (tileMatrices.length === 0) {
+
+    this.projection = this.geoPackage.getTileMatrixSetDao().getProjection(tileMatrixSet);
+
+    // Set the min and max zoom levels
+    if (tileMatrices.length != 0) {
+      this.minZoom = tileMatrices[0].getZoomLevel();
+      this.maxZoom = tileMatrices[tileMatrices.length - 1].getZoomLevel();
+    } else {
       this.minZoom = 0;
       this.maxZoom = 0;
-    } else {
-      this.minZoom = this.tileMatrices[0].zoom_level;
-      this.maxZoom = this.tileMatrices[this.tileMatrices.length - 1].zoom_level;
     }
-    // Populate the zoom level to tile matrix and the sorted tile widths and heights
-    for (let i = this.tileMatrices.length - 1; i >= 0; i--) {
-      const tileMatrix = this.tileMatrices[i];
-      this.zoomLevelToTileMatrix[tileMatrix.zoom_level] = tileMatrix;
-    }
-    this.initialize();
-  }
-  initialize(): void {
-    const tileMatrixSetDao = this.geoPackage.tileMatrixSetDao;
-    this.srs = tileMatrixSetDao.getSrs(this.tileMatrixSet);
-    this.projection = [this.srs.organization.toUpperCase(), this.srs.organization_coordsys_id].join(':');
-    Projection.loadProjection(this.projection, this.srs.definition);
 
     // Populate the zoom level to tile matrix and the sorted tile widths and heights
-    for (let i = this.tileMatrices.length - 1; i >= 0; i--) {
-      const tileMatrix = this.tileMatrices[i];
-      let width = tileMatrix.pixel_x_size * tileMatrix.tile_width;
-      let height = tileMatrix.pixel_y_size * tileMatrix.tile_height;
-      const proj4Projection: proj4.Converter & { to_meter?: number } = Projection.getConverter(this.projection);
-      if (proj4Projection.to_meter) {
-        width = proj4Projection.to_meter * tileMatrix.pixel_x_size * tileMatrix.tile_width;
-        height = proj4Projection.to_meter * tileMatrix.pixel_y_size * tileMatrix.tile_height;
-      }
-      this.widths.push(width);
-      this.heights.push(height);
+    for (let i = 0; i < this.tileMatrices.length; i++) {
+      const tileMatrix = tileMatrices[i];
+      this.zoomLevelToTileMatrix[tileMatrix.getZoomLevel()] = tileMatrix;
+      this.widths.push(tileMatrix.getPixelXSize() * tileMatrix.getTileWidth());
+      this.heights.push(tileMatrix.getPixelYSize() * tileMatrix.getTileHeight());
     }
+
+    this.widths = this.widths.sort((a, b) => a - b);
+    this.heights = this.heights.sort((a, b) => a - b);
+
+    if (this.geoPackage.getTileMatrixSetDao().getContents(tileMatrixSet) == null) {
+      throw new GeoPackageException('TileMatrixSet ' + tileMatrixSet.getId() + ' has null Contents');
+    }
+    if (this.geoPackage.getTileMatrixSetDao().getSrs(tileMatrixSet.getSrsId()) == null) {
+      throw new GeoPackageException('TileMa trixSet ' + tileMatrixSet.getId() + ' has null SpatialReferenceSystem');
+    }
+    this.webZoomToGeoPackageZooms = new Map<number, number>();
     this.setWebMapZoomLevels();
   }
+
   webZoomToGeoPackageZoom(webZoom: number): number {
-    const webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(0, 0, webZoom);
-    return this.determineGeoPackageZoomLevel(webMercatorBoundingBox, webZoom);
+    return this.determineGeoPackageZoomLevel(webZoom);
   }
+
   setWebMapZoomLevels(): void {
-    this.minWebMapZoom = 20;
-    this.maxWebMapZoom = 0;
-    this.webZoomToGeoPackageZooms = {};
-    const totalTileWidth = this.tileMatrixSet.max_x - this.tileMatrixSet.min_x;
-    const totalTileHeight = this.tileMatrixSet.max_y - this.tileMatrixSet.min_y;
+    const totalTileWidth = this.tileMatrixSet.getMaxX() - this.tileMatrixSet.getMinX();
+    const totalTileHeight = this.tileMatrixSet.getMaxY() - this.tileMatrixSet.getMinY();
+
+    let transform;
+    try {
+      transform = new ProjectionTransform(this.projection, Projections.getWGS84Projection());
+    } catch (e) {
+      console.error('Failed to create a projection transformation.');
+      transform = null;
+    }
+
     for (let i = 0; i < this.tileMatrices.length; i++) {
       const tileMatrix = this.tileMatrices[i];
-      const singleTileWidth = totalTileWidth / tileMatrix.matrix_width;
-      const singleTileHeight = totalTileHeight / tileMatrix.matrix_height;
+      const singleTileWidth = totalTileWidth / tileMatrix.getMatrixWidth();
+      const singleTileHeight = totalTileHeight / tileMatrix.getMatrixHeight();
       const tileBox = new BoundingBox(
-        this.tileMatrixSet.min_x,
-        this.tileMatrixSet.min_x + singleTileWidth,
-        this.tileMatrixSet.min_y,
-        this.tileMatrixSet.min_y + singleTileHeight,
+        this.tileMatrixSet.getMinX(),
+        this.tileMatrixSet.getMinY(),
+        this.tileMatrixSet.getMinX() + singleTileWidth,
+        this.tileMatrixSet.getMinY() + singleTileHeight,
       );
-      const proj4Projection = Projection.getConverter(this.projection, ProjectionConstants.EPSG_4326);
-      const ne = proj4Projection.forward([tileBox.maxLongitude, tileBox.maxLatitude]);
-      const sw = proj4Projection.forward([tileBox.minLongitude, tileBox.minLatitude]);
-      const width = ne[0] - sw[0];
-      const zoom = Math.ceil(Math.log2(360 / width));
-      if (this.minWebMapZoom > zoom) {
-        this.minWebMapZoom = zoom;
+      if (transform != null) {
+        const ne = transform.transform(tileBox.getMaxLongitude(), tileBox.getMaxLatitude());
+        const sw = transform.transform(tileBox.getMinLongitude(), tileBox.getMinLatitude());
+        const width = ne[0] - sw[0];
+        const zoom = Math.ceil(Math.log2(360 / width));
+        this.webZoomToGeoPackageZooms.set(zoom, tileMatrix.getZoomLevel());
       }
-      if (this.maxWebMapZoom < zoom) {
-        this.maxWebMapZoom = zoom;
-      }
-      this.webZoomToGeoPackageZooms[zoom] = tileMatrix.zoom_level;
     }
   }
-  determineGeoPackageZoomLevel(webMercatorBoundingBox: BoundingBox, zoom: number): number {
-    return this.webZoomToGeoPackageZooms[zoom];
+
+  determineGeoPackageZoomLevel(zoom: number): number {
+    return this.webZoomToGeoPackageZooms.get(zoom);
   }
+
   /**
-   * Get the bounding box of tiles at the zoom level
-   * @param  {Number} zoomLevel zoom level
-   * @return {BoundingBox}           bounding box of the zoom level, or null if no tiles
+   * @inheritDoc
    */
-  getBoundingBoxWithZoomLevel(zoomLevel: number): BoundingBox {
-    let boundingBox;
-    const tileMatrix = this.getTileMatrixWithZoomLevel(zoomLevel);
-    if (tileMatrix) {
-      const tileGrid = this.queryForTileGridWithZoomLevel(zoomLevel);
-      if (tileGrid) {
-        const matrixSetBoundingBox = this.boundingBox;
-        boundingBox = TileBoundingBoxUtils.getTileGridBoundingBox(
-          matrixSetBoundingBox,
-          tileMatrix.matrix_width,
-          tileMatrix.matrix_height,
-          tileGrid,
-        );
-      }
-    }
-    return boundingBox;
+  public getBoundingBox(): BoundingBox {
+    return this.tileMatrixSet.getBoundingBox();
   }
-  get boundingBox(): BoundingBox {
-    return this.tileMatrixSet.boundingBox;
+
+  /**
+   * @inheritDoc
+   */
+  public getBoundingBoxWithProjection(projection: Projection): BoundingBox {
+    return this.geoPackage.getTileMatrixSetDao().getBoundingBoxWithProjection(this.tileMatrixSet, projection);
   }
-  queryForTileGridWithZoomLevel(zoomLevel: number): TileGrid {
-    const where = this.buildWhereWithFieldAndValue(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
-    const whereArgs = this.buildWhereArgs(zoomLevel);
-    const minX = this.minOfColumn(TileColumn.COLUMN_TILE_COLUMN, where, whereArgs);
-    const maxX = this.maxOfColumn(TileColumn.COLUMN_TILE_COLUMN, where, whereArgs);
-    const minY = this.minOfColumn(TileColumn.COLUMN_TILE_ROW, where, whereArgs);
-    const maxY = this.maxOfColumn(TileColumn.COLUMN_TILE_ROW, where, whereArgs);
-    let tileGrid;
-    if (minX != null && minY != null && maxX != null && maxY != null) {
-      tileGrid = new TileGrid(minX, maxX, minY, maxY);
-    }
-    return tileGrid;
-  }
+
   /**
    * Get the tile grid of the zoom level
    * @param  {Number} zoomLevel zoom level
@@ -168,75 +181,259 @@ export class TileDao<T extends TileRow> extends UserDao<TileRow> {
    */
   getTileGridWithZoomLevel(zoomLevel: number): TileGrid {
     let tileGrid;
-    const tileMatrix = this.getTileMatrixWithZoomLevel(zoomLevel);
+    const tileMatrix = this.getTileMatrix(zoomLevel);
     if (tileMatrix) {
-      tileGrid = new TileGrid(0, ~~tileMatrix.matrix_width - 1, 0, ~~tileMatrix.matrix_height - 1);
+      tileGrid = new TileGrid(0, 0, ~~tileMatrix.getMatrixWidth() - 1, ~~tileMatrix.getMatrixHeight() - 1);
     }
     return tileGrid;
   }
+
   /**
-   * get the tile table
-   * @return {TileTable} tile table
+   * Get the bounding box of tiles
+   * @param zoomLevel zoom level
+   * @return bounding box of zoom level, or null if no tiles
    */
-  get table(): TileTable {
-    return this._table as TileTable;
+  public getBoundingBoxAtZoomLevel(zoomLevel): BoundingBox {
+    let boundingBox = null;
+    const tileMatrix = this.getTileMatrix(zoomLevel);
+    if (tileMatrix != null) {
+      const tileGrid = this.queryForTileGrid(zoomLevel);
+      if (tileGrid != null) {
+        const matrixSetBoundingBox = this.getBoundingBox();
+        boundingBox = TileBoundingBoxUtils.getBoundingBoxWithTileMatrixAndTileGrid(
+          matrixSetBoundingBox,
+          tileMatrix,
+          tileGrid,
+        );
+      }
+    }
+    return boundingBox;
   }
+
   /**
-   * Create a new tile row with the column types and values
-   * @param  {Array} columnTypes column types
-   * @param  {Array} values      values
-   * @return {TileRow}             tile row
+   * Get the bounding box of tiles at the zoom level
+   * @param zoomLevel zoom level
+   * @param projection desired projection
+   * @return bounding box of zoom level, or nil if no tiles
    */
-  newRow(columnTypes?: { [key: string]: GeoPackageDataType }, values?: Record<string, DBValue>): TileRow {
-    return new TileRow(this.table, columnTypes, values);
+  public getBoundingBoxAtZoomLevelWithProjection(zoomLevel: number, projection: Projection): BoundingBox {
+    let boundingBox = this.getBoundingBoxAtZoomLevel(zoomLevel);
+    if (boundingBox != null) {
+      const transform = GeometryTransform.create(this.projection, projection);
+      boundingBox = boundingBox.transform(transform);
+    }
+    return boundingBox;
   }
+
+  /**
+   * Get the tile grid of the zoom level
+   *
+   * @param zoomLevel
+   *            zoom level
+   * @return tile grid at zoom level, null if not tile matrix at zoom level
+   */
+  public getTileGrid(zoomLevel: number): TileGrid {
+    let tileGrid = null;
+    const tileMatrix = this.getTileMatrix(zoomLevel);
+    if (tileMatrix != null) {
+      tileGrid = new TileGrid(0, 0, tileMatrix.getMatrixWidth() - 1, tileMatrix.getMatrixHeight() - 1);
+    }
+    return tileGrid;
+  }
+
   /**
    * Adjust the tile matrix lengths if needed. Check if the tile matrix width
    * and height need to expand to account for pixel * number of pixels fitting
    * into the tile matrix lengths
    */
-  adjustTileMatrixLengths(): void {
-    const tileMatrixWidth = this.tileMatrixSet.max_x - this.tileMatrixSet.min_x;
-    const tileMatrixHeight = this.tileMatrixSet.max_y - this.tileMatrixSet.min_y;
-    for (let i = 0; i < this.tileMatrices.length; i++) {
-      const tileMatrix = this.tileMatrices[i];
-      const tempMatrixWidth = ~~(tileMatrixWidth / (tileMatrix.pixel_x_size * ~~tileMatrix.tile_width));
-      const tempMatrixHeight = ~~(tileMatrixHeight / (tileMatrix.pixel_y_size * ~~tileMatrix.tile_height));
-      if (tempMatrixWidth > ~~tileMatrix.matrix_width) {
-        tileMatrix.matrix_width = ~~tempMatrixWidth;
-      }
-      if (tempMatrixHeight > ~~tileMatrix.matrix_height) {
-        tileMatrix.matrix_height = ~~tempMatrixHeight;
-      }
-    }
-  }
-  /**
-   * Get the tile matrix at the zoom level
-   * @param  {Number} zoomLevel zoom level
-   * @returns {TileMatrix}           tile matrix
-   */
-  getTileMatrixWithZoomLevel(zoomLevel: number): TileMatrix {
-    return this.zoomLevelToTileMatrix[zoomLevel];
+  public adjustTileMatrixLengths(): void {
+    TileDaoUtils.adjustTileMatrixLengths(this.tileMatrixSet, this.tileMatrices);
   }
 
+  /**
+   * @inheritDoc
+   */
+  public newRow(): TileRow {
+    return new TileRow(this.getTable());
+  }
+
+  /**
+   * Get the Tile connection
+   * @return tile connection
+   */
+  public getTileDb(): TileConnection {
+    return this.tileDb;
+  }
+
+  /**
+   * Get the tile matrix set
+   *
+   * @return tile matrix set
+   */
+  public getTileMatrixSet(): TileMatrixSet {
+    return this.tileMatrixSet;
+  }
+
+  /**
+   * Get the tile matrices
+   *
+   * @return tile matrices
+   */
+  public getTileMatrices(): TileMatrix[] {
+    return this.tileMatrices;
+  }
+
+  /**
+   * Get the zoom levels
+   * @return zoom level set
+   */
+  public getZoomLevels(): number[] {
+    return Object.keys(this.zoomLevelToTileMatrix).map((key) => Number.parseInt(key));
+  }
+
+  /**
+   * Get the tile matrix at the zoom level
+   * @param zoomLevel zoom level
+   * @return tile matrix
+   */
+  public getTileMatrix(zoomLevel: number): TileMatrix {
+    let tileMatrix = null;
+    if (zoomLevel != null) {
+      tileMatrix = this.zoomLevelToTileMatrix[zoomLevel];
+    }
+    return tileMatrix;
+  }
+
+  /**
+   * Get the tile matrix at the min (first) zoom
+   * @return tile matrix
+   */
+  public getTileMatrixAtMinZoom(): TileMatrix {
+    const minZoom = Math.min(...Object.keys(this.zoomLevelToTileMatrix).map((key) => Number.parseInt(key)));
+    return this.zoomLevelToTileMatrix[minZoom];
+  }
+
+  /**
+   * Get the Spatial Reference System
+   * @return srs
+   */
+  public getSrs(): SpatialReferenceSystem {
+    return this.geoPackage.getSpatialReferenceSystemDao().queryForIdWithKey(this.tileMatrixSet.getSrsId());
+  }
+
+  /**
+   * Get the Spatial Reference System id
+   * @return srs id
+   */
+  public getSrsId(): number {
+    return this.tileMatrixSet.getSrsId();
+  }
+
+  /**
+   * Get the min zoom
+   * @return min zoom
+   */
+  public getMinZoom(): number {
+    return this.minZoom;
+  }
+
+  /**
+   * Get the max zoom
+   * @return max zoom
+   */
+  public getMaxZoom(): number {
+    return this.maxZoom;
+  }
+
+  /**
+   * Query for a Tile
+   * @param column column
+   * @param row row
+   * @param zoomLevel zoom level
+   * @return tile row
+   */
+  public queryForTile(column: number, row: number, zoomLevel: number): TileRow {
+    const fieldValues = new FieldValues();
+    fieldValues.addFieldValue(TileTable.COLUMN_TILE_COLUMN, column);
+    fieldValues.addFieldValue(TileTable.COLUMN_TILE_ROW, row);
+    fieldValues.addFieldValue(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
+    const resultSet = this.queryForFieldValues(fieldValues);
+    let tileRow = null;
+    if (resultSet.moveToNext()) {
+      tileRow = resultSet.getRow();
+    }
+    resultSet.close();
+    return tileRow;
+  }
+
+  /**
+   * Query for Tiles at a zoom level
+   * @param zoomLevel zoom level
+   * @return tile result set, should be closed
+   */
+  public queryForTiles(zoomLevel: number): TileResultSet {
+    return this.queryForEq(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
+  }
+
+  /**
+   * Query for Tiles at a zoom level in descending row and column order
+   * @param zoomLevel zoom level
+   * @return tile result set, should be closed
+   */
+  public queryForTilesDescending(zoomLevel: number): TileResultSet {
+    return this.queryForEq(
+      TileTable.COLUMN_ZOOM_LEVEL,
+      zoomLevel,
+      null,
+      null,
+      TileTable.COLUMN_TILE_ROW + ' DESC, ' + TileTable.COLUMN_TILE_COLUMN + ' DESC',
+    );
+  }
+
+  /**
+   * Query for Tiles at a zoom level and column
+   * @param column column
+   * @param zoomLevel zoom level
+   * @return tile result set
+   */
+  public queryForTilesInColumn(column: number, zoomLevel: number): TileResultSet {
+    const fieldValues = new FieldValues();
+    fieldValues.addFieldValue(TileTable.COLUMN_TILE_COLUMN, column);
+    fieldValues.addFieldValue(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
+    return this.queryForFieldValues(fieldValues);
+  }
+
+  /**
+   * Query for Tiles at a zoom level and row
+   *
+   * @param row row
+   * @param zoomLevel zoom level
+   * @return tile result set
+   */
+  public queryForTilesInRow(row: number, zoomLevel: number): TileResultSet {
+    const fieldValues = new FieldValues();
+    fieldValues.addFieldValue(TileTable.COLUMN_TILE_ROW, row);
+    fieldValues.addFieldValue(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
+    return this.queryForFieldValues(fieldValues);
+  }
 
   /**
    * Get the zoom level for the provided width and height in the default units
    * @param length in default units
    * @return zoom level
    */
-  getZoomLevelForLength(length: number): number {
+  public getZoomLevel(length: number): number {
     return TileDaoUtils.getZoomLevelForLength(this.widths, this.heights, this.tileMatrices, length);
   }
 
   /**
    * Get the zoom level for the provided width and height in the default units
+   *
    * @param width in default units
    * @param height in default units
    * @return zoom level
-   * @since 1.2.1
    */
-  getZoomLevelForWidthAndHeight(width: number, height: number): number {
+  public getZoomLevelForWidthAndHeight(width: number, height: number): number {
     return TileDaoUtils.getZoomLevelForWidthAndHeight(this.widths, this.heights, this.tileMatrices, width, height);
   }
 
@@ -245,22 +442,27 @@ export class TileDao<T extends TileRow> extends UserDao<TileRow> {
    * default units
    * @param length in default units
    * @return zoom level
-   * @since 1.2.1
    */
-  getClosestZoomLevelForLength(length: number): number {
+  public getClosestZoomLevel(length: number): number {
     return TileDaoUtils.getClosestZoomLevelForLength(this.widths, this.heights, this.tileMatrices, length);
   }
 
   /**
    * Get the closest zoom level for the provided width and height in the
    * default units
+   *
    * @param width in default units
    * @param height in default units
    * @return zoom level
-   * @since 1.2.1
    */
-  getClosestZoomLevelForWidthAndHeight(width: number, height: number): number {
-    return TileDaoUtils.getClosestZoomLevelForWidthAndHeight(this.widths, this.heights, this.tileMatrices, width, height);
+  public getClosestZoomLevelForWidthAndHeight(width: number, height: number): number {
+    return TileDaoUtils.getClosestZoomLevelForWidthAndHeight(
+      this.widths,
+      this.heights,
+      this.tileMatrices,
+      width,
+      height,
+    );
   }
 
   /**
@@ -270,9 +472,8 @@ export class TileDao<T extends TileRow> extends UserDao<TileRow> {
    * levels with tiles.
    * @param length length in default units
    * @return approximate zoom level
-   * @since 2.0.2
    */
-  getApproximateZoomLevelForLength(length: number): number {
+  public getApproximateZoomLevel(length: number): number {
     return TileDaoUtils.getApproximateZoomLevelForLength(this.widths, this.heights, this.tileMatrices, length);
   }
 
@@ -284,272 +485,210 @@ export class TileDao<T extends TileRow> extends UserDao<TileRow> {
    * @param width width in default units
    * @param height height in default units
    * @return approximate zoom level
-   * @since 2.0.2
    */
-  getApproximateZoomLevelForWidthAndHeight(width: number, height: number): number {
-    return TileDaoUtils.getApproximateZoomLevelForWidthAndHeight(this.widths, this.heights, this.tileMatrices, width, height);
+  public getApproximateZoomLevelForWidthAndHeight(width: number, height: number): number {
+    return TileDaoUtils.getApproximateZoomLevelForWidthAndHeight(
+      this.widths,
+      this.heights,
+      this.tileMatrices,
+      width,
+      height,
+    );
   }
 
   /**
    * Get the max length in default units that contains tiles
    * @return max distance length with tiles
-   * @since 1.2.0
    */
-  getMaxLength(): number {
+  public getMaxLength(): number {
     return TileDaoUtils.getMaxLengthForTileWidthsAndHeights(this.widths, this.heights);
   }
 
   /**
    * Get the min length in default units that contains tiles
    * @return min distance length with tiles
-   * @since 1.2.0
    */
-  getMinLength(): number {
+  public getMinLength(): number {
     return TileDaoUtils.getMinLengthForTileWidthsAndHeights(this.widths, this.heights);
   }
 
   /**
-   * Query for a tile
-   * @param  {Number} column    column
-   * @param  {Number} row       row
-   * @param  {Number} zoomLevel zoom level
-   */
-  queryForTile(column: number, row: number, zoomLevel: number): TileRow {
-    const fieldValues = new ColumnValues();
-    fieldValues.addColumn(TileColumn.COLUMN_TILE_COLUMN, column);
-    fieldValues.addColumn(TileColumn.COLUMN_TILE_ROW, row);
-    fieldValues.addColumn(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
-    let tileRow;
-    for (const rawRow of this.queryForFieldValues(fieldValues)) {
-      tileRow = this.getRow(rawRow) as TileRow;
-    }
-    return tileRow;
-  }
-  queryForTilesWithZoomLevel(zoomLevel: number): IterableIterator<TileRow> {
-    const iterator = this.queryForEach(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
-    return {
-      [Symbol.iterator](): IterableIterator<TileRow> {
-        return this;
-      },
-      next: (): IteratorResult<TileRow> => {
-        const nextRow = iterator.next();
-        if (!nextRow.done) {
-          return {
-            value: this.getRow(nextRow.value) as TileRow,
-            done: false,
-          };
-        }
-        return {
-          value: undefined,
-          done: true,
-        };
-      },
-    };
-  }
-  /**
-   * Query for Tiles at a zoom level in descending row and column order
-   * @param  {Number} zoomLevel    zoom level
-   * @returns {IterableIterator<TileRow>}
-   */
-  queryForTilesDescending(zoomLevel: number): IterableIterator<TileRow> {
-    const iterator = this.queryForEach(
-      TileColumn.COLUMN_ZOOM_LEVEL,
-      zoomLevel,
-      undefined,
-      undefined,
-      TileColumn.COLUMN_TILE_COLUMN + ' DESC, ' + TileColumn.COLUMN_TILE_ROW + ' DESC',
-    );
-    return {
-      [Symbol.iterator](): IterableIterator<TileRow> {
-        return this;
-      },
-      next: (): IteratorResult<TileRow> => {
-        const nextRow = iterator.next();
-        if (!nextRow.done) {
-          return {
-            value: this.getRow(nextRow.value) as TileRow,
-            done: false,
-          };
-        }
-        return {
-          value: undefined,
-          done: true,
-        };
-      },
-    };
-  }
-  /**
-   * Query for tiles at a zoom level and column
-   * @param  {Number} column       column
-   * @param  {Number} zoomLevel    zoom level
-   * @returns {IterableIterator<TileRow>}
-   */
-  queryForTilesInColumn(column: number, zoomLevel: number): IterableIterator<TileRow> {
-    const fieldValues = new ColumnValues();
-    fieldValues.addColumn(TileColumn.COLUMN_TILE_COLUMN, column);
-    fieldValues.addColumn(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
-    const iterator = this.queryForFieldValues(fieldValues);
-    return {
-      [Symbol.iterator](): IterableIterator<TileRow> {
-        return this;
-      },
-      next: (): IteratorResult<TileRow> => {
-        const nextRow = iterator.next();
-        if (!nextRow.done) {
-          const tileRow = this.getRow(nextRow.value) as TileRow;
-          return {
-            value: tileRow,
-            done: false,
-          };
-        } else {
-          return {
-            value: undefined,
-            done: true,
-          };
-        }
-      },
-    };
-  }
-  /**
-   * Query for tiles at a zoom level and row
-   * @param  {Number} row       row
-   * @param  {Number} zoomLevel    zoom level
-   */
-  queryForTilesInRow(row: number, zoomLevel: number): IterableIterator<TileRow> {
-    const fieldValues = new ColumnValues();
-    fieldValues.addColumn(TileColumn.COLUMN_TILE_ROW, row);
-    fieldValues.addColumn(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
-    const iterator = this.queryForFieldValues(fieldValues);
-    return {
-      [Symbol.iterator](): IterableIterator<TileRow> {
-        return this;
-      },
-      next: (): IteratorResult<TileRow> => {
-        const nextRow = iterator.next();
-        if (!nextRow.done) {
-          const tileRow = this.getRow(nextRow.value) as TileRow;
-          return {
-            value: tileRow,
-            done: false,
-          };
-        } else {
-          return {
-            value: undefined,
-            done: true,
-          };
-        }
-      },
-    };
-  }
-  /**
    * Query by tile grid and zoom level
-   * @param  {TileGrid} tileGrid  tile grid
-   * @param  {Number} zoomLevel zoom level
-   * @returns {IterableIterator<any>}
+   * @param tileGrid tile grid
+   * @param zoomLevel zoom level
+   * @param orderBy order by
+   * @return result set from query or null if the zoom level tile ranges do not overlap the bounding box
    */
-  queryByTileGrid(tileGrid: TileGrid, zoomLevel: number): IterableIterator<TileRow> {
-    if (!tileGrid) return;
-    let where = '';
-    where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
-    where += ' and ';
-    where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_TILE_COLUMN, tileGrid.min_x, '>=');
-    where += ' and ';
-    where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_TILE_COLUMN, tileGrid.max_x, '<=');
-    where += ' and ';
-    where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_TILE_ROW, tileGrid.min_y, '>=');
-    where += ' and ';
-    where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_TILE_ROW, tileGrid.max_y, '<=');
-    const whereArgs = this.buildWhereArgs([zoomLevel, tileGrid.min_x, tileGrid.max_x, tileGrid.min_y, tileGrid.max_y]);
-    const iterator = this.queryWhereWithArgsDistinct(where, whereArgs);
-    return {
-      [Symbol.iterator](): IterableIterator<TileRow> {
-        return this;
-      },
-      next: (): IteratorResult<TileRow> => {
-        const nextRow = iterator.next();
-        if (!nextRow.done) {
-          const tileRow = this.getRow(nextRow.value) as TileRow;
-          return {
-            value: tileRow,
-            done: false,
-          };
-        } else {
-          return {
-            value: undefined,
-            done: true,
-          };
-        }
-      },
-    };
-  }
-  /**
-   * count by tile grid and zoom level
-   * @param  {TileGrid} tileGrid  tile grid
-   * @param  {Number} zoomLevel zoom level
-   * @returns {Number} count of tiles
-   */
-  countByTileGrid(tileGrid: TileGrid, zoomLevel: number): number {
-    if (!tileGrid) return;
-    let where = '';
-    where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
-    where += ' and ';
-    where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_TILE_COLUMN, tileGrid.min_x, '>=');
-    where += ' and ';
-    where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_TILE_COLUMN, tileGrid.max_x, '<=');
-    where += ' and ';
-    where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_TILE_ROW, tileGrid.min_y, '>=');
-    where += ' and ';
-    where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_TILE_ROW, tileGrid.max_y, '<=');
-    const whereArgs = this.buildWhereArgs([zoomLevel, tileGrid.min_x, tileGrid.max_x, tileGrid.min_y, tileGrid.max_y]);
-    return this.countWhere(where, whereArgs);
-  }
-
-  deleteTile(column: number, row: number, zoomLevel: number): number {
-    let where = '';
-    where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
-    where += ' and ';
-    where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_TILE_COLUMN, column);
-    where += ' and ';
-    where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_TILE_ROW, row);
-    const whereArgs = this.buildWhereArgs([zoomLevel, column, row]);
-    return this.deleteWhere(where, whereArgs);
-  }
-  dropTable(): boolean {
-    const tileMatrixDao = this.geoPackage.tileMatrixDao;
-    const dropResult = UserDao.prototype.dropTable.call(this);
-    const tileMatrixSetDao = this.geoPackage.tileMatrixSetDao;
-    tileMatrixSetDao.delete(this.tileMatrixSet);
-    for (let i = this.tileMatrices.length - 1; i >= 0; i--) {
-      const tileMatrix = this.tileMatrices[i];
-      tileMatrixDao.delete(tileMatrix);
+  public queryByTileGrid(tileGrid: TileGrid, zoomLevel: number, orderBy?: string): TileResultSet {
+    let tileResultSet = null;
+    if (tileGrid != null) {
+      const where = [];
+      where.push(this.buildWhere(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel));
+      where.push(' AND ');
+      where.push(this.buildWhereWithOp(TileTable.COLUMN_TILE_COLUMN, tileGrid.getMinX(), '>='));
+      where.push(' AND ');
+      where.push(this.buildWhereWithOp(TileTable.COLUMN_TILE_COLUMN, tileGrid.getMaxX(), '<='));
+      where.push(' AND ');
+      where.push(this.buildWhereWithOp(TileTable.COLUMN_TILE_ROW, tileGrid.getMinY(), '>='));
+      where.push(' AND ');
+      where.push(this.buildWhereWithOp(TileTable.COLUMN_TILE_ROW, tileGrid.getMaxY(), '<='));
+      const whereArgs = [zoomLevel, tileGrid.getMinX(), tileGrid.getMaxX(), tileGrid.getMinY(), tileGrid.getMaxY()];
+      tileResultSet = this.query(where.join(''), whereArgs, null, null, orderBy);
     }
-    const dao = this.geoPackage.contentsDao;
-    dao.deleteById(this.gpkgTableName);
-    return dropResult;
-  }
-  rename(newName: string): void {
-    super.rename(newName);
-    const oldName = this.tileMatrixSet.table_name;
-    const values: Record<string, DBValue> = {};
-    values[TileMatrixSetDao.COLUMN_TABLE_NAME] = newName;
-    const where = this.buildWhereWithFieldAndValue(TileMatrixSetDao.COLUMN_TABLE_NAME, oldName);
-    const whereArgs = this.buildWhereArgs([oldName]);
-    const contentsDao = this.geoPackage.contentsDao;
-    const contents = contentsDao.queryForId(oldName);
-    contents.table_name = newName;
-    contents.identifier = newName;
-    contentsDao.create(contents);
-    const tileMatrixSetDao = this.geoPackage.tileMatrixSetDao;
-    tileMatrixSetDao.updateWithValues(values, where, whereArgs);
-    const tileMatrixDao = this.geoPackage.tileMatrixDao;
-    const tileMatrixUpdate: Record<string, DBValue> = {};
-    tileMatrixUpdate[TileMatrixDao.COLUMN_TABLE_NAME] = newName;
-    const tileMatrixWhere = this.buildWhereWithFieldAndValue(TileMatrixDao.COLUMN_TABLE_NAME, oldName);
-    tileMatrixDao.updateWithValues(tileMatrixUpdate, tileMatrixWhere, whereArgs);
-    contentsDao.deleteById(oldName);
+
+    return tileResultSet;
   }
 
-  static readTable(geoPackage: GeoPackage, tableName: string): TileDao<TileRow> {
-    return geoPackage.getTileDao(tableName);
+  /**
+   * Query for the bounding
+   * @param zoomLevel zoom level
+   * @return tile grid of tiles at the zoom level
+   */
+  public queryForTileGrid(zoomLevel: number): TileGrid {
+    const where = this.buildWhere(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
+    const whereArgs = [zoomLevel];
+
+    const minX = this.min(TileTable.COLUMN_TILE_COLUMN, where, whereArgs);
+    const maxX = this.max(TileTable.COLUMN_TILE_COLUMN, where, whereArgs);
+    const minY = this.min(TileTable.COLUMN_TILE_ROW, where, whereArgs);
+    const maxY = this.max(TileTable.COLUMN_TILE_ROW, where, whereArgs);
+
+    let tileGrid = null;
+    if (minX != null && maxX != null && minY != null && maxY != null) {
+      tileGrid = new TileGrid(minX, minY, maxX, maxY);
+    }
+
+    return tileGrid;
+  }
+
+  /**
+   * Delete a Tile
+   * @param column column
+   * @param row row
+   * @param zoomLevel zoom level
+   * @return number deleted, should be 0 or 1
+   */
+  public deleteTile(column: number, row: number, zoomLevel: number): number {
+    const where = [];
+    where.push(this.buildWhere(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel));
+    where.push(' AND ');
+    where.push(this.buildWhere(TileTable.COLUMN_TILE_COLUMN, column));
+    where.push(' AND ');
+    where.push(this.buildWhere(TileTable.COLUMN_TILE_ROW, row));
+    const whereArgs = [zoomLevel, column, row];
+    return this.delete(where.join(''), whereArgs);
+  }
+
+  /**
+   * Count of Tiles at a zoom level
+   *
+   * @param zoomLevel
+   *            zoom level
+   * @return count
+   */
+  public countAtZoomLevel(zoomLevel: number): number {
+    const where = this.buildWhere(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
+    const whereArgs = [zoomLevel];
+    return super.count(where, whereArgs);
+  }
+
+  /**
+   * Determine if the tiles are in the XYZ tile coordinate format
+   *
+   * @return true if XYZ tile format
+   */
+  public isXYZTiles(): boolean {
+    // Convert the bounding box to wgs84
+    const boundingBox = this.tileMatrixSet.getBoundingBox();
+    const wgs84BoundingBox = boundingBox.transform(
+      GeometryTransform.create(this.projection, ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM),
+    );
+
+    let xyzTiles = false;
+
+    // Verify the bounds are the entire world
+    if (
+      wgs84BoundingBox.getMinLatitude() <= ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE &&
+      wgs84BoundingBox.getMaxLatitude() >= ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE &&
+      wgs84BoundingBox.getMinLongitude() <= -ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH &&
+      wgs84BoundingBox.getMaxLongitude() >= ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH
+    ) {
+      xyzTiles = true;
+
+      // Verify each tile matrix is the correct width and height
+      for (const tileMatrix of this.tileMatrices) {
+        const zoomLevel = tileMatrix.getZoomLevel();
+        const tilesPerSide = TileBoundingBoxUtils.tilesPerSide(zoomLevel);
+        if (tileMatrix.getMatrixWidth() != tilesPerSide || tileMatrix.getMatrixHeight() != tilesPerSide) {
+          xyzTiles = false;
+          break;
+        }
+      }
+    }
+
+    return xyzTiles;
+  }
+
+  /**
+   * Get the map zoom level range
+   * @return map zoom level range, min at index 0, max at index 1
+   */
+  public getMapZoomRange(): number[] {
+    return TileDaoUtils.getMapZoomRange(this, this.tileMatrixSet, this.tileMatrices);
+  }
+
+  /**
+   * Get the map min zoom level
+   *
+   * @return map min zoom level
+   */
+  public getMapMinZoom(): number {
+    return TileDaoUtils.getMapMinZoom(this, this.tileMatrixSet, this.tileMatrices);
+  }
+
+  /**
+   * Get the map max zoom level
+   *
+   * @return map max zoom level
+   */
+  public getMapMaxZoom(): number {
+    return TileDaoUtils.getMapMaxZoom(this, this.tileMatrixSet, this.tileMatrices);
+  }
+
+  /**
+   * Get the map zoom level from the tile matrix
+   *
+   * @param tileMatrix tile matrix
+   * @return map zoom level
+   */
+  public getMapZoomWithTileMatrix(tileMatrix: TileMatrix): number {
+    return TileDaoUtils.getMapZoomWithTileMatrixSetAndTileMatrix(this, this.tileMatrixSet, tileMatrix);
+  }
+
+  /**
+   * Get the map zoom level from the tile matrix zoom level
+   *
+   * @param zoomLevel tile matrix zoom level
+   * @return map zoom level
+   */
+  public getMapZoom(zoomLevel: number): number {
+    return this.getMapZoomWithTileMatrix(this.getTileMatrix(zoomLevel));
+  }
+
+  /**
+   * Get a tile matrix set DAO
+   * @return tile matrix set DAO
+   */
+  public getTileMatrixSetDao(): TileMatrixSetDao {
+    return this.geoPackage.getTileMatrixSetDao();
+  }
+
+  /**
+   * Get a tile matrix DAO
+   *
+   * @return tile matrix DAO
+   */
+  public getTileMatrixDao(): TileMatrixDao {
+    return this.geoPackage.getTileMatrixDao();
   }
 }

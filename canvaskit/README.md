@@ -15,11 +15,12 @@
 * Install google skia and checkout latest tagged version
   * ```git clone https://skia.googlesource.com/skia.git```
   * ```cd skia```
-  * ```python2 tools/git-sync-deps```
+  * ```python3 tools/git-sync-deps```
+  * ```bin/fetch-ninja```
   * ```git checkout canvaskit/0.25.1```
 * Build stripped down version of CanvasKit for GeoPackage
   * ```cd modules/canvaskit```
-  * ```./compile.sh release no_skottie no_particles no_rt_shader no_paragraph no_woff2 no_alias_font no_effects_deserialization no_skp_serialization```
+  * ```./compile.sh release no_skottie no_particles no_rt_shader no_paragraph no_woff2 no_alias_font no_effects_deserialization no_skp_serialization force_encode_jpeg force_encode_webp```
 * Copy CanvasKit js/wasm files to geopackage library
   * ```cd ../../out/canvaskit_wasm```
   * ```cp canvaskit.js /path/to/geopackage_root/canvaskit/```

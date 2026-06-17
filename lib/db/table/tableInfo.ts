@@ -2,15 +2,15 @@
  * Table Info queries (table_info)
  */
 import { TableColumn } from './tableColumn';
-import { GeoPackageConnection } from '../geoPackageConnection';
 import { GeoPackageDataType } from '../geoPackageDataType';
-import { GeometryType } from '../../features/user/geometryType';
+import { GeometryType } from '@ngageoint/simple-features-js';
 import { SQLiteMaster } from '../master/sqliteMaster';
 import { SQLiteMasterColumn } from '../master/sqliteMasterColumn';
 import { StringUtils } from '../stringUtils';
+import type { GeoPackageConnection } from '../geoPackageConnection';
+import { GeoPackageException } from '../../geoPackageException';
 
 export class TableInfo {
-
   /**
    * Index column
    */
@@ -74,7 +74,7 @@ export class TableInfo {
   constructor(tableName: string, columns: TableColumn[]) {
     this.tableName = tableName;
     this.columns = columns;
-    columns.forEach(column => {
+    columns.forEach((column) => {
       this.namesToColumns.set(column.getName(), column);
       if (column.isPrimaryKey()) {
         this.primaryKeys.push(column);
@@ -114,7 +114,7 @@ export class TableInfo {
    */
   getColumnAtIndex(index: number): TableColumn {
     if (index < 0 || index >= this.columns.length) {
-      throw new Error('Column index: ' + index + ', not within range 0 to ' + (this.columns.length - 1));
+      throw new GeoPackageException('Column index: ' + index + ', not within range 0 to ' + (this.columns.length - 1));
     }
     return this.columns[index];
   }
@@ -141,7 +141,7 @@ export class TableInfo {
    * Check if the table has one or more primary keys
    * @return true if has at least one primary key
    */
-  hasPrimaryKey() {
+  hasPrimaryKey(): boolean {
     return this.primaryKeys.length !== 0;
   }
 
@@ -165,7 +165,6 @@ export class TableInfo {
     return pk;
   }
 
-  // @ts-ignore
   /**
    * Query for the table_info of the table name
    * @param db connection
@@ -173,49 +172,66 @@ export class TableInfo {
    * @return table info or null if no table
    */
   static info(db: GeoPackageConnection, tableName: string): TableInfo {
-    let sql = 'PRAGMA table_info(' + StringUtils.quoteWrap(tableName) + ')';
-    let results = db.all(sql, null);
-    let tableColumns: TableColumn[] = [];
+    const sql = 'PRAGMA table_info(' + StringUtils.quoteWrap(tableName) + ')';
+    const results = db.all(sql, null);
+    const tableColumns: TableColumn[] = [];
 
     results.forEach((result) => {
-      let index = result.cid;
-      let name = result.name;
+      const index = result.cid;
+      const name = result.name;
       let type = result.type;
-      let notNull = result.notnull === 1;
-      let defaultValueString = result.dflt_value;
-      let primaryKey = result.pk === 1;
+      const notNull = result.notnull === 1;
+      const defaultValueString = result.dflt_value;
+      const primaryKey = result.pk === 1;
       let autoincrement = false;
       if (primaryKey) {
-        const autoincrementResult = db.all('SELECT tbl_name FROM ' + SQLiteMaster.TABLE_NAME + ' WHERE ' + SQLiteMasterColumn.nameFromType(SQLiteMasterColumn.TBL_NAME) + '=? AND ' + SQLiteMasterColumn.nameFromType(SQLiteMasterColumn.SQL) + ' LIKE ?', [tableName, '%AUTOINCREMENT%']);
+        const autoincrementResult = db.all(
+          'SELECT tbl_name FROM ' +
+            SQLiteMaster.TABLE_NAME +
+            ' WHERE ' +
+            SQLiteMasterColumn.nameFromType(SQLiteMasterColumn.TBL_NAME) +
+            '=? AND ' +
+            SQLiteMasterColumn.nameFromType(SQLiteMasterColumn.SQL) +
+            ' LIKE ?',
+          [tableName, '%AUTOINCREMENT%'],
+        );
         autoincrement = autoincrementResult.length === 1;
       }
 
       // If the type has a max limit on it, pull it off
       let max = null;
-      if (type != null && type.endsWith(")")) {
-        let maxStart = type.indexOf("(");
+      if (type != null && type.endsWith(')')) {
+        const maxStart = type.indexOf('(');
         if (maxStart > -1) {
-          let maxString = type.substring(maxStart + 1, type.length - 1);
+          const maxString = type.substring(maxStart + 1, type.length - 1);
           if (maxString.length !== 0) {
             try {
               max = parseInt(maxString);
               type = type.substring(0, maxStart);
-            } catch (e) {
-              console.error(e);
-            }
+            } catch (e) {}
           }
         }
       }
 
-      let dataType = TableInfo.getDataType(type);
+      const dataType = TableInfo.getDataType(type);
       let defaultValue = undefined;
       if (result.dflt_value) {
-        defaultValue = result.dflt_value.replace(/\\'/g, '');
+        defaultValue = TableInfo.getDefaultValue(result.dflt_value.replace(/\\'/g, ''), dataType);
       }
-      let tableColumn = new TableColumn(index, name, type, dataType, max, notNull, defaultValueString, defaultValue, primaryKey, autoincrement);
+      const tableColumn = new TableColumn(
+        index,
+        name,
+        type,
+        dataType,
+        max,
+        notNull,
+        defaultValueString,
+        defaultValue,
+        primaryKey,
+        autoincrement,
+      );
       tableColumns.push(tableColumn);
     });
-
 
     let tableInfo: TableInfo = null;
     if (tableColumns.length !== 0) {
@@ -241,5 +257,45 @@ export class TableInfo {
       }
     }
     return dataType;
+  }
+
+  /**
+   * Get the default object value for the string default value with the data type
+   * @param defaultValue default value
+   * @param type data type
+   * @return default value
+   */
+  public static getDefaultValue(defaultValue: string, type: GeoPackageDataType): any {
+    let value: any = defaultValue;
+    if (defaultValue != null && type != null && defaultValue.toUpperCase() !== TableInfo.DEFAULT_NULL) {
+      switch (type) {
+        case GeoPackageDataType.TEXT:
+        case GeoPackageDataType.DATE:
+        case GeoPackageDataType.DATETIME:
+          break;
+        case GeoPackageDataType.BOOLEAN:
+          value = Number.parseInt(defaultValue) === 1;
+          break;
+        case GeoPackageDataType.TINYINT:
+        case GeoPackageDataType.SMALLINT:
+        case GeoPackageDataType.MEDIUMINT:
+        case GeoPackageDataType.INT:
+        case GeoPackageDataType.INTEGER:
+          value = Number.parseInt(defaultValue);
+          break;
+        case GeoPackageDataType.FLOAT:
+        case GeoPackageDataType.DOUBLE:
+        case GeoPackageDataType.REAL:
+          value = Number.parseFloat(defaultValue);
+          break;
+        case GeoPackageDataType.BLOB:
+          value = Buffer.from(defaultValue);
+          break;
+        default:
+          throw new GeoPackageException('Unsupported Data Type ' + type);
+      }
+    }
+
+    return value;
   }
 }

@@ -1,269 +1,269 @@
-import { default as testSetup } from '../../fixtures/testSetup'
-import {TileScaling} from "../../../lib/extension/scale/tileScaling";
-import {TileScalingType} from "../../../lib/extension/scale/tileScalingType";
+import { default as testSetup } from '../../testSetup';
+import { TileScaling } from '../../../lib/extension/nga/scale/tileScaling';
+import { TileScalingType } from '../../../lib/extension/nga/scale/tileScalingType';
+import { FeatureConverter } from '@ngageoint/simple-features-geojson-js';
+import { FeatureTableMetadata } from '../../../lib/features/user/featureTableMetadata';
+import { FeatureIndexType } from '../../../lib/features/index/featureIndexType';
 
-var FeatureColumn = require('../../../lib/features/user/featureColumn').FeatureColumn
-  , FeatureTableStyles = require('../../../lib/extension/style/featureTableStyles').FeatureTableStyles
-  , GeometryColumns = require('../../../lib/features/columns/geometryColumns').GeometryColumns
-  , AlterTable = require('../../../lib/db/alterTable').AlterTable
-  , TableInfo = require('../../../lib/db/table/tableInfo').TableInfo
-  , CoreSQLUtils = require('../../../lib/db/coreSQLUtils').CoreSQLUtils
-  , GeoPackageDataType = require('../../../lib/db/geoPackageDataType').GeoPackageDataType
-  , GeometryData = require('../../../lib/geom/geometryData').GeometryData
-  , GeometryType = require('../../../lib/features/user/geometryType').GeometryType
-  , TileMatrixDao = require('../../../lib/tiles/matrix/tileMatrixDao').TileMatrixDao
-  , TileMatrixSetDao = require('../../../lib/tiles/matrixset/tileMatrixSetDao').TileMatrixSetDao
-  , NGAExtensions = require('../../../lib/extension/ngaExtensions').NGAExtensions
-  , should = require('chai').should()
-  , wkx = require('wkx')
-  , path = require('path')
-  , _ = require('lodash');
+var FeatureColumn = require('../../../lib/features/user/featureColumn').FeatureColumn,
+  FeatureTableStyles = require('../../../lib/extension/nga/style/featureTableStyles').FeatureTableStyles,
+  GeometryColumns = require('../../../lib/features/columns/geometryColumns').GeometryColumns,
+  AlterTable = require('../../../lib/db/alterTable').AlterTable,
+  TableInfo = require('../../../lib/db/table/tableInfo').TableInfo,
+  CoreSQLUtils = require('../../../lib/db/sqlUtils').SQLUtils,
+  GeoPackageDataType = require('../../../lib/db/geoPackageDataType').GeoPackageDataType,
+  GeoPackageGeometryData = require('../../../lib/geom/geoPackageGeometryData').GeoPackageGeometryData,
+  GeometryType = require('@ngageoint/simple-features-js').GeometryType,
+  TileMatrixDao = require('../../../lib/tiles/matrix/tileMatrixDao').TileMatrixDao,
+  TileMatrixSetDao = require('../../../lib/tiles/matrixset/tileMatrixSetDao').TileMatrixSetDao,
+  NGAExtensions = require('../../../lib/extension/nga/ngaExtensions').NGAExtensions,
+  should = require('chai').should(),
+  path = require('path'),
+  _ = require('lodash');
 
-describe('AlterTable tests', function() {
-
+describe('AlterTable tests', function () {
   var testGeoPackage = path.join(__dirname, '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
-  var geopackage;
+  var geoPackage;
   var tableName = 'AlterTest_FeatureTable';
   var copyTableName = tableName + '_Copy';
 
   var featureTableStyles;
+  var featureStyleExtension;
 
-  beforeEach(async function() {
-    geopackage = await testSetup.createGeoPackage(testGeoPackage);
-    var columns = [];
+  beforeEach(async function () {
+    geoPackage = await testSetup.createGeoPackage(testGeoPackage);
 
-    columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id'));
-    columns.push(FeatureColumn.createGeometryColumn(1, 'geom', GeometryType.GEOMETRY, false, null));
-    columns.push(FeatureColumn.createColumn(2, 'name', GeoPackageDataType.TEXT, false, ""));
-    columns.push(FeatureColumn.createColumn(3, '_feature_id', GeoPackageDataType.TEXT, false, ""));
-    columns.push(FeatureColumn.createColumn(4, '_properties_id', GeoPackageDataType.TEXT, false, ""));
-    columns.push(FeatureColumn.createColumn(5, 'test_col', GeoPackageDataType.INTEGER, true, 3));
+    var additionalColumns = [];
+    additionalColumns.push(FeatureColumn.createColumn('name', GeoPackageDataType.TEXT, false, ''));
+    additionalColumns.push(FeatureColumn.createColumn('_feature_id', GeoPackageDataType.TEXT, false, ''));
+    additionalColumns.push(FeatureColumn.createColumn('_properties_id', GeoPackageDataType.TEXT, false, ''));
+    additionalColumns.push(FeatureColumn.createColumn('test_col', GeoPackageDataType.INTEGER, true, 3));
 
     const geometryColumns = new GeometryColumns();
-    geometryColumns.table_name = tableName;
-    geometryColumns.column_name = 'geom';
-    geometryColumns.geometry_type_name = GeometryType.nameFromType(GeometryType.GEOMETRY);
-    geometryColumns.z = 0;
-    geometryColumns.m = 0;
+    geometryColumns.setTableName(tableName);
+    geometryColumns.setColumnName('geom');
+    geometryColumns.setGeometryType(GeometryType.GEOMETRY);
+    geometryColumns.setZ(0);
+    geometryColumns.setM(0);
+    geometryColumns.setSrsId(4326);
 
-    geopackage.createFeatureTable(tableName, geometryColumns, columns);
+    geoPackage.createFeatureTableWithMetadata(FeatureTableMetadata.create(geometryColumns, additionalColumns));
 
-    var featureDao = geopackage.getFeatureDao(tableName);
+    const featureDao = geoPackage.getFeatureDao(tableName);
 
-    var createRow = function(geoJson, name, featureDao) {
-      var srs = featureDao.srs;
-      var featureRow = featureDao.newRow();
-      var geometryData = new GeometryData();
-      geometryData.setSrsId(srs.srs_id);
-      var geometry = wkx.Geometry.parseGeoJSON(geoJson);
-      geometryData.setGeometry(geometry);
-      featureRow.geometry = geometryData;
-      featureRow.setValueWithColumnName('name', name);
-      featureRow.setValueWithColumnName('_feature_id', name);
-      featureRow.setValueWithColumnName('_properties_id', 'properties' + name);
-      if (!_.isNil(geoJson.properties) && !_.isNil(geoJson.properties.test_col)) {
-        featureRow.setValueWithColumnName('test_col', geoJson.properties.test_col);
+    const createRow = function (geoJson, name, properties, featureDao) {
+      const featureRow = featureDao.newRow();
+      const geometryData = GeoPackageGeometryData.createWithSrsId(
+        featureDao.getSrsId(),
+        FeatureConverter.toSimpleFeaturesGeometry({
+          type: 'Feature',
+          geometry: geoJson,
+        }),
+      );
+      featureRow.setGeometry(geometryData);
+      featureRow.setValue('name', name);
+      featureRow.setValue('_feature_id', name);
+      featureRow.setValue('_properties_id', 'properties' + name);
+      if (!_.isNil(properties) && !_.isNil(properties.test_col)) {
+        featureRow.setValue('test_col', properties.test_col);
       }
       return featureDao.create(featureRow);
     };
-    var box1 = {
-      "type": "Polygon",
-      "coordinates": [[[-1, 1], [1, 1], [1, 3], [-1, 3], [-1, 1]]]
+    const box1 = {
+      type: 'Polygon',
+      coordinates: [
+        [
+          [-1, 1],
+          [1, 1],
+          [1, 3],
+          [-1, 3],
+          [-1, 1],
+        ],
+      ],
     };
 
-    var box2 = {
-      "type": "Polygon",
-      "coordinates": [[[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]]]
+    const box2 = {
+      type: 'Polygon',
+      coordinates: [
+        [
+          [0, 0],
+          [2, 0],
+          [2, 2],
+          [0, 2],
+          [0, 0],
+        ],
+      ],
     };
 
-    var line = {
-      "type": "LineString",
-      "properties": {
-        "test_col": 26
-      },
-      "coordinates": [[2, 3], [-1, 0]]
+    const line = {
+      type: 'LineString',
+      coordinates: [
+        [2, 3],
+        [-1, 0],
+      ],
     };
 
-    // @ts-ignore
-    // @ts-ignore
-    var line2 = {
-      "type": "Feature",
-      "properties": {
-        "test_col": 12
-      },
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [[2.0, 2.5], [-0.5, 0]]
-      }
+    const point = {
+      type: 'Point',
+      coordinates: [0.5, 1.5],
     };
 
-    var point = {
-      "type": "Point",
-      "properties": {
-      },
-      "coordinates": [0.5, 1.5]
+    const point2 = {
+      type: 'Point',
+      coordinates: [1.5, 0.5],
     };
 
-    var point2 = {
-      "type": "Point",
-      "coordinates": [1.5, .5]
-    };
-
-    createRow(box1, 'box1', featureDao);
-    createRow(box2, 'box2', featureDao);
-    createRow(line, 'line', featureDao);
-    createRow(line, 'line2', featureDao);
-    createRow(point, 'point', featureDao);
-    createRow(point2, 'point2', featureDao);
-    await featureDao.featureTableIndex.index();
-    geopackage.featureStyleExtension.getOrCreateExtension(tableName);
-    geopackage.featureStyleExtension.getRelatedTables().getOrCreateExtension();
-    geopackage.featureStyleExtension.getContentsId().getOrCreateExtension();
-    featureTableStyles = new FeatureTableStyles(geopackage, tableName);
+    createRow(box1, 'box1', {}, featureDao);
+    createRow(box2, 'box2', {}, featureDao);
+    createRow(line, 'line', { test_col: 26 }, featureDao);
+    createRow(line, 'line2', {}, featureDao);
+    createRow(point, 'point', {}, featureDao);
+    createRow(point2, 'point2', {}, featureDao);
+    const indexer = geoPackage.getFeatureIndexManager(featureDao);
+    indexer.setIndexLocation(FeatureIndexType.RTREE);
+    indexer.index();
+    featureStyleExtension = new NGAExtensions(geoPackage).getFeatureStyleExtension();
+    featureStyleExtension.getOrCreateExtension(tableName);
+    featureStyleExtension.getRelatedTables().getOrCreateExtension();
+    featureStyleExtension.getContentsId().getOrCreateExtension();
+    featureTableStyles = new FeatureTableStyles(geoPackage, tableName);
     featureTableStyles.createStyleRelationship();
   });
 
-  afterEach(async function() {
-    geopackage.close();
+  afterEach(async function () {
+    geoPackage.close();
     await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
-  it('should copy a feature table and it\'s content and it\'s extensions', function() {
-    var featureDao = geopackage.getFeatureDao(tableName);
+  it("should copy a feature table and it's content and it's extensions", function () {
+    var featureDao = geoPackage.getFeatureDao(tableName);
 
     featureDao.count().should.be.equal(6);
     // rename table
-    geopackage.copyTable(tableName, copyTableName, true, true);
+    geoPackage.copyTable(tableName, copyTableName, true, true);
 
     // get feature dao for updated table name
-    featureDao = geopackage.getFeatureDao(copyTableName);
+    featureDao = geoPackage.getFeatureDao(copyTableName);
     featureDao.count().should.be.equal(6);
 
     // check if extensions were copied successfully
-    NGAExtensions.getFeatureStyleExtension(geopackage).has(copyTableName).should.equal(true);
+    featureStyleExtension.has(copyTableName).should.equal(true);
   });
 
-  it('should copy a feature table and not it\'s content', function() {
-    var featureDao = geopackage.getFeatureDao(tableName);
-    geopackage.featureStyleExtension.has(tableName).should.equal(true);
+  it("should copy a feature table and not it's content", function () {
+    var featureDao = geoPackage.getFeatureDao(tableName);
+    featureStyleExtension.has(tableName).should.equal(true);
 
     featureDao.count().should.be.equal(6);
     // rename table
-    geopackage.copyTable(tableName, copyTableName, false, true);
+    geoPackage.copyTable(tableName, copyTableName, false, true);
 
     // get feature dao for updated table name
-    featureDao = geopackage.getFeatureDao(copyTableName);
+    featureDao = geoPackage.getFeatureDao(copyTableName);
     featureDao.count().should.be.equal(0);
 
     // verify feature style extension was copied
-    geopackage.featureStyleExtension.has(copyTableName).should.equal(true);
+    featureStyleExtension.has(copyTableName).should.equal(true);
   });
 
-
-  it('should copy a feature table and not it\'s extensions', function() {
-    var featureDao = geopackage.getFeatureDao(tableName);
+  it("should copy a feature table and not it's extensions", function () {
+    var featureDao = geoPackage.getFeatureDao(tableName);
 
     featureDao.count().should.be.equal(6);
     // rename table
-    geopackage.copyTable(tableName, copyTableName, true, false);
+    geoPackage.copyTable(tableName, copyTableName, true, false);
 
     // get feature dao for updated table name
-    featureDao = geopackage.getFeatureDao(copyTableName);
+    featureDao = geoPackage.getFeatureDao(copyTableName);
     featureDao.count().should.be.equal(6);
 
     // verify feature style extension was not copied
-    geopackage.featureStyleExtension.has(copyTableName).should.equal(false);
+    featureStyleExtension.has(copyTableName).should.equal(false);
   });
 
-  it('should delete a table', function() {
-    geopackage.connection.tableExists(tableName).should.be.equal(true);
-    geopackage.deleteTable(tableName);
-    geopackage.connection.tableExists(tableName).should.be.equal(false);
+  it('should delete a table', function () {
+    geoPackage.getConnection().tableExists(tableName).should.be.equal(true);
+    geoPackage.deleteTable(tableName);
+    geoPackage.getConnection().tableExists(tableName).should.be.equal(false);
     // verify feature style extension was deleted
-    geopackage.featureStyleExtension.has(tableName).should.equal(false);
+    featureStyleExtension.has(tableName).should.equal(false);
   });
 
-  it('should rename a feature table', function() {
+  it('should rename a feature table', function () {
     const newTableName = tableName + '_New';
-    geopackage.connection.tableExists(tableName).should.be.equal(true);
-    geopackage.connection.tableExists(newTableName).should.be.equal(false);
-    geopackage.renameTable(tableName, newTableName);
-    geopackage.connection.tableExists(tableName).should.be.equal(false);
-    geopackage.connection.tableExists(newTableName).should.be.equal(true);
+    geoPackage.getConnection().tableExists(tableName).should.be.equal(true);
+    geoPackage.getConnection().tableExists(newTableName).should.be.equal(false);
+    geoPackage.renameTable(tableName, newTableName);
+    geoPackage.getConnection().tableExists(tableName).should.be.equal(false);
+    geoPackage.getConnection().tableExists(newTableName).should.be.equal(true);
   });
 
-  it('should rename a column in a feature table', function() {
+  it('should rename a column in a feature table', function () {
     const columnName = 'test_col';
     const newColumnName = 'test_col_renamed';
-    var featureDao = geopackage.getFeatureDao(tableName);
-    let tableInfo = TableInfo.info(geopackage.connection, tableName);
+    var featureDao = geoPackage.getFeatureDao(tableName);
+    let tableInfo = TableInfo.info(geoPackage.getConnection(), tableName);
     should.exist(tableInfo.getColumn(columnName));
     should.not.exist(tableInfo.getColumn(newColumnName));
-    featureDao.renameColumn(columnName, newColumnName);
-    tableInfo = TableInfo.info(geopackage.connection, tableName);
+    featureDao.renameColumnWithName(columnName, newColumnName);
+    tableInfo = TableInfo.info(geoPackage.getConnection(), tableName);
     should.not.exist(tableInfo.getColumn(columnName));
     should.exist(tableInfo.getColumn(newColumnName));
   });
 
-  it('should add a column to a feature table', function() {
+  it('should add a column to a feature table', function () {
     const columnName = 'feature_is_great';
-    var featureDao = geopackage.getFeatureDao(tableName);
-    var column = FeatureColumn.createColumn(6, columnName, GeoPackageDataType.BOOLEAN, true, false)
+    const featureDao = geoPackage.getFeatureDao(tableName);
+    let column = FeatureColumn.createColumn(columnName, GeoPackageDataType.BOOLEAN, true, false);
     featureDao.addColumn(column);
-    let tableInfo = TableInfo.info(geopackage.connection, tableName);
+    let tableInfo = TableInfo.info(geoPackage.getConnection(), tableName);
     should.exist(tableInfo.getColumn(columnName));
-    featureDao.dropColumn(columnName);
-    tableInfo = TableInfo.info(geopackage.connection, tableName);
+    featureDao.dropColumnWithName(columnName);
+    tableInfo = TableInfo.info(geoPackage.getConnection(), tableName);
     should.not.exist(tableInfo.getColumn(columnName));
-
-    column = FeatureColumn.createColumn(6, columnName, GeoPackageDataType.BOOLEAN, true, false)
+    column = FeatureColumn.createColumn(columnName, GeoPackageDataType.BOOLEAN, true, false);
     featureDao.addColumn(column);
-    tableInfo = TableInfo.info(geopackage.connection, tableName);
+    tableInfo = TableInfo.info(geoPackage.getConnection(), tableName);
     should.exist(tableInfo.getColumn(columnName));
-    AlterTable.dropColumnForUserTable(geopackage.connection, featureDao.table, columnName);
-    tableInfo = TableInfo.info(geopackage.connection, tableName);
+    AlterTable.dropColumnForUserTable(geoPackage.getConnection(), featureDao.table, columnName);
+    tableInfo = TableInfo.info(geoPackage.getConnection(), tableName);
     should.not.exist(tableInfo.getColumn(columnName));
   });
 
-  it('should test all drop column functions', function() {
+  it('should test all drop column functions', function () {
     const columnName = 'feature_is_great';
-    var column = FeatureColumn.createColumn(6, columnName, GeoPackageDataType.BOOLEAN, true, false);
-    var tableInfo = TableInfo.info(geopackage.connection, tableName);
+    var column = FeatureColumn.createColumn(columnName, GeoPackageDataType.BOOLEAN, true, false);
+    var tableInfo = TableInfo.info(geoPackage.getConnection(), tableName);
     should.not.exist(tableInfo.getColumn(columnName));
-    AlterTable.addColumn(geopackage.connection, tableName, columnName, CoreSQLUtils.columnDefinition(column));
-    tableInfo = TableInfo.info(geopackage.connection, tableName);
+    AlterTable.addColumn(geoPackage.getConnection(), tableName, columnName, CoreSQLUtils.columnDefinition(column));
+    tableInfo = TableInfo.info(geoPackage.getConnection(), tableName);
     should.exist(tableInfo.getColumn(columnName));
-    AlterTable.dropColumn(geopackage.connection, tableName, columnName);
-    tableInfo = TableInfo.info(geopackage.connection, tableName);
+    AlterTable.dropColumn(geoPackage.getConnection(), tableName, columnName);
+    tableInfo = TableInfo.info(geoPackage.getConnection(), tableName);
     should.not.exist(tableInfo.getColumn(columnName));
   });
 
-  it('should test all alter column functions', function() {
+  it('should test all alter column functions', function () {
     const columnName = 'feature_is_great';
-    var column = FeatureColumn.createColumn(6, columnName, GeoPackageDataType.BOOLEAN, true, false);
-    AlterTable.addColumn(geopackage.connection, tableName, columnName, CoreSQLUtils.columnDefinition(column));
-    var tableInfo = TableInfo.info(geopackage.connection, tableName);
-    tableInfo.getColumn(columnName).getDefaultValue().should.be.equal('0');
+    var column = FeatureColumn.createColumn(columnName, GeoPackageDataType.BOOLEAN, true, false);
+    AlterTable.addColumn(geoPackage.getConnection(), tableName, columnName, CoreSQLUtils.columnDefinition(column));
+    var tableInfo = TableInfo.info(geoPackage.getConnection(), tableName);
+    tableInfo.getColumn(columnName).getDefaultValue().should.be.equal(false);
     var columnCopy = column.copy();
     columnCopy.setDefaultValue(true);
-    AlterTable.alterColumn(geopackage.connection, tableName, columnCopy);
-    tableInfo = TableInfo.info(geopackage.connection, tableName);
-    tableInfo.getColumn(columnName).getDefaultValue().should.be.equal('1');
+    AlterTable.alterColumn(geoPackage.getConnection(), tableName, columnCopy);
+    tableInfo = TableInfo.info(geoPackage.getConnection(), tableName);
+    tableInfo.getColumn(columnName).getDefaultValue().should.be.equal(true);
   });
 });
 
-describe('AlterTable tests - Tile Table Copying', function() {
+describe('AlterTable tests - Tile Table Copying', function () {
   var geoPackage;
-  var tileDao;
-
-  var filename;
-  beforeEach('create the GeoPackage connection', async function() {
+  beforeEach('create the GeoPackage connection', async function () {
     var originalFilename = path.join(__dirname, '..', '..', 'fixtures', 'denver_tile.gpkg');
-    // @ts-ignore
+
     let result = await copyAndOpenGeopackage(originalFilename);
-    filename = result.path;
-    geoPackage = result.geopackage;
-    tileDao = geoPackage.getTileDao('denver');
+    geoPackage = result.geoPackage;
     let tileScalingExtension = geoPackage.getTileScalingExtension('denver');
     tileScalingExtension.getOrCreateExtension();
     const tileScaling = new TileScaling();
@@ -273,12 +273,12 @@ describe('AlterTable tests - Tile Table Copying', function() {
     tileScalingExtension.createOrUpdate(tileScaling);
   });
 
-  afterEach('close the geopackage connection', async function() {
+  afterEach('close the geoPackage connection', async function () {
     geoPackage.close();
     // await testSetup.deleteGeoPackage(filename);
   });
 
-  it('should copy TileTable and it\'s contents', function(done) {
+  it("should copy TileTable and it's contents", function (done) {
     geoPackage.copyTable('denver', 'cherry_creek', true, true);
     let copyTileDao = geoPackage.getTileDao('cherry_creek');
     copyTileDao.count().should.be.equal(42);

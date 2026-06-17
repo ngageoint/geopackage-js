@@ -1,11 +1,32 @@
 ### Changelog
 
+##### 5.0.1
+- Added in FeatureTileGenerator
+- Added in UrlTileGenerator
+- Rebuilt CanvasKit to add support for webp and jpeg
+
+##### 5.0.0
+- GeoPackage JS's API has been updated to more closely match GeoPackage Java v6.4.0
+  - Not yet implemented: 2D Gridded Tile Coverage Extension and OGC API Feature Generator
+- GeoPackageExtensions is now ExtensionManager
+- GeoPackageAPI is now GeoPackageManager
+- Added FeatureTileTableLink extension
+- Added support for extended geometry types
+- Added Properties extension
+- Added ZoomOther extension
+- Added support for drawing extended geometry types
+- Updated to use NGA simple features javascript libraries
+- Updated to use NGA projections javascript library
+- Added UserCustomRow
+- Reworked UserRow, UserTable, and UserColumn and updated all super types
+- Added in FeatureConnection, TileConnection, AttributesConnection and UserCustomConnections.
+- Added GeoPackageCache
+
 ##### 4.2.7
 
 - Upgrade the [`inquirer`](https://www.npmjs.com/package/inquirer) dependency to address [CVE-2025-54798](https://github.com/advisories/GHSA-52f5-9888-hmc6), and [CVE-2026-44705](https://github.com/advisories/GHSA-ph9p-34f9-6g65)
 
 ##### 4.2.6
-
 - Upgrade the [`file-type`](https://www.npmjs.com/package/file-type) dependency to address [CVE-2022-36313](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-36313).
 
 ##### 4.2.5

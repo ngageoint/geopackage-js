@@ -3,6 +3,8 @@ const CopyPlugin = require('copy-webpack-plugin');
 const NodePolyfillWebpackPlugin = require('node-polyfill-webpack-plugin');
 
 module.exports = {
+  mode: 'development',
+  devtool: 'source-map',
   entry: './test/browserTests.js',
   plugins: [
     new NodePolyfillWebpackPlugin(),
@@ -28,17 +30,40 @@ module.exports = {
       {
         test: /\.tsx?$/,
         use: 'ts-loader',
-        exclude: [
-          /node_modules/,
-        ],
+        exclude: [/node_modules/],
       },
     ],
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
     fallback: {
-      'fs': false,
-    }
+      fs: false,
+      http: false,
+      https: false,
+    },
+    alias: {
+      '@ngageoint/projections-js': path.join(__dirname, './node_modules/@ngageoint/projections-js/dist/index.js'),
+      '@ngageoint/simple-features-js': path.join(
+        __dirname,
+        '/node_modules/@ngageoint/simple-features-js/dist/index.js',
+      ),
+      '@ngageoint/simple-features-proj-js': path.join(
+        __dirname,
+        '/node_modules/@ngageoint/simple-features-proj-js/dist/index.js',
+      ),
+      '@ngageoint/simple-features-wkb-js': path.join(
+        __dirname,
+        '/node_modules/@ngageoint/simple-features-wkb-js/dist/index.js',
+      ),
+      '@ngageoint/simple-features-wkt-js': path.join(
+        __dirname,
+        '/node_modules/@ngageoint/simple-features-wkt-js/dist/index.js',
+      ),
+      '@ngageoint/simple-features-geojson-js': path.join(
+        __dirname,
+        '/node_modules/@ngageoint/simple-features-geojson-js/dist/index.js',
+      ),
+    },
   },
   output: {
     filename: 'browser.test.bundle.js',
@@ -48,5 +73,5 @@ module.exports = {
       type: 'umd',
     },
   },
-  devtool: 'source-map',
+  externals: ['better-sqlite3'],
 };

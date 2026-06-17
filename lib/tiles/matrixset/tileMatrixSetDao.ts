@@ -1,58 +1,42 @@
-import { Dao } from '../../dao/dao';
-import { GeoPackage } from '../../geoPackage';
-
 import { TileMatrixSet } from './tileMatrixSet';
-import { Contents } from '../../core/contents/contents';
-import { SpatialReferenceSystem } from '../../core/srs/spatialReferenceSystem';
-import { DBValue } from '../../db/dbAdapter';
+import { Contents } from '../../contents/contents';
+import { SpatialReferenceSystem } from '../../srs/spatialReferenceSystem';
+import { DBValue } from '../../db/dbValue';
+import { GeoPackageDao } from '../../db/geoPackageDao';
+import { Projection } from '@ngageoint/projections-js';
+import type { GeoPackage } from '../../geoPackage';
+import { BoundingBox } from '../../boundingBox';
+import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
+import { TileMatrix } from '../matrix/tileMatrix';
 
 /**
  * Tile Matrix Set Data Access Object
- * @class TileMatrixSetDao
- * @extends Dao
  */
-export class TileMatrixSetDao extends Dao<TileMatrixSet> {
-  public static readonly TABLE_NAME: string = 'gpkg_tile_matrix_set';
-  public static readonly COLUMN_PK: string = 'table_name';
-  public static readonly COLUMN_TABLE_NAME: string = 'table_name';
-  public static readonly COLUMN_SRS_ID: string = 'srs_id';
-  public static readonly COLUMN_MIN_X: string = 'min_x';
-  public static readonly COLUMN_MIN_Y: string = 'min_y';
-  public static readonly COLUMN_MAX_X: string = 'max_x';
-  public static readonly COLUMN_MAX_Y: string = 'max_y';
-
+export class TileMatrixSetDao extends GeoPackageDao<TileMatrixSet, string> {
   readonly gpkgTableName: string = 'gpkg_tile_matrix_set';
-  readonly idColumns: string[] = [TileMatrixSetDao.COLUMN_PK];
-  readonly columns: string[] = [
-    TileMatrixSetDao.COLUMN_TABLE_NAME,
-    TileMatrixSetDao.COLUMN_SRS_ID,
-    TileMatrixSetDao.COLUMN_MIN_X,
-    TileMatrixSetDao.COLUMN_MIN_Y,
-    TileMatrixSetDao.COLUMN_MAX_X,
-    TileMatrixSetDao.COLUMN_MAX_Y,
-  ];
-
-  columnToPropertyMap: { [key: string]: string } = {};
+  readonly idColumns: string[] = [TileMatrixSet.COLUMN_ID];
 
   constructor(geoPackage: GeoPackage) {
-    super(geoPackage);
-    this.columnToPropertyMap[TileMatrixSetDao.COLUMN_TABLE_NAME] = TileMatrixSet.TABLE_NAME;
-    this.columnToPropertyMap[TileMatrixSetDao.COLUMN_SRS_ID] = TileMatrixSet.SRS_ID;
-    this.columnToPropertyMap[TileMatrixSetDao.COLUMN_MIN_X] = TileMatrixSet.MIN_X;
-    this.columnToPropertyMap[TileMatrixSetDao.COLUMN_MIN_Y] = TileMatrixSet.MIN_Y;
-    this.columnToPropertyMap[TileMatrixSetDao.COLUMN_MAX_X] = TileMatrixSet.MAX_X;
-    this.columnToPropertyMap[TileMatrixSetDao.COLUMN_MAX_Y] = TileMatrixSet.MAX_Y;
+    super(geoPackage, TileMatrixSet.TABLE_NAME);
+  }
+
+  public static createDao(geoPackage: GeoPackage): TileMatrixSetDao {
+    return new TileMatrixSetDao(geoPackage);
+  }
+
+  queryForIdWithKey(key: string): TileMatrixSet {
+    return this.queryForId(key);
   }
 
   createObject(results?: Record<string, DBValue>): TileMatrixSet {
     const tms = new TileMatrixSet();
     if (results) {
-      tms.table_name = results.table_name as string;
-      tms.srs_id = results.srs_id as number;
-      tms.min_y = results.min_y as number;
-      tms.min_x = results.min_x as number;
-      tms.max_y = results.max_y as number;
-      tms.max_x = results.max_x as number;
+      tms.setId(results[TileMatrixSet.COLUMN_ID] as string);
+      tms.setSrsId(results[TileMatrixSet.COLUMN_SRS_ID] as number);
+      tms.setMinX(results[TileMatrixSet.COLUMN_MIN_X] as number);
+      tms.setMinY(results[TileMatrixSet.COLUMN_MIN_Y] as number);
+      tms.setMaxX(results[TileMatrixSet.COLUMN_MAX_X] as number);
+      tms.setMaxY(results[TileMatrixSet.COLUMN_MAX_Y] as number);
     }
     return tms;
   }
@@ -62,29 +46,64 @@ export class TileMatrixSetDao extends Dao<TileMatrixSet> {
    */
   getTileTables(): string[] {
     const tableNames = [];
-    for (const result of this.connection.each(
-      'select ' + TileMatrixSetDao.COLUMN_TABLE_NAME + ' from ' + TileMatrixSetDao.TABLE_NAME,
+    for (const result of this.db.each(
+      'select ' + TileMatrixSet.COLUMN_TABLE_NAME + ' from ' + TileMatrixSet.TABLE_NAME,
     )) {
-      tableNames.push(result[TileMatrixSetDao.COLUMN_TABLE_NAME]);
+      tableNames.push(result[TileMatrixSet.COLUMN_TABLE_NAME]);
     }
     return tableNames;
   }
-  getProjection(tileMatrixSet: TileMatrixSet): proj4.Converter {
-    const srs = this.getSrs(tileMatrixSet);
-    if (!srs) return;
-    return this.geoPackage.spatialReferenceSystemDao.getProjection(srs);
+
+  getProjection(tileMatrixSet: TileMatrixSet): Projection {
+    const srsId = this.getSrs(tileMatrixSet.getSrsId());
+    return this.geoPackage.getSpatialReferenceSystemDao().getProjection(srsId);
   }
+
   /**
    * Get the Spatial Reference System of the Tile Matrix set
-   * @param  {TileMatrixSet}   tileMatrixSet tile matrix set
+   * @param  {number} srsId tile matrix set
    */
-  getSrs(tileMatrixSet: TileMatrixSet): SpatialReferenceSystem {
-    return this.geoPackage.spatialReferenceSystemDao.queryForId(tileMatrixSet.srs_id);
+  getSrs(srsId: number): SpatialReferenceSystem {
+    return this.geoPackage.getSpatialReferenceSystemDao().queryForId(srsId);
   }
+
   /**
+   * @param {string} tableName
+   */
+  getContentsWithTableName(tableName: string): Contents {
+    return this.geoPackage.getContentsDao().queryForId(tableName);
+  }
+
+  /**
+   * Get the contents for the tile matrix set
    * @param {TileMatrixSet} tileMatrixSet
    */
   getContents(tileMatrixSet: TileMatrixSet): Contents {
-    return this.geoPackage.contentsDao.queryForId(tileMatrixSet.table_name);
+    return this.getContentsWithTableName(tileMatrixSet.getTableName());
+  }
+
+  /**
+   * Get a bounding box in the provided projection
+   * @param tileMatrixSet tileMatrixSet
+   * @param projection desired projection
+   * @return bounding box
+   */
+  public getBoundingBoxWithProjection(tileMatrixSet: TileMatrixSet, projection: Projection): BoundingBox {
+    let boundingBox = tileMatrixSet.getBoundingBox();
+    if (projection != null) {
+      if (!this.getProjection(tileMatrixSet).equalsProjection(projection)) {
+        const transform = GeometryTransform.create(this.getProjection(tileMatrixSet), projection);
+        boundingBox = boundingBox.transform(transform);
+      }
+    }
+    return boundingBox;
+  }
+
+  /**
+   * Queries for a TileMatrixSet with a TileMatrix
+   * @param tileMatrix
+   */
+  public queryWithTileMatrix(tileMatrix: TileMatrix): TileMatrixSet {
+    return this.queryForIdWithKey(tileMatrix.getTableName());
   }
 }

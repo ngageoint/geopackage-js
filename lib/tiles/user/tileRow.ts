@@ -1,144 +1,225 @@
 import { TileTable } from './tileTable';
 import { UserRow } from '../../user/userRow';
 import { TileColumn } from './tileColumn';
-import { DBValue } from '../../db/dbAdapter';
-import { GeoPackageDataType } from '../../db/geoPackageDataType';
-/**
- * tileRow module.
- * @module tiles/user/tileRow
- */
+import { TileColumns } from './tileColumns';
+import { ImageUtils } from '../../image/imageUtils';
+import { GeoPackageImage } from '../../image/geoPackageImage';
+import { ImageType } from '../../image/imageType';
 
 /**
  * Tile Row containing the values from a single result set row
- * @class
- * @extends UserRow
- * @param  {TileTable} tileTable tile table
- * @param  {Array} columnTypes  column types
- * @param  {Array} values       values
  */
-export class TileRow extends UserRow {
-  tileTable: TileTable;
-  constructor(tileTable: TileTable, columnTypes?: { [key: string]: GeoPackageDataType }, values?: Record<string, DBValue>) {
-    super(tileTable, columnTypes, values);
-    this.tileTable = tileTable;
+export class TileRow extends UserRow<TileColumn, TileTable> {
+  /**
+   * Constructor
+   * @param table tile table
+   * @param columns columns
+   * @param columnTypes column types
+   * @param values values
+   */
+  public constructor(table: TileTable, columns: TileColumns, columnTypes: number[], values: any[]);
+
+  /**
+   * Constructor to create an empty row
+   * @param table
+   */
+  public constructor(table: TileTable);
+
+  /**
+   * Copy Constructor
+   * @param tileRow tile row to copy
+   */
+  public constructor(tileRow: TileRow);
+
+  /**
+   * Constructor
+   * @param args
+   */
+  public constructor(...args) {
+    if (args.length === 1) {
+      super(args[0]);
+    } else if (args.length === 4) {
+      super(args[0], args[1], args[2], args[3]);
+    }
   }
+
+  /**
+   * @inheritDoc
+   */
+  public getColumns(): TileColumns {
+    return super.getColumns() as TileColumns;
+  }
+
   /**
    * Get the zoom level column index
-   * @return {Number} zoom level column index
+   * @return zoom level column index
    */
-  get zoomLevelColumnIndex(): number {
-    return this.tileTable.getZoomLevelColumnIndex();
+  public getZoomLevelColumnIndex(): number {
+    return this.getColumns().getZoomLevelIndex();
   }
+
   /**
    * Get the zoom level column
-   * @return {TileColumn} zoom level column
+   * @return zoom level column
    */
-  get zoomLevelColumn(): TileColumn {
-    return this.tileTable.getZoomLevelColumn();
+  public getZoomLevelColumn(): TileColumn {
+    return this.getColumns().getZoomLevelColumn();
   }
+
   /**
    * Get the zoom level
-   * @return {Number} zoom level
+   * @return zoom level
    */
-  get zoomLevel(): number {
-    return this.getValueWithColumnName(this.zoomLevelColumn.name);
+  public getZoomLevel(): number {
+    return this.getValueWithIndex(this.getZoomLevelColumnIndex()) as number;
   }
+
   /**
    * Set the zoom level
-   * @param {Number} zoomLevel zoom level
+   * @param zoomLevel zoom level
    */
-  set zoomLevel(zoomLevel: number) {
-    this.setValueWithIndex(this.zoomLevelColumnIndex, zoomLevel);
+  public setZoomLevel(zoomLevel: number): void {
+    this.setValueWithIndex(this.getZoomLevelColumnIndex(), zoomLevel);
   }
+
   /**
-   * Get the tile column column Index
-   * @return {number} tile column column index
+   * Get the tile column column index
+   * @return tile column index
    */
-  get tileColumnColumnIndex(): number {
-    return this.tileTable.getTileColumnColumnIndex();
+  public getTileColumnColumnIndex(): number {
+    return this.getColumns().getTileColumnIndex();
   }
+
   /**
    * Get the tile column column
-   * @return {TileColumn} tile column column
+   *
+   * @return tile column
    */
-  get tileColumnColumn(): TileColumn {
-    return this.tileTable.getTileColumnColumn();
+  public getTileColumnColumn(): TileColumn {
+    return this.getColumns().getTileColumnColumn();
   }
+
   /**
    * Get the tile column
-   * @return {Number} tile column
+   *
+   * @return tile column
    */
-  get tileColumn(): number {
-    return this.getValueWithColumnName(this.tileColumnColumn.name);
+  public getTileColumn(): number {
+    return this.getValueWithIndex(this.getTileColumnColumnIndex()) as number;
   }
+
   /**
    * Set the tile column
-   * @param {number} tileColumn tile column
+   *
+   * @param tileColumn
+   *            tile column
    */
-  set tileColumn(tileColumn: number) {
-    this.setValueWithColumnName(this.tileColumnColumn.name, tileColumn);
+  public setTileColumn(tileColumn: number): void {
+    this.setValueWithIndex(this.getTileColumnColumnIndex(), tileColumn);
   }
+
   /**
    * Get the tile row column index
-   * @return {Number} tile row column index
+   *
+   * @return tile row column index
    */
-  get rowColumnIndex(): number {
-    return this.tileTable.getTileRowColumnIndex();
+  public getTileRowColumnIndex(): number {
+    return this.getColumns().getTileRowIndex();
   }
+
   /**
    * Get the tile row column
-   * @return {TileColumn} tile row column
+   *
+   * @return tile row column
    */
-  get rowColumn(): TileColumn {
-    return this.tileTable.getTileRowColumn();
+  public getTileRowColumn(): TileColumn {
+    return this.getColumns().getTileRowColumn();
   }
+
   /**
    * Get the tile row
-   * @return {Number} tile row
+   *
+   * @return tile row
    */
-  get row(): number {
-    return this.getValueWithColumnName(this.rowColumn.name);
+  public getTileRow(): number {
+    return this.getValueWithIndex(this.getTileRowColumnIndex()) as number;
   }
+
   /**
    * Set the tile row
-   * @param {Number} tileRow tile row
+   *
+   * @param tileRow
+   *            tile row
    */
-  set tileRow(tileRow: number) {
-    this.setValueWithColumnName(this.rowColumn.name, tileRow);
+  public setTileRow(tileRow: number): void {
+    this.setValueWithIndex(this.getTileRowColumnIndex(), tileRow);
   }
+
   /**
    * Get the tile data column index
-   * @return {Number} tile data column index
+   *
+   * @return tile data column index
    */
-  get tileDataColumnIndex(): number {
-    return this.tileTable.getTileDataColumnIndex();
+  public getTileDataColumnIndex(): number {
+    return this.getColumns().getTileDataIndex();
   }
+
   /**
    * Get the tile data column
-   * @return {TileColumn} tile data column
+   *
+   * @return tile data column
    */
-  get tileDataColumn(): TileColumn {
-    return this.tileTable.getTileDataColumn();
+  public getTileDataColumn(): TileColumn {
+    return this.getColumns().getTileDataColumn();
   }
+
   /**
    * Get the tile data
-   * @return {Buffer} tile data
+   *
+   * @return bytes
    */
-  get tileData(): Buffer {
-    return this.getValueWithColumnName(this.tileDataColumn.name);
+  public getTileData(): Buffer | Uint8Array {
+    return this.getValueWithIndex(this.getTileDataColumnIndex());
   }
+
   /**
    * Set the tile data
-   * @param {Buffer} tileData tile data
+   *
+   * @param tileData
+   *            tile data
    */
-  set tileData(tileData: Buffer) {
-    this.setValueWithColumnName(this.tileDataColumn.name, tileData);
+  public setTileData(tileData: Buffer | Uint8Array): void {
+    this.setValueWithIndex(this.getTileDataColumnIndex(), tileData);
   }
+
   /**
-   * Get the tile data as an image
-   * @return {*} tile image
+   * Get the tile data image
+   * @return image
    */
-  get tileDataImage(): void {
-    return null;
+  public getTileDataImage(): Promise<GeoPackageImage> {
+    return ImageUtils.getImage(this.getTileData());
+  }
+
+  /**
+   * Set the tile data from a GeoPackageImage
+   * @param image image
+   * @param imageFormat image format
+   * @param compressionQuality compression quality
+   */
+  public async setTileDataWithGeoPackageImage(
+    image: GeoPackageImage,
+    imageFormat: ImageType,
+    compressionQuality?: number,
+  ): Promise<void> {
+    const buffer = await ImageUtils.writeImageToBytes(image, imageFormat, compressionQuality);
+    this.setTileData(buffer);
+  }
+
+  /**
+   * Copy the row
+   * @return row copy
+   */
+  public copy(): TileRow {
+    return new TileRow(this);
   }
 }

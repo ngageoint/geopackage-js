@@ -1,7 +1,3 @@
-/**
- * @module attributes
- */
-
 import { UserColumns } from '../user/userColumns';
 import { AttributesColumn } from './attributesColumn';
 

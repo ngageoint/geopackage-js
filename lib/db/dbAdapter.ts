@@ -1,9 +1,5 @@
-/**
- * TODO:
- * This should allow `null` as well, but adding that could be a breaking change to clients.
- * Additionally set `"strictNullChecks": true` in tsconfig.
- */
-export type DBValue = boolean | string | number | Buffer | Uint8Array;
+import { DBValue } from './dbValue';
+import type { ResultSet } from './resultSet';
 
 export interface DBAdapter {
   db: any;
@@ -16,10 +12,10 @@ export interface DBAdapter {
   getDBConnection(): any;
   export(): Promise<any>;
   registerFunction(name: string, functionDefinition: Function): this;
-  get(sql: string, params?: [] | Record<string, any>): any;
+  get(sql: string, params?: [] | Record<string, any>): Record<string, any>;
   isTableExists(tableName: string): boolean;
-  all(sql: string, params?: [] | Record<string, any> | null): any[];
-  each(sql: string, params?: [] | Record<string, any>): IterableIterator<any>;
+  all(sql: string, params?: [] | Record<string, any> | null): Record<string, any>[];
+  each(sql: string, params?: [] | Record<string, any>): IterableIterator<Record<string, DBValue>>;
   run(sql: string, params?: [] | Record<string, any>): { changes: number; lastInsertRowid: number };
   insert(sql: string, params?: [] | Record<string, any>): number;
   prepareStatement(sql: string): any;
@@ -29,4 +25,8 @@ export interface DBAdapter {
   dropTable(table: string): boolean;
   count(tableName: string, where?: string, whereArgs?: [] | Record<string, any>): number;
   transaction(func: Function): void;
+  size(): number;
+  readableSize(): string;
+  query(sql: string, params: [] | Record<string, any>): ResultSet;
+  unsafe(enabled: boolean): void;
 }

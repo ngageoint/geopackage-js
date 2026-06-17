@@ -1,22 +1,49 @@
-import { GeoPackage } from '../geoPackage';
-import { GeoPackageConnection } from '../db/geoPackageConnection';
-import { ColumnValues } from './columnValues';
-/**
- * Dao module.
- */
-
+import { FieldValues } from './fieldValues';
 import { SqliteQueryBuilder } from '../db/sqliteQueryBuilder';
-import { DBValue } from '../db/dbAdapter';
-import { CoreSQLUtils } from '../db/coreSQLUtils';
+import { DBValue } from '../db/dbValue';
+import { SQLUtils } from '../db/sqlUtils';
+import type { GeoPackage } from '../geoPackage';
+import type { GeoPackageConnection } from '../db/geoPackageConnection';
+
+/**
+ * Return class for the {@link Dao#createOrUpdate(Object)} method.
+ */
+export class CreateOrUpdateStatus {
+  private created: boolean;
+  private updated: boolean;
+  private numLinesChanged: number;
+
+  public constructor(created: boolean, updated: boolean, numberLinesChanged: number) {
+    this.created = created;
+    this.updated = updated;
+    this.numLinesChanged = numberLinesChanged;
+  }
+
+  public isCreated(): boolean {
+    return this.created;
+  }
+
+  public isUpdated(): boolean {
+    return this.updated;
+  }
+
+  public getNumLinesChanged(): number {
+    return this.numLinesChanged;
+  }
+}
 
 /**
  * Base DAO
  */
-export abstract class Dao<T> {
+export abstract class Dao<T, ID> {
+  /**
+   * GeoPackage
+   */
+  readonly geoPackage: GeoPackage;
   /**
    * Database connection to the sqlite file
    */
-  readonly connection: GeoPackageConnection;
+  readonly db: GeoPackageConnection;
 
   /**
    * ID Columns for this DAO
@@ -29,11 +56,14 @@ export abstract class Dao<T> {
   gpkgTableName: string;
 
   /**
-   *
-   * @param geoPackage GeoPackage object this dao belongs to
+   * Constructor
+   * @param geoPackage GeoPackageConnection object
+   * @param tableName tableName
    */
-  constructor(readonly geoPackage: GeoPackage) {
-    this.connection = geoPackage.database;
+  constructor(geoPackage: GeoPackage, tableName?: string) {
+    this.geoPackage = geoPackage;
+    this.db = geoPackage.getConnection();
+    this.gpkgTableName = tableName;
   }
 
   /**
@@ -41,11 +71,23 @@ export abstract class Dao<T> {
    */
   abstract createObject(result: Record<string, DBValue>): T;
 
+  getTableName(): string {
+    return this.gpkgTableName;
+  }
+
   /**
    * Checks if the table exists
    */
   isTableExists(): boolean {
-    return this.connection.isTableExists(this.gpkgTableName);
+    return this.db.isTableExists(this.gpkgTableName);
+  }
+
+  /**
+   * Checks if the ID exists
+   * @param id
+   */
+  idExists(id: ID): boolean {
+    return this.queryForIdWithKey(id) != null;
   }
 
   /**
@@ -64,10 +106,19 @@ export abstract class Dao<T> {
   queryForId(id: DBValue): T | undefined {
     const whereString = this.buildPkWhere(id);
     const whereArgs = this.buildPkWhereArgs(id);
-    const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
-    const result = this.connection.get(query, whereArgs);
+    const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), undefined, whereString);
+    const result = this.db.get(query, whereArgs);
     if (!result) return;
     return this.createObject(result);
+  }
+
+  /**
+   * Query for equal
+   * @param field
+   * @param value
+   */
+  queryForEq(field: string, value: any): T[] {
+    return this.queryForAllEq(field, value).map((result) => this.createObject(result));
   }
 
   queryForSameId(object: T): T {
@@ -94,10 +145,37 @@ export abstract class Dao<T> {
   queryForMultiId(idValues: DBValue[]): T {
     const whereString = this.buildPkWhere(idValues);
     const whereArgs = this.buildPkWhereArgs(idValues);
-    const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
-    const result = this.connection.get(query, whereArgs);
+    const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), undefined, whereString);
+    const result = this.db.get(query, whereArgs);
     if (!result) return;
     return this.createObject(result);
+  }
+
+  /**
+   * Performs a raw query
+   * @param sql
+   * @param params
+   */
+  queryRaw(sql: string, params?: [] | Record<string, any>): Record<string, DBValue> {
+    return this.db.get(sql, params);
+  }
+
+  /**
+   * Performs a raw query
+   * @param sql
+   * @param params
+   */
+  queryAllRaw(sql: string, params?: [] | Record<string, any>): Record<string, DBValue>[] {
+    return this.db.all(sql, params);
+  }
+
+  /**
+   * Performs a raw query
+   * @param sql
+   * @param params
+   */
+  queryEachRaw(sql: string, params?: [] | Record<string, any>): IterableIterator<any> {
+    return this.db.each(sql, params);
   }
 
   /**
@@ -107,8 +185,19 @@ export abstract class Dao<T> {
    * @return {Object[]} raw object array from the database
    */
   queryForAll(where?: string, whereArgs?: DBValue[]): Record<string, DBValue>[] {
-    const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, where);
-    return this.connection.all(query, whereArgs);
+    const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), undefined, where);
+    return this.db.all(query, whereArgs);
+  }
+
+  /**
+   * Queries for all matches and returns them in the callback.  Be aware this pulls all results into memory
+   * @param  {string} [where]     Optional where clause
+   * @param  {object[]} [whereArgs] Optional where args array
+   * @return {Object[]} raw object array from the database
+   */
+  queryForAllAndCreateObjects(where?: string, whereArgs?: DBValue[]): T[] {
+    const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), undefined, where);
+    return this.db.all(query, whereArgs).map((result) => this.createObject(result));
   }
 
   /**
@@ -118,29 +207,40 @@ export abstract class Dao<T> {
    * @return {Object[]} raw object array from the database
    */
   queryForLike(fieldName: string, value: string): Record<string, DBValue>[] {
-    const values = new ColumnValues();
-    values.addColumn(fieldName, value);
+    const values = new FieldValues();
+    values.addFieldValue(fieldName, value);
     const where = this.buildWhereLike(values);
     const whereArgs = this.buildWhereArgs(value);
-    const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, where);
-    return this.connection.all(query, whereArgs);
+    const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), undefined, where);
+    return this.db.all(query, whereArgs);
   }
 
   /**
    * Queries for all matches and returns them.  Only queries for the specified column name  Be aware this pulls all results into memory
    * @param {string}  columnName  name of the column to query for
-   * @param {module:dao/columnValues~ColumnValues} [fieldValues] optional values to filter on
+   * @param {FieldValues} [fieldValues] optional values to filter on
    * @return {Object[]} raw object array from the database
    */
-  queryForColumns(columnName: string, fieldValues?: ColumnValues): Record<string, DBValue>[] {
+  queryForColumns(columnName: string, fieldValues?: FieldValues): Record<string, DBValue>[] {
     let where: string | undefined = undefined;
     let whereArgs: DBValue[] | null = null;
     if (fieldValues) {
       where = this.buildWhere(fieldValues);
       whereArgs = this.buildWhereArgs(fieldValues);
     }
-    const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", [columnName], where);
-    return this.connection.all(query, whereArgs);
+    const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), [columnName], where);
+    return this.db.all(query, whereArgs);
+  }
+
+  /**
+   * Query for column of rows matching the where clause
+   * @param columnName
+   * @param where
+   * @param whereArgs
+   */
+  queryForColumnWhere(columnName: string, where?: string, whereArgs?: DBValue[]): Record<string, DBValue>[] {
+    const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), [columnName], where);
+    return this.db.all(query, whereArgs);
   }
 
   /**
@@ -152,7 +252,7 @@ export abstract class Dao<T> {
   queryForChunk(pageSize: number, page: number): Record<string, DBValue>[] {
     const query = SqliteQueryBuilder.buildQuery(
       false,
-      "'" + this.gpkgTableName + "'",
+      SQLUtils.quoteWrap(this.gpkgTableName),
       undefined,
       undefined,
       undefined,
@@ -162,7 +262,7 @@ export abstract class Dao<T> {
       pageSize,
       page * pageSize,
     );
-    return this.connection.all(query);
+    return this.db.all(query);
   }
 
   /**
@@ -172,7 +272,7 @@ export abstract class Dao<T> {
    * @param  {string} [groupBy] group by clause
    * @param  {string} [having]  having clause
    * @param  {string} [orderBy] order by clause
-   * @param  {Array<string>} [columns] columns to retrieve
+   * @param  {string[]} [columns] columns to retrieve
    * @return {IterableIterator<any>} iterable of database objects
    */
   queryForEach(
@@ -181,12 +281,12 @@ export abstract class Dao<T> {
     groupBy?: string,
     having?: string,
     orderBy?: string,
-    columns?: Array<string>
+    columns?: string[],
   ): IterableIterator<Record<string, DBValue>> {
     if (!field) {
       const query: string = SqliteQueryBuilder.buildQuery(
         false,
-        "'" + this.gpkgTableName + "'",
+        SQLUtils.quoteWrap(this.gpkgTableName),
         columns,
         undefined,
         undefined,
@@ -194,13 +294,13 @@ export abstract class Dao<T> {
         having,
         orderBy,
       );
-      return this.connection.each(query);
+      return this.db.each(query);
     } else {
       const whereString: string = this.buildWhereWithFieldAndValue(field, value);
       const whereArgs: DBValue[] | null = this.buildWhereArgs(value);
       const query = SqliteQueryBuilder.buildQuery(
         false,
-        "'" + this.gpkgTableName + "'",
+        SQLUtils.quoteWrap(this.gpkgTableName),
         undefined,
         whereString,
         undefined,
@@ -208,20 +308,22 @@ export abstract class Dao<T> {
         having,
         orderBy,
       );
-      return this.connection.each(query, whereArgs);
+      return this.db.each(query, whereArgs);
     }
   }
 
+  abstract queryForIdWithKey(key: ID): T;
+
   /**
    * Iterate all objects in thet able that match the ColumnValues passed in
-   * @param  {module:dao/columnValues~ColumnValues} fieldValues ColumnValues to query for
+   * @param  {FieldValues} fieldValues ColumnValues to query for
    * @return {IterableIterator<any>}
    */
-  queryForFieldValues(fieldValues: ColumnValues): IterableIterator<Record<string, DBValue>> {
+  queryForFieldValues(fieldValues: FieldValues): IterableIterator<Record<string, DBValue>> {
     const whereString: string = this.buildWhere(fieldValues);
     const whereArgs: DBValue[] = this.buildWhereArgs(fieldValues);
-    const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
-    return this.connection.each(query, whereArgs);
+    const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), undefined, whereString);
+    return this.db.each(query, whereArgs);
   }
 
   /**
@@ -238,8 +340,8 @@ export abstract class Dao<T> {
     whereArgs?: DBValue[],
     columns?: string[],
   ): IterableIterator<Record<string, DBValue>> {
-    const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", columns, where, join);
-    return this.connection.each(query, whereArgs);
+    const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), columns, where, join);
+    return this.db.each(query, whereArgs);
   }
 
   /**
@@ -251,7 +353,7 @@ export abstract class Dao<T> {
    */
   countJoinWhereWithArgs(join: string, where?: string, whereArgs?: DBValue[]): number {
     const query = "select COUNT(*) as count from '" + this.gpkgTableName + "' " + join + ' where ' + where;
-    const result = this.connection.get(query, whereArgs);
+    const result = this.db.get(query, whereArgs);
     return result?.count;
   }
 
@@ -262,8 +364,33 @@ export abstract class Dao<T> {
    * @return {IterableIterator<any>}
    */
   queryWhereWithArgsDistinct(where: string, whereArgs?: DBValue[]): IterableIterator<Record<string, DBValue>> {
-    const query = SqliteQueryBuilder.buildQuery(true, "'" + this.gpkgTableName + "'", undefined, where);
-    return this.connection.each(query, whereArgs);
+    const query = SqliteQueryBuilder.buildQuery(true, SQLUtils.quoteWrap(this.gpkgTableName), undefined, where);
+    return this.db.each(query, whereArgs);
+  }
+
+  /**
+   * Creates a geometry index iterator from the iterator returned from a query
+   * @param iterator
+   * @private
+   */
+  public createTypedIterator(iterator: IterableIterator<Record<string, DBValue>>): IterableIterator<T> {
+    const createObject = this.createObject;
+    return {
+      [Symbol.iterator](): IterableIterator<T> {
+        return this;
+      },
+      next(): { value: T; done: boolean } {
+        let tObj = null;
+        const result = iterator.next();
+        if (result.value != null) {
+          tObj = createObject(result.value);
+        }
+        return {
+          value: tObj,
+          done: result.done,
+        };
+      },
+    };
   }
 
   /**
@@ -286,7 +413,7 @@ export abstract class Dao<T> {
   ): IterableIterator<Record<string, DBValue>> {
     const query: string = SqliteQueryBuilder.buildQuery(
       false,
-      "'" + this.gpkgTableName + "'",
+      SQLUtils.quoteWrap(this.gpkgTableName),
       undefined,
       where,
       undefined,
@@ -295,7 +422,7 @@ export abstract class Dao<T> {
       orderBy,
       limit,
     );
-    return this.connection.each(query, whereArgs);
+    return this.db.each(query, whereArgs);
   }
 
   /**
@@ -306,9 +433,9 @@ export abstract class Dao<T> {
   buildPkWhere(idValue: any[] | any): string {
     if (Array.isArray(idValue)) {
       const idValuesArray = idValue;
-      const idColumnValues = new ColumnValues();
+      const idColumnValues = new FieldValues();
       for (let i = 0; i < idValuesArray.length; i++) {
-        idColumnValues.addColumn(this.idColumns[i], idValuesArray[i]);
+        idColumnValues.addFieldValue(this.idColumns[i], idValuesArray[i]);
       }
       return this.buildWhere(idColumnValues);
     }
@@ -325,7 +452,10 @@ export abstract class Dao<T> {
       const idValuesArray = idValue;
       let values: DBValue[] = [];
       for (let i = 0; i < idValuesArray.length; i++) {
-        values = values.concat(this.buildWhereArgs(idValuesArray[i]));
+        const value = this.buildWhereArgs(idValuesArray[i]);
+        if (value != null) {
+          values = values.concat(value);
+        }
       }
       return values;
     }
@@ -334,18 +464,19 @@ export abstract class Dao<T> {
 
   /**
    * Build where (or selection) LIKE statement for fields
-   * @param  {module:dao/columnValues~ColumnValues} fields    columns and values
+   * @param  {FieldValues} fields    columns and values
    * @param  {string} [operation] AND or OR
    * @return {string} where clause
    */
-  buildWhereLike(fields: ColumnValues, operation?: string): string {
+  buildWhereLike(fields: FieldValues, operation?: string): string {
     let whereString = '';
     for (let i = 0; i < fields.columns.length; i++) {
       const column = fields.columns[i];
+      const value = fields.values[i];
       if (i) {
         whereString += ' ' + operation + ' ';
       }
-      whereString += this.buildWhereWithFieldAndValue(column, fields.getValue(column), 'like');
+      whereString += this.buildWhereWithFieldAndValue(column, value, 'like');
     }
     return whereString;
   }
@@ -356,28 +487,29 @@ export abstract class Dao<T> {
    * @param  [operation=AND] AND or OR
    * @return where clause
    */
-  buildWhere(fields: ColumnValues, operation = 'and'): string {
+  buildWhere(fields: FieldValues, operation = 'and'): string {
     let whereString = '';
     for (let i = 0; i < fields.columns.length; i++) {
       const column = fields.columns[i];
+      const value = fields.values[i];
       if (i) {
         whereString += ' ' + operation + ' ';
       }
-      whereString += this.buildWhereWithFieldAndValue(column, fields.getValue(column));
+      whereString += this.buildWhereWithFieldAndValue(column, value);
     }
     return whereString;
   }
 
   /**
    * Builds a where args array
-   * @param {any[]|ColumnValues|any} values argument values to push
+   * @param {any[]|FieldValues|any} values argument values to push
    * @returns {any[]}
    */
-  buildWhereArgs(values: DBValue[] | ColumnValues | DBValue): DBValue[] | null {
+  buildWhereArgs(values: DBValue[] | FieldValues | DBValue): DBValue[] | null {
     let args: DBValue[] = [];
     if (Array.isArray(values)) {
       args = this._buildWhereArgsWithArray(values);
-    } else if (values instanceof ColumnValues) {
+    } else if (values instanceof FieldValues) {
       args = this._buildWhereArgsWithColumnValues(values);
     } else {
       if (values !== undefined && values !== null) {
@@ -405,14 +537,13 @@ export abstract class Dao<T> {
 
   /**
    * Builds a where args array
-   * @param {ColumnValues} values argument values to push
+   * @param {FieldValues} values argument values to push
    * @returns {any[]}
    */
-  _buildWhereArgsWithColumnValues(values: ColumnValues): DBValue[] {
+  _buildWhereArgsWithColumnValues(values: FieldValues): DBValue[] {
     const args = [];
     for (let i = 0; i < values.columns.length; i++) {
-      const column = values.columns[i];
-      const value = values.getValue(column);
+      const value = values.values[i];
       if (value !== undefined && value !== null) {
         args.push(value);
       }
@@ -457,7 +588,7 @@ export abstract class Dao<T> {
     const whereArgs = this.buildWhereArgs(value);
     const query = SqliteQueryBuilder.buildQuery(
       false,
-      "'" + this.gpkgTableName + "'",
+      SQLUtils.quoteWrap(this.gpkgTableName),
       undefined,
       whereString,
       undefined,
@@ -465,32 +596,32 @@ export abstract class Dao<T> {
       having,
       orderBy,
     );
-    return this.connection.all(query, whereArgs);
+    return this.db.all(query, whereArgs);
   }
 
   /**
    * Count rows in the table optionally filtered by the parameters specified
-   * @param  {module:dao/columnValues~ColumnValues|string} [fields] Either a ColumnValues object or a string specifying a field name
+   * @param  {FieldValues|string} [fields] Either a ColumnValues object or a string specifying a field name
    * @param  {Object} [value]  value to filter on if fields is a string
    * @return {number} count of objects
    */
-  count(fields?: ColumnValues | string, value?: DBValue): number {
+  count(fields?: FieldValues | string, value?: DBValue): number {
     if (!fields) {
-      return this.connection.count(this.gpkgTableName);
+      return this.db.count(this.gpkgTableName);
     }
     let where;
     let whereArgs;
     let query;
-    if (fields instanceof ColumnValues) {
+    if (fields instanceof FieldValues) {
       where = this.buildWhere(fields, 'and');
       whereArgs = this.buildWhereArgs(fields);
-      query = SqliteQueryBuilder.buildCount("'" + this.gpkgTableName + "'", where);
+      query = SqliteQueryBuilder.buildCount(SQLUtils.quoteWrap(this.gpkgTableName), where);
     } else {
       const whereString = this.buildWhereWithFieldAndValue(fields, value);
       whereArgs = this.buildWhereArgs(value);
-      query = SqliteQueryBuilder.buildCount("'" + this.gpkgTableName + "'", whereString);
+      query = SqliteQueryBuilder.buildCount(SQLUtils.quoteWrap(this.gpkgTableName), whereString);
     }
-    const result = this.connection.get(query, whereArgs);
+    const result = this.db.get(query, whereArgs);
     return result?.count;
   }
 
@@ -501,8 +632,8 @@ export abstract class Dao<T> {
    * @return {number} count of objects
    */
   countWhere(where: string, whereArgs: DBValue[]): number {
-    const query = SqliteQueryBuilder.buildCount("'" + this.gpkgTableName + "'", where);
-    const result = this.connection.get(query, whereArgs);
+    const query = SqliteQueryBuilder.buildCount(SQLUtils.quoteWrap(this.gpkgTableName), where);
+    const result = this.db.get(query, whereArgs);
     return result?.count;
   }
 
@@ -514,7 +645,7 @@ export abstract class Dao<T> {
    * @return {number}
    */
   minOfColumn(column: string, where?: string, whereArgs?: DBValue[]): number {
-    return this.connection.minOfColumn("'" + this.gpkgTableName + "'", column, where, whereArgs);
+    return this.db.minOfColumn(SQLUtils.quoteWrap(this.gpkgTableName), column, where, whereArgs);
   }
 
   /**
@@ -525,7 +656,7 @@ export abstract class Dao<T> {
    * @return {number}
    */
   maxOfColumn(column: string, where?: string, whereArgs?: DBValue[]): number {
-    return this.connection.maxOfColumn("'" + this.gpkgTableName + "'", column, where, whereArgs);
+    return this.db.maxOfColumn(SQLUtils.quoteWrap(this.gpkgTableName), column, where, whereArgs);
   }
 
   /**
@@ -548,18 +679,26 @@ export abstract class Dao<T> {
   deleteById(idValue: DBValue): number {
     const where = this.buildPkWhere(idValue);
     const whereArgs = this.buildPkWhereArgs(idValue);
-    return this.connection.delete("'" + this.gpkgTableName + "'", where, whereArgs);
+    return this.db.delete(SQLUtils.quoteWrap(this.gpkgTableName), where, whereArgs);
   }
 
   /**
    * Delete the object specified by the ids
-   * @param  {module:dao/columnValues~ColumnValues} idValues id values
+   * @param  {FieldValues} idValues id values
    * @return {number} number of objects deleted
    */
   deleteByMultiId(idValues: any[]): number {
     const where = this.buildPkWhere(idValues);
     const whereArgs = this.buildPkWhereArgs(idValues);
-    return this.connection.delete("'" + this.gpkgTableName + "'", where, whereArgs);
+    return this.db.delete(SQLUtils.quoteWrap(this.gpkgTableName), where, whereArgs);
+  }
+
+  deleteByID(id: ID): void {
+    if (typeof id === 'object') {
+      this.deleteByMultiId(Object.values(id));
+    } else if (typeof id === 'number' || typeof id === 'boolean' || typeof id === 'string') {
+      this.deleteById(id);
+    }
   }
 
   /**
@@ -569,7 +708,7 @@ export abstract class Dao<T> {
    * @return {number} number of objects deleted
    */
   deleteWhere(where: string, whereArgs: DBValue[]): number {
-    return this.connection.delete("'" + this.gpkgTableName + "'", where, whereArgs);
+    return this.db.delete(SQLUtils.quoteWrap(this.gpkgTableName), where, whereArgs);
   }
 
   /**
@@ -577,7 +716,7 @@ export abstract class Dao<T> {
    * @return {number} number of objects deleted
    */
   deleteAll(): number {
-    return this.connection.delete("'" + this.gpkgTableName + "'", '', []);
+    return this.db.delete(SQLUtils.quoteWrap(this.gpkgTableName), '', []);
   }
 
   /**
@@ -586,14 +725,14 @@ export abstract class Dao<T> {
    * @return {number} id of the inserted object
    */
   create(object: T): number {
-    const sql = SqliteQueryBuilder.buildInsert("'" + this.gpkgTableName + "'", object);
+    const sql = SqliteQueryBuilder.buildInsert(SQLUtils.quoteWrap(this.gpkgTableName), object);
     const insertObject = SqliteQueryBuilder.buildUpdateOrInsertObject(object);
-    return this.connection.insert(sql, insertObject);
+    return this.db.insert(sql, insertObject);
   }
 
   /**
    * Update all rows that match the query
-   * @param  {module:dao/columnValues~ColumnValues} values    values to insert
+   * @param  {FieldValues} values    values to insert
    * @param  {string} where     where clause
    * @param  {Object[]} whereArgs where arguments
    * @return {number} number of objects updated
@@ -606,8 +745,8 @@ export abstract class Dao<T> {
     changes: number;
     lastInsertRowid: number;
   } {
-    const update = SqliteQueryBuilder.buildUpdate("'" + this.gpkgTableName + "'", values, where, whereArgs);
-    return this.connection.run(update.sql, update.args);
+    const update = SqliteQueryBuilder.buildUpdate(SQLUtils.quoteWrap(this.gpkgTableName), values, where, whereArgs);
+    return this.db.run(update.sql, update.args);
   }
 
   /**
@@ -615,24 +754,25 @@ export abstract class Dao<T> {
    * @param  {Object} object object with updated values
    * @return {number} number of objects updated
    */
-  update(
-    object: T,
-  ): {
+  update(object: T): {
     changes: number;
     lastInsertRowid: number;
   } {
     const updateValues = SqliteQueryBuilder.buildUpdateOrInsertObject(object);
-    let update = SqliteQueryBuilder.buildObjectUpdate("'" + this.gpkgTableName + "'", object);
+    let update = SqliteQueryBuilder.buildObjectUpdate(SQLUtils.quoteWrap(this.gpkgTableName), object);
     const multiId = this.getMultiId(object);
-    if (multiId.length) {
+    if (multiId.length > 0) {
       let where = ' where ';
       for (let i = 0; i < multiId.length; i++) {
+        if (i > 0) {
+          where += ' and ';
+        }
         where += '"' + this.idColumns[i] + '" = $' + SqliteQueryBuilder.fixColumnName(this.idColumns[i]);
         updateValues[SqliteQueryBuilder.fixColumnName(this.idColumns[i])] = multiId[i];
       }
       update += where;
     }
-    return this.connection.run(update, updateValues);
+    return this.db.run(update, updateValues);
   }
 
   /**
@@ -640,28 +780,29 @@ export abstract class Dao<T> {
    * @param  {Object} object object to update or create
    * @return {number} number of objects modified
    */
-  createOrUpdate(object: T): number {
+  createOrUpdate(object: T): CreateOrUpdateStatus {
     const existing = this.queryForSameId(object);
     if (!existing) {
-      return this.create(object);
+      const rowsInserted = this.create(object);
+      return new CreateOrUpdateStatus(true, false, rowsInserted);
     } else {
-      return this.update(object).changes;
+      const rowsUpdated = this.update(object).changes;
+      return new CreateOrUpdateStatus(false, true, rowsUpdated);
     }
   }
 
   /**
-   * Drops this table
-   * @return {boolean} results of the drop
+   * Drop the user table
    */
-  dropTable(): boolean {
-    return this.connection.dropTable(this.gpkgTableName);
+  public dropTable(): void {
+    SQLUtils.dropTable(this.db, this.getTableName());
   }
 
   /**
    * Drops this table
    */
-  dropTableWithTableName(tableName: string) {
-    CoreSQLUtils.dropTable(this.geoPackage.connection, tableName);
+  dropTableWithTableName(tableName: string): void {
+    SQLUtils.dropTable(this.db, tableName);
   }
 
   /**
@@ -669,7 +810,7 @@ export abstract class Dao<T> {
    * @param {string} newName
    */
   rename(newName: string): void {
-    this.connection.run('ALTER TABLE ' + "'" + this.gpkgTableName + "' RENAME TO '" + newName + "'");
+    this.db.run('ALTER TABLE ' + SQLUtils.quoteWrap(this.gpkgTableName) + ' RENAME TO ' + SQLUtils.quoteWrap(newName));
     this.gpkgTableName = newName;
   }
 }

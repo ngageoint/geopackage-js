@@ -1,4 +1,4 @@
-const { GeoPackageAPI, setSqljsWasmLocateFile } = window.GeoPackage;
+const { GeoPackageManager, setSqljsWasmLocateFile } = window.GeoPackage;
 const geopackageMap = L.map('geopackage-map').setView([38.6258, -90.189933], 14);
 L.tileLayer('http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png', {
   attribution:
@@ -26,7 +26,7 @@ window.loadUrl = function(url) {
 };
 
 function loadByteArray(array) {
-  GeoPackageAPI.open(array).then(geoPackage => {
+  GeoPackageManager.open(array).then(geoPackage => {
     // Now you can operate on the GeoPackage
     // Get the tile table names
     const tileTableNames = geoPackage.getTileTables();

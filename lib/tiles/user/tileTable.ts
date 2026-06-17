@@ -1,20 +1,14 @@
-/**
- * @module tiles/user/tileTable
- */
-
 import { UserTable } from '../../user/userTable';
 import { TileColumn } from './tileColumn';
 import { TileColumns } from './tileColumns';
 import { UniqueConstraint } from '../../db/table/uniqueConstraint';
-import { ContentsDataType } from '../../core/contents/contentsDataType';
-import { Contents } from '../../core/contents/contents';
+import { ContentsDataType } from '../../contents/contentsDataType';
+import { Contents } from '../../contents/contents';
+import { GeoPackageException } from '../../geoPackageException';
 
 /**
  * `TileTable` models [tile pyramid user tables](https://www.geopackage.org/spec121/index.html#tiles_user_tables).
- *
  * @class
- * @param {string} tableName
- * @param {module:tiles/user/tileColumn~TileColumn[]} columns
  */
 export class TileTable extends UserTable<TileColumn> {
   /**
@@ -51,39 +45,38 @@ export class TileTable extends UserTable<TileColumn> {
     super(new TileColumns(tableName, columns, false));
 
     // Build a unique constraint on zoom level, tile column, and tile data
-    let uniqueConstraint = new UniqueConstraint();
+    const uniqueConstraint = new UniqueConstraint();
     uniqueConstraint.add(this.getUserColumns().getZoomLevelColumn());
     uniqueConstraint.add(this.getUserColumns().getTileColumnColumn());
     uniqueConstraint.add(this.getUserColumns().getTileRowColumn());
 
     // Add the unique constraint
     this.addConstraint(uniqueConstraint);
-
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   copy(): TileTable {
-    return new TileTable(this.getTableName(), this.columns._columns);
+    return new TileTable(this.getTableName(), this.columns.getColumns());
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   getDataType(): string {
-    return ContentsDataType.TILES;
+    return ContentsDataType.nameFromType(ContentsDataType.TILES);
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   getUserColumns(): TileColumns {
     return super.getUserColumns() as TileColumns;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   createUserColumns(columns: TileColumn[]): TileColumns {
     return new TileColumns(this.getTableName(), columns, true);
@@ -156,26 +149,27 @@ export class TileTable extends UserTable<TileColumn> {
   /**
    * Create the required table columns, starting at the provided index
    * @param startingIndex starting index
+   * @param autoincrement defaults to false
    * @return tile columns
    */
-  static createRequiredColumns(startingIndex: number = 0): TileColumn[]{
-    let columns: TileColumn[] = [];
-    columns.push(TileColumn.createIdColumn(startingIndex++));
-    columns.push(TileColumn.createZoomLevelColumn(startingIndex++));
-    columns.push(TileColumn.createTileColumnColumn(startingIndex++));
-    columns.push(TileColumn.createTileRowColumn(startingIndex++));
-    columns.push(TileColumn.createTileDataColumn(startingIndex));
+  static createRequiredColumns(autoincrement = false): TileColumn[] {
+    const columns: TileColumn[] = [];
+    columns.push(TileColumn.createIdColumn(autoincrement));
+    columns.push(TileColumn.createZoomLevelColumn());
+    columns.push(TileColumn.createTileColumnColumn());
+    columns.push(TileColumn.createTileRowColumn());
+    columns.push(TileColumn.createTileDataColumn());
     return columns;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
-  validateContents(contents: Contents) {
+  validateContents(contents: Contents): void {
     // Verify the Contents have a tiles data type
-    let dataType = contents.data_type;
+    const dataType = contents.getDataType();
     if (dataType === null || dataType === undefined || dataType !== ContentsDataType.TILES) {
-      throw new Error('The Contents of a TileTable must have a data type of tiles');
+      throw new GeoPackageException('The Contents of a TileTable must have a data type of tiles');
     }
   }
 }

@@ -1,27 +1,24 @@
-import { default as testSetup } from '../../fixtures/testSetup'
+import { default as testSetup } from '../../testSetup';
 
-var Verification = require('../../fixtures/verification');
-describe('GeoPackage Extension Dao tests', function() {
+var Verification = require('../../verification');
+describe('GeoPackage Extension Dao tests', function () {
   var testGeoPackage;
-  var tableName = 'test_features.test';
-  var geopackage;
+  var geoPackage;
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     let created = await testSetup.createTmpGeoPackage();
     testGeoPackage = created.path;
-    geopackage = created.geopackage;
+    geoPackage = created.geoPackage;
   });
 
-  afterEach(async function() {
-    geopackage.close();
+  afterEach(async function () {
+    geoPackage.close();
     await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
-  it('should create an extensions table', function() {
-    var extensionDao = geopackage.extensionDao;
-    extensionDao.createTable();
-    var verified = Verification.verifyExtensions(geopackage);
+  it('should create an extensions table', function () {
+    geoPackage.createExtensionsTable();
+    var verified = Verification.verifyExtensions(geoPackage);
     verified.should.be.equal(true);
   });
-
 });

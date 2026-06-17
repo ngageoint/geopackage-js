@@ -30,7 +30,7 @@ Software source code previously released under an open source license and then m
 
 [GeoPackage JS](https://github.com/ngageoint/geopackage-js) is a [GeoPackage Library](http://ngageoint.github.io/GeoPackage/) JavaScript implementation of the Open Geospatial Consortium [GeoPackage](http://www.geopackage.org/) [spec](http://www.geopackage.org/spec/).  It is listed as an [OGC GeoPackage Implementation](http://www.geopackage.org/#implementations_nga) by the National Geospatial-Intelligence Agency.
 
-<a href='http://www.opengeospatial.org/resource/products/details/?pid=1628'>
+<a href='http://www.opengeospatial.org/resource/products/details/?pid=1768'>
     <img src="https://github.com/ngageoint/GeoPackage/raw/master/docs/images/ogc.gif" height=50>
 </a>
 

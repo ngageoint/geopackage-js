@@ -3,7 +3,6 @@
  */
 
 export class StringUtils {
-
   /**
    * Wrap the name in double quotes
    * @param name  name
@@ -11,7 +10,7 @@ export class StringUtils {
    */
   static quoteWrap(name: string): string {
     let quoteName = null;
-    if (name !== null) {
+    if (name != null) {
       if (name.startsWith('"') && name.endsWith('"')) {
         quoteName = name;
       } else {

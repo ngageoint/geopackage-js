@@ -1,8 +1,11 @@
-import { DBAdapter, DBValue } from './dbAdapter';
+import { DBAdapter } from './dbAdapter';
+import { DBValue } from '../db/dbValue';
 import fs from 'fs';
 import path from 'path';
 import http from 'http';
 import os from 'os';
+import { GeoPackageUtilities } from '../io/geoPackageUtilities';
+import { ResultSet } from './resultSet';
 
 /**
  * This adapter uses better-sqlite3 to execute queries against the GeoPackage database
@@ -16,15 +19,15 @@ export class SqliteAdapter implements DBAdapter {
    * Returns a Promise which, when resolved, returns a DBAdapter which has connected to the GeoPackage database file
    */
   async initialize(): Promise<this> {
-    // @ts-ignore
     try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const Database = require('better-sqlite3');
       if (this.filePath && typeof this.filePath === 'string') {
         if (this.filePath.indexOf('http') === 0) {
           const url: string = this.filePath as string;
           return new Promise((resolve, reject) => {
             http
-              .get(url, response => {
+              .get(url, (response) => {
                 if (response.statusCode !== 200) {
                   reject(new Error('Unable to reach url: ' + this.filePath));
                 }
@@ -39,12 +42,11 @@ export class SqliteAdapter implements DBAdapter {
                     this.filePath = tmpPath;
                     resolve(this);
                   } catch (err) {
-                    console.log('error', err);
                     reject(err);
                   }
                 });
               })
-              .on('error', e => {
+              .on('error', (e) => {
                 reject(e);
               });
           });
@@ -63,7 +65,6 @@ export class SqliteAdapter implements DBAdapter {
             try {
               this.db.pragma('journal_mode = WAL');
             } catch (err) {
-              console.log('error', err);
               reject(err);
             }
             this.filePath = tmpPath;
@@ -80,18 +81,35 @@ export class SqliteAdapter implements DBAdapter {
       throw err;
     }
   }
-  // /**
-  //  * Creates an adapter from an already established better-sqlite3 database connection
-  //  * @param  {*} db better-sqlite3 database connection
-  //  * @return {module:db/sqliteAdapter~Adapter}
-  //  */
-  // static createAdapterFromDb(db) {
-  //   return new SqliteAdapter(db);
-  // };
 
+  /**
+   *
+   * @param filePath
+   */
   constructor(filePath?: string | Buffer | Uint8Array) {
     this.filePath = filePath;
   }
+
+  /**
+   * Returns the size in bytes
+   */
+  public size(): number {
+    if (typeof this.filePath === 'string') {
+      const stats = fs.statSync(this.filePath);
+      return stats.size;
+    }
+  }
+
+  /**
+   * Returns the size in bytes
+   */
+  public readableSize(): string {
+    if (typeof this.filePath === 'string') {
+      const stats = fs.statSync(this.filePath);
+      return GeoPackageUtilities.formatBytes(stats.size);
+    }
+  }
+
   /**
    * Closes the connection to the GeoPackage
    */
@@ -115,8 +133,8 @@ export class SqliteAdapter implements DBAdapter {
   /**
    * Returns a Buffer containing the contents of the database as a file
    */
-  async export(): Promise<any> {
-    return new Promise(resolve => {
+  async export(): Promise<Uint8Array> {
+    return new Promise((resolve) => {
       return fs.readFile(this.filePath as string, (err, data) => {
         resolve(data);
       });
@@ -127,7 +145,7 @@ export class SqliteAdapter implements DBAdapter {
    * @see {@link https://github.com/JoshuaWise/better-sqlite3/wiki/API#registeroptions-function---this|better-sqlite3 register}
    * @param  {string} name               name of function to register
    * @param  {Function} functionDefinition function to register
-   * @return {module:db/sqliteAdapter~Adapter} this
+   * @return {Adapter} this
    */
   registerFunction(name: string, functionDefinition: Function): this {
     this.db.function(name, functionDefinition);
@@ -154,8 +172,9 @@ export class SqliteAdapter implements DBAdapter {
    * @returns {Boolean}
    */
   isTableExists(tableName: string): boolean {
-    const statement = this.db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=:name");
+    let statement = this.db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=:name");
     const result = statement.get({ name: tableName });
+    statement = null;
     return !!result;
   }
   /**
@@ -220,7 +239,7 @@ export class SqliteAdapter implements DBAdapter {
    * Prepares a SQL statement
    * @param sql
    */
-  prepareStatement (sql: string): any {
+  prepareStatement(sql: string): any {
     return this.db.prepare(sql);
   }
   /**
@@ -229,14 +248,15 @@ export class SqliteAdapter implements DBAdapter {
    * @param  {Object|Array} [params] bind parameters
    * @return {Number} last inserted row id
    */
-  bindAndInsert (statement: any, params?: [] | Record<string, DBValue>): number {
+  bindAndInsert(statement: any, params?: [] | Record<string, DBValue>): number {
     return statement.run(params).lastInsertRowid;
   }
   /**
    * Closes a prepared statement
    * @param statement
    */
-  closeStatement (statement: any) {
+  closeStatement(statement: any): void {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     statement = null;
   }
   /**
@@ -247,7 +267,11 @@ export class SqliteAdapter implements DBAdapter {
    */
   delete(sql: string, params?: [] | Record<string, DBValue>): number {
     const statement = this.db.prepare(sql);
-    return statement.run(params).changes;
+    if (params != null) {
+      return statement.run(params).changes;
+    } else {
+      return statement.run().changes;
+    }
   }
   /**
    * Drops the table
@@ -262,7 +286,7 @@ export class SqliteAdapter implements DBAdapter {
       vacuum.run();
       return result.changes === 0;
     } catch (e) {
-      console.log('Drop Table Error', e);
+      console.error('Drop Table Error', e);
       return false;
     }
   }
@@ -288,5 +312,34 @@ export class SqliteAdapter implements DBAdapter {
 
   transaction(func: Function): void {
     this.db.transaction(func)();
+  }
+
+  /**
+   * Returns a result set for the given query
+   */
+  query(sql: string, params?: [] | Record<string, DBValue>): ResultSet {
+    let statement = this.db.prepare(sql);
+    let iterator;
+    if (params) {
+      iterator = statement.iterate(params);
+    } else {
+      iterator = statement.iterate();
+    }
+    const close = (): void => {
+      if (iterator != null) {
+        iterator.return();
+        iterator = null;
+      }
+      statement = null;
+    };
+    return new ResultSet(iterator, { close }, this);
+  }
+
+  /**
+   * Enable or disable unsafe mode
+   * @param enabled
+   */
+  unsafe(enabled: boolean): void {
+    this.db.unsafeMode(enabled);
   }
 }

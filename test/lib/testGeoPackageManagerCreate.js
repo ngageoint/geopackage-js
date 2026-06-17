@@ -1,28 +1,27 @@
-import { default as testSetup } from '../fixtures/testSetup'
+import { default as testSetup } from '../testSetup';
 
-var { GeoPackageAPI } = require('../../')
-  , should = require('chai').should();
+var { GeoPackageManager } = require('../../'),
+  should = require('chai').should();
 
-describe('GeoPackageAPI Create tests', function() {
-
+describe('GeoPackageManager Create tests', function () {
   var testGeoPackage;
-  var geopackage;
+  var geoPackage;
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     let created = await testSetup.createTmpGeoPackage();
     testGeoPackage = created.path;
-    geopackage = created.geopackage;
+    geoPackage = created.geoPackage;
   });
 
-  afterEach(async function() {
-    geopackage.close();
+  afterEach(async function () {
+    geoPackage.close();
     await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
-  it('should not allow a file without a gpkg extension', async function() {
+  it('should not allow a file without a gpkg extension', async function () {
     try {
-      let gp = await GeoPackageAPI.create('/tmp/test.g');
-      should.fail(gp, null, 'Error should have been thrown')
+      let gp = await GeoPackageManager.create('/tmp/test.g');
+      should.fail(gp, null, 'Error should have been thrown');
     } catch (e) {
       should.exist(e);
       return;
@@ -30,14 +29,12 @@ describe('GeoPackageAPI Create tests', function() {
     should.fail(false, true, 'Error should have been thrown');
   });
 
-  it('should create the geopackage file', async function() {
-    should.exist(geopackage);
-    var applicationId = geopackage.getApplicationId();
+  it('should create the geoPackage file', async function () {
+    should.exist(geoPackage);
+    var applicationId = geoPackage.getApplicationId();
     var buff = Buffer.alloc(4);
-    // @ts-ignore
     buff.writeUInt32BE(applicationId);
     var idString = buff.toString('ascii', 0, 4);
     idString.should.be.equal('GPKG');
   });
-
 });

@@ -1,13 +1,16 @@
+import { GeoPackageImage } from '../image/geoPackageImage';
+import { ImageType } from '../image/imageType';
+
 export interface CanvasAdapter {
   /**
    * Initializes the adapter for use.
    */
-  initialize(): Promise<void>
+  initialize(): Promise<void>;
 
   /**
    * Returns if the Adapter has been initialized.
    */
-  isInitialized(): boolean
+  isInitialized(): boolean;
 
   /**
    * Creates a canvas object
@@ -21,14 +24,14 @@ export interface CanvasAdapter {
    * @param data
    * @param contentType
    */
-  createImage(data: any, contentType: string): Promise<{image: any, width: number, height: number}>;
+  createImage(data: Uint8Array | Buffer | string | Blob, contentType: string): Promise<GeoPackageImage>;
 
   /**
    * Scales an image created using this adapter.
    * @param image
    * @param scale
    */
-  scaleImage(image: {image: any, width: number, height: number}, scale: number): Promise<{image: any, width: number, height: number}>;
+  scaleImage(image: GeoPackageImage, scale: number): Promise<GeoPackageImage>;
 
   /**
    * Scales an image created using this adapter.
@@ -36,14 +39,14 @@ export interface CanvasAdapter {
    * @param scaledWidth
    * @param scaledHeight
    */
-  scaleImageToDimensions(image: {image: any, width: number, height: number}, scaledWidth: number, scaledHeight: number): Promise<{image: any, width: number, height: number}>;
+  scaleImageToDimensions(image: GeoPackageImage, scaledWidth: number, scaledHeight: number): Promise<GeoPackageImage>;
 
   /**
    * Creates an ImageData object
    * @param width
    * @param height
    */
-  createImageData(width, height): any;
+  createImageData(width, height): ImageData;
 
   /**
    * Performs any cleanup needed for the specified canvas. The canvas should not be used after calling this function.
@@ -75,12 +78,43 @@ export interface CanvasAdapter {
    * Converts the canvas to a base64 data url in the format specified
    * @param canvas
    * @param format
+   * @param quality 0 to 1
    */
-  toDataURL(canvas: any, format: string): Promise<string>;
+  toDataURL(canvas: any, format: string, quality?: number): Promise<string>;
 
   /**
    * Performs any cleanup needed for the specified image
    * @param image
    */
-  disposeImage(image: {image: any, width: number, height: number}): void;
+  disposeImage(image: GeoPackageImage): void;
+
+  /**
+   * Writes the image to a buffer
+   * @param image
+   * @param imageFormat
+   * @param compressionQuality a Number between 0 and 1 indicating the image quality to be used when creating images
+   * using file formats that support lossy compression (such as jpg)
+   */
+  writeImageToBytes(image: GeoPackageImage, imageFormat: ImageType, compressionQuality: number): Promise<Uint8Array>;
+
+  /**
+   * Gets the image as ImageData
+   * @param image
+   */
+  getImageData(image: GeoPackageImage): ImageData;
+
+  /**
+   * Draw content of fromCanvas into the toContext
+   * @param fromCanvas
+   * @param toContext
+   */
+  mergeCanvas(fromCanvas: any, toContext: any): void;
+
+  /**
+   * Converts the contents drawn in a canvas to a byte array
+   * @param canvas
+   * @param imageFormat
+   * @param compressionQuality
+   */
+  toBytes(canvas: any, imageFormat: ImageType, compressionQuality?: number): Promise<Uint8Array>;
 }

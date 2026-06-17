@@ -2,7 +2,7 @@
 
 ### Setup
 1. Install python
-2. Install node version 14+
+2. Install node version 16+
 3. npm install
 
 ### Test in node context
