@@ -4,6 +4,8 @@
 
 - Upgrade the [`inquirer`](https://www.npmjs.com/package/inquirer) dependency to address [CVE-2025-54798](https://github.com/advisories/GHSA-52f5-9888-hmc6), and [CVE-2026-44705](https://github.com/advisories/GHSA-ph9p-34f9-6g65)
 
+- Upgrade the [`lodash`](https://github.com/lodash/lodash) dependency to address [CVE-2026-4800](https://github.com/advisories/GHSA-r5fr-rjxr-66jc), [CVE-2026-2950](https://github.com/advisories/GHSA-f23m-r3pf-42rh), and [CVE-2025-13465](https://github.com/advisories/GHSA-xxjr-mmjv-4gpg)
+
 ##### 4.2.6
 
 - Upgrade the [`file-type`](https://www.npmjs.com/package/file-type) dependency to address [CVE-2022-36313](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-36313).
