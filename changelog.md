@@ -2,7 +2,7 @@
 
 ##### 4.2.7
 
-- Upgrade the [`file-type`](https://www.npmjs.com/package/inquirer) dependency to address [CVE-2025-54798](https://github.com/advisories/GHSA-52f5-9888-hmc6), and [CVE-2026-44705](https://github.com/advisories/GHSA-ph9p-34f9-6g65)
+- Upgrade the [`inquirer`](https://www.npmjs.com/package/inquirer) dependency to address [CVE-2025-54798](https://github.com/advisories/GHSA-52f5-9888-hmc6), and [CVE-2026-44705](https://github.com/advisories/GHSA-ph9p-34f9-6g65)
 
 ##### 4.2.6
 
