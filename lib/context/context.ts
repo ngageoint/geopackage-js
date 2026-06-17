@@ -29,7 +29,7 @@ export class Context {
       Db.registerDbAdapter(SqliteAdapter);
     } catch (e) {
       console.error('Unable to register SqliteAdapter. The better-sqlite3 module was not found. Falling back to SqljsAdapter.', e);
-      // fallback to sqljs adapter — point sql.js at its bundled wasm file
+      // fallback to sqljs adapter
       Db.registerDbAdapter(SqljsAdapter);
     }
   }
