@@ -40,7 +40,7 @@
     "@types/proj4": "2.5.2",
     "file-type": "^16.5.4",
     "image-size": "0.8.3",
-    "lodash": "4.17.21",
+    "lodash": "4.18.1",
     "proj4": "2.8.0",
     "reproject": "1.2.5",
     "rtree-sql.js": "1.7.0",
