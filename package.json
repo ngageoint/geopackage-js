@@ -107,6 +107,9 @@
     "report-dir": "./docs/coverage",
     "reporter": [
       "lcov"
+    ],
+    "exclude": [
+      "canvaskit/**"
     ]
   },
   "scripts": {
