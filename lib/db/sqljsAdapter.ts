@@ -228,7 +228,7 @@ export class SqljsAdapter implements DBAdapter {
   run(sql: string, params?: [] | Record<string, DBValue>): { changes: number; lastInsertRowid: number } {
     if (params && !(params instanceof Array)) {
       for (const key in params) {
-        params['$' + key] = params[key];
+        params['$' + key] = typeof params[key] === 'undefined' ? null : params[key];
       }
     }
     this.db.run(sql, params);
@@ -251,7 +251,7 @@ export class SqljsAdapter implements DBAdapter {
   insert(sql: string, params?: [] | Record<string, DBValue>): number {
     if (params && !(params instanceof Array)) {
       for (const key in params) {
-        params['$' + key] = params[key];
+        params['$' + key] = typeof params[key] === 'undefined' ? null : params[key];
       }
     }
     const statement = this.db.prepare(sql, params);
