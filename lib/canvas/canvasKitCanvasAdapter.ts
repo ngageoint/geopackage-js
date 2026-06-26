@@ -87,6 +87,7 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
               } else {
                 reject('Code: ' + res.statusCode);
               }
+              res.resume();
             })
           });
         } else {
