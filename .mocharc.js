@@ -2,7 +2,8 @@
 module.exports = {
     diff: true,
     extension: ['ts', 'tsx', 'js'], // include extensions
-    opts: './mocha.opts', // point to you mocha options file. the rest is whatever.
+    require: ['ts-node/register/transpile-only'],
+    file: ['./test/setupNodeEnv.js'],
     package: './package.json',
     reporter: 'spec',
     slow: 75,
