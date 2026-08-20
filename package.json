@@ -62,7 +62,7 @@
     "browserify-css": "0.15.0",
     "canvas-compare": "https://github.com/caldwellc/canvas-compare.git",
     "chai": "4.2.0",
-    "copy-webpack-plugin": "^8.1.1",
+    "copy-webpack-plugin": "^14.0.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.9.0",
     "eslint-plugin-prettier": "^3.1.2",
