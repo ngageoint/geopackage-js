@@ -73,7 +73,7 @@
     "nock": "11.7.0",
     "node-loader": "^2.0.0",
     "node-polyfill-webpack-plugin": "^1.1.0",
-    "nyc": "^14.1.1",
+    "nyc": "^18.0.0",
     "prettier": "^1.19.1",
     "sass": "^1.29.0",
     "sass-loader": "^10.0.5",
