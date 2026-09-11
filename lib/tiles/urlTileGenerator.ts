@@ -336,7 +336,7 @@ export class UrlTileGenerator extends TileGenerator {
     }
 
     let attempt = 1;
-    while (attempt < this.downloadAttempts) {
+    while (attempt <= this.downloadAttempts) {
       try {
         const result = await this.downloadTile(zoomUrl, z, x, y);
         contentType = result.contentType;
