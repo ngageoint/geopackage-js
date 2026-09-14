@@ -733,4 +733,5 @@ module.exports.validateGeoPackage = function (geoPackage) {
   assert.isNull(geoPackage.quickCheck());
 };
 
-export default module.exports;
+Object.assign(exports, module.exports);
+exports.default = module.exports;

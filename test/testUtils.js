@@ -1,4 +1,4 @@
-import { default as testSetup } from './testSetup';
+const testSetup = require('./testSetup');
 
 var GeoPackageManager = require('../index').GeoPackageManager;
 var isNode = typeof process !== 'undefined' && process.version;

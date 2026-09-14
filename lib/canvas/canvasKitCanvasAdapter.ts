@@ -110,7 +110,8 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
                     data.push(chunk);
                   })
                   .on('end', function () {
-                    resolve(Buffer.concat(data).buffer as Buffer);
+                    const buffer = Buffer.concat(data);
+                    resolve(Buffer.from(buffer.buffer, buffer.byteOffset, buffer.byteLength));
                   })
                   .on('error', function (e) {
                     reject(e);

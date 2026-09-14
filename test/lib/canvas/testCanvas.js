@@ -1,6 +1,8 @@
 var should = require('chai').should(),
   Canvas = require('../../../lib/canvas/canvas').Canvas,
   path = require('path'),
+  fs = require('fs'),
+  http = require('http'),
   CanvasKitCanvasAdapter = require('../../../lib/canvas/canvasKitCanvasAdapter').CanvasKitCanvasAdapter,
   HtmlCanvasAdapter = require('../../../lib/canvas/htmlCanvasAdapter').HtmlCanvasAdapter;
 
@@ -65,6 +67,46 @@ const webTextBase64 =
   'data:image/png;base64,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';
 
 describe('Canvas tests', function () {
+  let server;
+  let serverUrl;
+
+  before(function (done) {
+    if (isWeb) {
+      done();
+      return;
+    }
+    const pushpinPath = path.join(__dirname, '..', '..', 'fixtures', 'pushpin.png');
+    server = http.createServer((req, res) => {
+      if (req.url === '/pushpin.png') {
+        fs.readFile(pushpinPath, (err, data) => {
+          if (err) {
+            res.statusCode = 500;
+            res.end();
+          } else {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'image/png');
+            res.end(data);
+          }
+        });
+      } else {
+        res.statusCode = 404;
+        res.end();
+      }
+    });
+    server.listen(0, '127.0.0.1', () => {
+      serverUrl = 'http://127.0.0.1:' + server.address().port;
+      done();
+    });
+  });
+
+  after(function (done) {
+    if (server) {
+      server.close(() => done());
+    } else {
+      done();
+    }
+  });
+
   beforeEach(function (done) {
     if (isWeb) {
       Canvas.registerCanvasAdapter(HtmlCanvasAdapter);
@@ -154,7 +196,8 @@ describe('Canvas tests', function () {
   it('should draw an image from a web address', function (done) {
     this.timeout(5000);
     const canvas = Canvas.create(64, 64);
-    Canvas.createImage('http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png').then((image) => {
+    const url = isWeb ? 'http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png' : serverUrl + '/pushpin.png';
+    Canvas.createImage(url).then((image) => {
       canvas.getContext('2d').drawImage(image.image, 0, 0);
       canvas.toDataURL().should.be.equal(isWeb ? webPushPin : pushPinBase64);
       Canvas.disposeCanvas(canvas);
@@ -192,7 +235,8 @@ describe('Canvas tests', function () {
 
   it('should fail to load a bad url', function (done) {
     this.timeout(10000);
-    Canvas.createImage('http://maps.google.com/mapfiles/kml/pushpin/bad-pushpin.png').catch((e) => {
+    const url = isWeb ? 'http://maps.google.com/mapfiles/kml/pushpin/bad-pushpin.png' : serverUrl + '/bad-pushpin.png';
+    Canvas.createImage(url).catch((e) => {
       if (isWeb) {
         e.type.should.be.equal('error');
       } else {

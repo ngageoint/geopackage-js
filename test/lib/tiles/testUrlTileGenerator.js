@@ -8,6 +8,12 @@ import { TestGeoPackageProgress } from '../io/testGeoPackageProgress';
 import { default as testSetup } from '../../testSetup';
 import path from 'path';
 const assert = require('chai').assert;
+const nock = require('nock');
+
+const MOCK_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+  'base64',
+);
 
 describe('URL Tile Generator', function () {
   var TABLE_NAME = 'generate_test';
@@ -16,6 +22,18 @@ describe('URL Tile Generator', function () {
   var filename;
   var geoPackage;
   var testPath = path.join(__dirname, '..', '..', 'fixtures', 'tmp');
+
+  beforeEach(function () {
+    if (!nock.isActive()) nock.activate();
+    nock('https://osm.gs.mil')
+      .persist()
+      .get(/\/tiles\/default\/\d+\/\d+\/\d+\.png/)
+      .reply(200, MOCK_PNG, { 'content-type': 'image/png' });
+  });
+
+  afterEach(function () {
+    nock.cleanAll();
+  });
 
   beforeEach('should create the GeoPackage', async function () {
     filename = path.join(testPath, testSetup.createTempName());
