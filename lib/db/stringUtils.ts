@@ -14,7 +14,9 @@ export class StringUtils {
       if (name.startsWith('"') && name.endsWith('"')) {
         quoteName = name;
       } else {
-        quoteName = '"' + name + '"';
+        // A double quote inside an SQL identifier is escaped by doubling it, otherwise the
+        // quoting ends at that character and the rest of the name is read as SQL.
+        quoteName = '"' + name.replace(/"/g, '""') + '"';
       }
     }
     return quoteName;
@@ -28,8 +30,8 @@ export class StringUtils {
   static quoteUnwrap(name: string): string {
     let unquotedName = null;
     if (name != null) {
-      if (name.startsWith('"') && name.endsWith('"')) {
-        unquotedName = name.substring(1, name.length - 1);
+      if (name.length > 1 && name.startsWith('"') && name.endsWith('"')) {
+        unquotedName = name.substring(1, name.length - 1).replace(/""/g, '"');
       } else {
         unquotedName = name;
       }
