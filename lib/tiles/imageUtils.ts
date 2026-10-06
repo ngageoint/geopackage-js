@@ -1,16 +1,17 @@
-import sizeOf from 'image-size';
-import { ISizeCalculationResult } from 'image-size/dist/types/interface';
+import { imageSize } from 'image-size';
 import { Canvas } from '../canvas/canvas';
+
+type ISizeCalculationResult = ReturnType<typeof imageSize>;
 
 export class ImageUtils {
 
   /**
    * Get image for data
-   * @param {Buffer|String} data file data or file path
+   * @param {Buffer} data file data
    * @returns {Object}
    */
-  public static getImageSize(data: Buffer | string): ISizeCalculationResult {
-    return sizeOf.imageSize(data);
+  public static getImageSize(data: Buffer): ISizeCalculationResult {
+    return imageSize(data);
   }
 
   /**
