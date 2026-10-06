@@ -1,5 +1,17 @@
 ### Changelog
 
+##### 4.2.10
+- Update image-size package to v2.0.4
+- Replace file-type package with magic-bytes v1.13.1
+
+##### 4.2.9
+- Bumps mocha (6.2.2 → 11.8.0), migrating the dead mocha.opts file into .mocharc.js (unsupported since mocha v8)
+- Removes the unused coveralls devDependency — CI already uploads coverage via the coverallsapp/github-action, nothing in the repo invoked the npm package
+- Applies non-breaking npm audit fix for transitive deps (brace-expansion, fast-uri, immutable, js-yaml, shell-quote)
+- Bumps copy-webpack-plugin (8.1.1 → 14.0.0) — no config changes needed, patterns API unchanged
+- Bumps nyc (14.1.1 → 18.0.0) — verified coverage instrumentation and lcov reporting still work
+- Bumps typedoc (0.15.4 → 0.26.11, kept off the 0.28 line since that requires TypeScript 5.x and this project is on 4.x); removes the dead mode: "file" config/CLI flag, which typedoc had already silently dropped years ago
+
 ##### 4.2.8
 - Update [`better-sqlite3`](https://www.npmjs.com/package/better-sqlite3) version constraint to allow major versions 9-12.
 - Fix dangling error response for image http request.
