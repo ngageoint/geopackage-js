@@ -1,4 +1,5 @@
-import * as fileType from 'file-type';
+import * as fs from 'fs';
+import { filetypeinfo } from 'magic-bytes.js';
 import proj4 from 'proj4';
 import ProjectTile from './projectTile';
 
@@ -143,8 +144,9 @@ export class TileCreator {
    * @param gridRow `number`
    */
   async addTile(tileData: any, gridColumn: number, gridRow: number): Promise<void> {
-    const type = await (typeof tileData === 'string' ? fileType.fromFile(tileData) : fileType.fromBuffer(tileData));
-    const tile = await ImageUtils.getImage(tileData, type.mime);
+    const bytes = typeof tileData === 'string' ? fs.readFileSync(tileData) : tileData;
+    const [type] = filetypeinfo(bytes);
+    const tile = await ImageUtils.getImage(tileData, type && type.mime);
     this.tileContext.clearRect(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height);
     this.tileContext.drawImage(tile.image, 0, 0);
     this.chunks = [];
