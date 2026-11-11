@@ -495,25 +495,7 @@ export class TileBoundingBoxUtils {
    * @return tile grid
    */
   public static getTileGridFromBoundingBox(webMercatorBoundingBox: BoundingBox, zoom: number): TileGrid {
-    const tilesPerSide = TileBoundingBoxUtils.tilesPerSide(zoom);
-    const tileSize = TileBoundingBoxUtils.tileSize(tilesPerSide);
-    const minX = Math.round(
-      (webMercatorBoundingBox.getMinLongitude() + ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize,
-    );
-    const tempMaxX =
-      (webMercatorBoundingBox.getMaxLongitude() + ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize;
-    let maxX = Math.round(tempMaxX - ProjectionConstants.WEB_MERCATOR_PRECISION);
-    maxX = Math.min(maxX, tilesPerSide - 1);
-
-    const minY = Math.round(
-      ((webMercatorBoundingBox.getMaxLatitude() - ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) * -1) / tileSize,
-    );
-    const tempMaxY =
-      ((webMercatorBoundingBox.getMinLatitude() - ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) * -1) / tileSize;
-    let maxY = Math.round(tempMaxY - ProjectionConstants.WEB_MERCATOR_PRECISION);
-    maxY = Math.min(maxY, tilesPerSide - 1);
-
-    return new TileGrid(minX, minY, maxX, maxY);
+    return TileBoundingBoxUtils.getTileGridWithBoundingBoxAndZoom(webMercatorBoundingBox, zoom);
   }
 
   /**
@@ -1087,6 +1069,35 @@ export class TileBoundingBoxUtils {
       maxY--;
     }
     maxY = Math.min(maxY, tilesPerLat - 1);
+    return TileBoundingBoxUtils.boundedTileGrid(minX, minY, maxX, maxY, tilesPerLon, tilesPerLat);
+  }
+
+  /**
+   * Create a tile grid within the tile matrix. A box with no width or height
+   * on a tile edge (such as a point) keeps the tile that starts at that edge:
+   * the max side is pulled back off the edge, which used to leave it one tile
+   * before the min side.
+   *
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @param tilesWide tiles across
+   * @param tilesHigh tiles down
+   * @return tile grid
+   */
+  private static boundedTileGrid(
+    minX: number,
+    minY: number,
+    maxX: number,
+    maxY: number,
+    tilesWide: number,
+    tilesHigh: number,
+  ): TileGrid {
+    minX = Math.max(0, Math.min(minX, tilesWide - 1));
+    minY = Math.max(0, Math.min(minY, tilesHigh - 1));
+    maxX = Math.max(minX, Math.min(maxX, tilesWide - 1));
+    maxY = Math.max(minY, Math.min(maxY, tilesHigh - 1));
     return new TileGrid(minX, minY, maxX, maxY);
   }
 
@@ -1102,22 +1113,22 @@ export class TileBoundingBoxUtils {
     const tileSize = this.tileSize(tilesPerSide);
 
     const minX = Math.floor(
-      (webMercatorBoundingBox.getMinLongitude() + ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize,
+      (webMercatorBoundingBox.getMinLongitude() + ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize +
+        ProjectionConstants.WEB_MERCATOR_PRECISION,
     );
     const tempMaxX =
       (webMercatorBoundingBox.getMaxLongitude() + ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize;
-    let maxX = Math.floor(tempMaxX - ProjectionConstants.WEB_MERCATOR_PRECISION);
-    maxX = Math.min(maxX, tilesPerSide - 1);
+    const maxX = Math.floor(tempMaxX - ProjectionConstants.WEB_MERCATOR_PRECISION);
 
     const minY = Math.floor(
-      ((webMercatorBoundingBox.getMaxLatitude() - ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) * -1) / tileSize,
+      ((webMercatorBoundingBox.getMaxLatitude() - ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) * -1) / tileSize +
+        ProjectionConstants.WEB_MERCATOR_PRECISION,
     );
     const tempMaxY =
       ((webMercatorBoundingBox.getMinLatitude() - ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) * -1) / tileSize;
-    let maxY = Math.floor(tempMaxY - ProjectionConstants.WEB_MERCATOR_PRECISION);
-    maxY = Math.min(maxY, tilesPerSide - 1);
+    const maxY = Math.floor(tempMaxY - ProjectionConstants.WEB_MERCATOR_PRECISION);
 
-    return new TileGrid(minX, minY, maxX, maxY);
+    return TileBoundingBoxUtils.boundedTileGrid(minX, minY, maxX, maxY, tilesPerSide, tilesPerSide);
   }
 
   /**
