@@ -135,4 +135,38 @@ describe('TileBoundingBoxUtils tests', function () {
     tileBox.getMinY().should.equal(0);
     tileBox.getMaxY().should.equal(4095);
   });
+  it('should get the tile that contains a point, also on a tile edge', function () {
+    const h = 20037508.342789244;
+    const check = function (grid, x, y) {
+      grid.getMinX().should.equal(x);
+      grid.getMaxX().should.equal(x);
+      grid.getMinY().should.equal(y);
+      grid.getMaxY().should.equal(y);
+    };
+    // (0, 0) used to give [1,1 .. 0,0] at zoom 1
+    check(TileBoundingBoxUtils.getTileGridFromWebMercator({ x: 0, y: 0 }, 1), 1, 1);
+    check(TileBoundingBoxUtils.getTileGridWGS84(new BoundingBox(0, 0, 0, 0), 1), 2, 1);
+    // east and south edges of the world are in the last tile
+    check(TileBoundingBoxUtils.getTileGridFromWebMercator({ x: h, y: -h }, 3), 7, 7);
+    for (let zoom = 0; zoom <= 20; zoom++) {
+      const tiles = TileBoundingBoxUtils.tilesPerSide(zoom);
+      const size = (2 * h) / tiles;
+      for (let i = 0; i < tiles; i += Math.max(1, Math.floor(tiles / 7))) {
+        for (const f of [0, 0.3, 0.7]) {
+          // used to round to the nearest tile edge instead of flooring
+          const x = -h + (i + f) * size;
+          const y = h - (i + f) * size;
+          check(TileBoundingBoxUtils.getTileGridFromWebMercator({ x: x, y: y }, zoom), i, i);
+          check(TileBoundingBoxUtils.getTileGridWithBoundingBoxAndZoom(new BoundingBox(x, y, x, y), zoom), i, i);
+        }
+      }
+      const lonTiles = TileBoundingBoxUtils.tilesPerWGS84LonSide(zoom);
+      const latTiles = TileBoundingBoxUtils.tilesPerWGS84LatSide(zoom);
+      for (let i = 0; i < latTiles; i += Math.max(1, Math.floor(latTiles / 7))) {
+        const lon = -180 + (i * 360) / lonTiles;
+        const lat = 90 - (i * 180) / latTiles;
+        check(TileBoundingBoxUtils.getTileGridWGS84(new BoundingBox(lon, lat, lon, lat), zoom), i, i);
+      }
+    }
+  });
 });
