@@ -495,8 +495,6 @@ export class TileBoundingBoxUtils {
    * @return tile grid
    */
   public static getTileGridFromBoundingBox(webMercatorBoundingBox: BoundingBox, zoom: number): TileGrid {
-    const tilesPerSide = TileBoundingBoxUtils.tilesPerSide(zoom);
-    const tileSize = TileBoundingBoxUtils.tileSize(tilesPerSide);
     return TileBoundingBoxUtils.getTileGridWithBoundingBoxAndZoom(webMercatorBoundingBox, zoom);
   }
 
