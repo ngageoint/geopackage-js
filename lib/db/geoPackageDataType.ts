@@ -21,7 +21,11 @@ export namespace GeoPackageDataType {
   }
 
   export function fromName(type: string): GeoPackageDataType {
-    return GeoPackageDataType[type as keyof typeof GeoPackageDataType] as GeoPackageDataType;
+    if (type === null || type === undefined) {
+      return undefined;
+    }
+    // SQLite type names are case insensitive
+    return GeoPackageDataType[type.toUpperCase() as keyof typeof GeoPackageDataType] as GeoPackageDataType;
   }
 
   /**
