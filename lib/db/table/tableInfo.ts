@@ -249,9 +249,9 @@ export class TableInfo {
   static getDataType(type: string): GeoPackageDataType {
     let dataType = GeoPackageDataType.fromName(type);
 
-    if (dataType === null || dataType === undefined) {
-      // Check if a geometry and set as a blob
-      const geomType = GeometryType.fromName(type);
+    if ((dataType === null || dataType === undefined) && type !== null && type !== undefined) {
+      // Check if a geometry and set as a blob (type names are case insensitive)
+      const geomType = GeometryType.fromName(type.toUpperCase());
       if (geomType !== null && geomType !== undefined) {
         dataType = GeoPackageDataType.BLOB;
       }
